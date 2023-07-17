@@ -1,4 +1,4 @@
-import 'package:erick/view/OTP.dart';
+import 'package:erick/features/onboarding/view/OTP.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

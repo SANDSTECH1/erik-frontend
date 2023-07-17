@@ -1,6 +1,9 @@
-import 'package:erick/view/login.dart';
+import 'package:erick/features/onboarding/view/login.dart';
+import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,18 +20,25 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'First Method',
-          // You can use the library anywhere in the app even in theme
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            textTheme: Typography.englishLike2018.apply(fontSizeFactor: 1.sp),
+        return MultiProvider(
+          providers: providers,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'First Method',
+            // You can use the library anywhere in the app even in theme
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              textTheme: Typography.englishLike2018.apply(fontSizeFactor: 1.sp),
+            ),
+            home: child,
           ),
-          home: child,
         );
       },
       child: const LoginScreen(),
     );
   }
 }
+
+List<SingleChildWidget> providers = [
+  ChangeNotifierProvider<LoginViewModel>(create: (_) => LoginViewModel()),
+];
