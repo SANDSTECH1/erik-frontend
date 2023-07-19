@@ -1,13 +1,9 @@
 import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
-import 'package:erick/features/onboarding/viewmodel/resetpassviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-
-import 'features/onboarding/viewmodel/forgetpassviewmodel.dart';
-import 'features/onboarding/viewmodel/otpviewmodel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,9 +34,7 @@ class MyApp extends StatelessWidget {
           ),
         );
       },
-      child: const LoginScreen(
-        userToken: '',
-      ),
+      child: const LoginScreen(),
     );
   }
 }
@@ -48,10 +42,5 @@ class MyApp extends StatelessWidget {
 List<SingleChildWidget> providers(BuildContext context) {
   return [
     ChangeNotifierProvider<LoginViewModel>(create: (_) => LoginViewModel()),
-    ChangeNotifierProvider<ForgetPassViewModel>(
-        create: (_) => ForgetPassViewModel(context)),
-    ChangeNotifierProvider<OtpViewModel>(create: (_) => OtpViewModel()),
-    ChangeNotifierProvider<ResetPassViewModel>(
-        create: (_) => ResetPassViewModel()),
   ];
 }

@@ -1,5 +1,5 @@
 import 'package:erick/features/onboarding/view/Confirmpass.dart';
-import 'package:erick/features/onboarding/viewmodel/otpviewmodel.dart';
+import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:otp_text_field/otp_field.dart';
@@ -8,13 +8,13 @@ import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
 
 class otp extends StatelessWidget {
-  final String data;
-  const otp({super.key, required this.data});
+  const otp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<OtpViewModel>(context);
-    OtpFieldController optcontroller = OtpFieldController();
+    final controller = Provider.of<LoginViewModel>(context);
+
+    String otpcode = "";
 
     return Scaffold(
         body: Row(
@@ -85,7 +85,6 @@ class otp extends StatelessWidget {
                   20.verticalSpace,
                   OTPTextField(
                       otpFieldStyle: OtpFieldStyle(),
-                      controller: optcontroller,
                       length: 5,
                       width: MediaQuery.of(context).size.width,
                       textFieldAlignment: MainAxisAlignment.spaceAround,
@@ -97,6 +96,7 @@ class otp extends StatelessWidget {
                         print("Changed: " + pin);
                       },
                       onCompleted: (pin) {
+                        otpcode = pin;
                         print("Completed: " + pin);
                       }),
                 ],
@@ -105,13 +105,7 @@ class otp extends StatelessWidget {
             25.verticalSpace,
             GestureDetector(
               onTap: () async {
-                final controller =
-                    Provider.of<OtpViewModel>(context, listen: false);
-                controller.otp();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Confirmpass()),
-                );
+                controller.verify(otpcode, context);
               },
               child: Container(
                 width: 447.w,

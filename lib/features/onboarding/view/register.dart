@@ -1,7 +1,7 @@
 import 'package:erick/features/onboarding/view/OTP.dart';
+import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:erick/features/onboarding/viewmodel/forgetpassviewmodel.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,8 +14,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<ForgetPassViewModel>(context);
-    final ForgetPassViewModel viewModel = ForgetPassViewModel(context);
+    final controller = Provider.of<LoginViewModel>(context);
     return Scaffold(
       body: Row(
         children: [
@@ -72,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: 447.w,
                 child: TextField(
                   //enabled: false,
-                  controller: controller.useremailcontroller,
+                  controller: controller.userforgotemailcontroller,
                   decoration: InputDecoration(
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(4.r)),
@@ -110,142 +109,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               30.verticalSpace,
-              // SizedBox(
-              //   width: 447.w,
-              //   child: TextField(
-              //     enabled: false, // to trigger disabledBorder
-              //     decoration: InputDecoration(
-              //       focusedBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       disabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide: const BorderSide(
-              //             width: 1,
-              //           )),
-              //       errorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       focusedErrorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       hintText: "Email",
-              //       hintStyle:
-              //           TextStyle(fontSize: 16, color: Color(0xFFB3B1B1)),
-              //     ),
-              //     obscureText: false,
-              //   ),
-              // ),
-              // 30.verticalSpace,
-              // SizedBox(
-              //   width: 447.w,
-              //   child: TextField(
-              //     enabled: false, // to trigger disabledBorder
-              //     decoration: InputDecoration(
-              //       suffixIcon: Icon(Icons.visibility_outlined),
-              //       focusedBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       disabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide: const BorderSide(
-              //             width: 1,
-              //           )),
-              //       errorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       focusedErrorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       hintText: "Password",
-              //       hintStyle:
-              //           TextStyle(fontSize: 16, color: Color(0xFFB3B1B1)),
-              //     ),
-              //     obscureText: false,
-              //   ),
-              // ),
-              // 30.verticalSpace,
-              // SizedBox(
-              //   width: 447.w,
-              //   child: TextField(
-              //     enabled: false, // to trigger disabledBorder
-              //     decoration: InputDecoration(
-              //       suffixIcon: Icon(Icons.visibility_outlined),
-              //       focusedBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       disabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //         borderSide:
-              //             const BorderSide(width: 1, color: Colors.grey),
-              //       ),
-              //       border: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide: const BorderSide(
-              //             width: 1,
-              //           )),
-              //       errorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       focusedErrorBorder: OutlineInputBorder(
-              //           borderRadius: BorderRadius.all(Radius.circular(4.r)),
-              //           borderSide:
-              //               const BorderSide(width: 1, color: Colors.grey)),
-              //       hintText: "Confirm Password",
-              //       hintStyle:
-              //           TextStyle(fontSize: 16, color: Color(0xFFB3B1B1)),
-              //     ),
-              //     obscureText: false,
-              //   ),
-              // ),
-              30.verticalSpace,
               GestureDetector(
                 onTap: () {
-                  controller.forgetpass();
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const otp(
-                              data: '',
-                            )),
-                  );
+                  controller.forgetpass(context);
                 },
                 child: Container(
                   width: 447.w,

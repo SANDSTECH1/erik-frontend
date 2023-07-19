@@ -3,15 +3,15 @@ import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:erick/features/onboarding/viewmodel/resetpassviewmodel.dart';
 import 'package:provider/provider.dart';
 
 class Confirmpass extends StatelessWidget {
-  const Confirmpass({super.key});
+  final token;
+  const Confirmpass({super.key, required this.token});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<ResetPassViewModel>(context);
+    final controller = Provider.of<LoginViewModel>(context);
     return Scaffold(
       body: Row(
         children: [
@@ -173,23 +173,7 @@ class Confirmpass extends StatelessWidget {
               30.verticalSpace,
               GestureDetector(
                 onTap: () async {
-                  await controller
-                      .resetpass(); // Call the resetpass method from the view model
-                  final userToken = controller
-                      .userToken; // Get the userToken from the view model
-                  if (userToken != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginScreen(
-                          userToken:
-                              userToken, // Pass the userToken to the LoginScreen
-                        ),
-                      ),
-                    );
-                  } else {
-                    print('no token found');
-                  }
+                  controller.resetpass(context);
                 },
                 child: Container(
                   width: 447.w,

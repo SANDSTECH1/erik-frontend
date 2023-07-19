@@ -1,11 +1,10 @@
+import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-
-String userToken = "";
 
 class NetworkHelper {
   getApi(String url) async {
@@ -38,6 +37,7 @@ class NetworkHelper {
             'Content-Type': 'application/json',
           },
           body: jsondata);
+      print(response.body);
 
       return response;
     } catch (e) {
@@ -108,7 +108,7 @@ class NetworkHelper {
 }
 
 class ApiUrls {
-  static const String baseUrl = "http://localhost:4000/api/v1/";
+  static const String baseUrl = "http://localhost:4000/api/v1";
 
   //For Users
   String login = "$baseUrl/userLogin";
