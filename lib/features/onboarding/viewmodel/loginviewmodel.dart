@@ -14,6 +14,8 @@ class LoginViewModel with ChangeNotifier {
   userModel get userdata => _user;
 
   login() async {
+    // String userToken = await login(); // Replace this with your login method
+    // AuthManager.setToken(userToken);
     final response = await NetworkHelper().postApi(ApiUrls().login, {
       "email": useremailcontroller.text,
       "password": userpasswordcontroller.text

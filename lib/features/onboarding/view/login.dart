@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, required String userToken});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -110,8 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide:
                                 const BorderSide(width: 1, color: Colors.grey)),
                         hintText: "Name",
-                        hintStyle: const TextStyle(
-                            fontSize: 16, color: Color(0xFFB3B1B1)),
+                        hintStyle:
+                            const TextStyle(fontSize: 16, color: Colors.black),
                       ),
                       obscureText: false,
                     ),
@@ -155,8 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide:
                                 const BorderSide(width: 1, color: Colors.grey)),
                         hintText: "Password",
-                        hintStyle: const TextStyle(
-                            fontSize: 16, color: Color(0xFFB3B1B1)),
+                        hintStyle:
+                            const TextStyle(fontSize: 16, color: Colors.black),
                       ),
                       obscureText: false,
                     ),
@@ -170,7 +170,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Confirmpass()),
+                              builder: (context) => const RegisterScreen()),
                         );
                       },
                       child: const Align(
@@ -186,11 +186,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   GestureDetector(
                     onTap: () {
                       controller.login();
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //       builder: (context) => const calender_screen()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const calender_screen()),
+                      );
                     },
                     child: Container(
                       width: 447.w,
