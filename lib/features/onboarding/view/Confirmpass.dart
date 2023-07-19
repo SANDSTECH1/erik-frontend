@@ -1,12 +1,17 @@
 import 'package:erick/features/onboarding/view/OTP.dart';
+import 'package:erick/features/onboarding/view/login.dart';
+import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:erick/features/onboarding/viewmodel/resetpassviewmodel.dart';
+import 'package:provider/provider.dart';
 
 class Confirmpass extends StatelessWidget {
   const Confirmpass({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<ResetPassViewModel>(context);
     return Scaffold(
       body: Row(
         children: [
@@ -82,7 +87,8 @@ class Confirmpass extends StatelessWidget {
               SizedBox(
                 width: 447.w,
                 child: TextField(
-                  enabled: false, // to trigger disabledBorder
+                  controller: controller.passwordcontroller,
+                  //enabled: false, // to trigger disabledBorder
                   decoration: InputDecoration(
                     suffixIcon: Icon(Icons.visibility_outlined),
                     focusedBorder: OutlineInputBorder(
@@ -124,7 +130,9 @@ class Confirmpass extends StatelessWidget {
               SizedBox(
                 width: 447.w,
                 child: TextField(
-                  enabled: false, // to trigger disabledBorder
+                  //enabled: false,
+                  controller: controller
+                      .confirmpasswordcontroller, // to trigger disabledBorder
                   decoration: InputDecoration(
                     suffixIcon: Icon(Icons.visibility_outlined),
                     focusedBorder: OutlineInputBorder(
@@ -164,11 +172,24 @@ class Confirmpass extends StatelessWidget {
               ),
               30.verticalSpace,
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => otp()),
-                  );
+                onTap: () async {
+                  await controller
+                      .resetpass(); // Call the resetpass method from the view model
+                  final userToken = controller
+                      .userToken; // Get the userToken from the view model
+                  if (userToken != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(
+                          userToken:
+                              userToken, // Pass the userToken to the LoginScreen
+                        ),
+                      ),
+                    );
+                  } else {
+                    print('no token found');
+                  }
                 },
                 child: Container(
                   width: 447.w,

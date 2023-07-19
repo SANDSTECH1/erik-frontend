@@ -1,16 +1,20 @@
-import 'package:erick/features/onboarding/view/login.dart';
+import 'package:erick/features/onboarding/view/Confirmpass.dart';
+import 'package:erick/features/onboarding/viewmodel/otpviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_text_field.dart';
 import 'package:otp_text_field/style.dart';
+import 'package:provider/provider.dart';
 
 class otp extends StatelessWidget {
-  const otp({super.key});
+  final String data;
+  const otp({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    OtpFieldController otpController = OtpFieldController();
+    final controller = Provider.of<OtpViewModel>(context);
+    OtpFieldController optcontroller = OtpFieldController();
 
     return Scaffold(
         body: Row(
@@ -81,7 +85,7 @@ class otp extends StatelessWidget {
                   20.verticalSpace,
                   OTPTextField(
                       otpFieldStyle: OtpFieldStyle(),
-                      controller: otpController,
+                      controller: optcontroller,
                       length: 5,
                       width: MediaQuery.of(context).size.width,
                       textFieldAlignment: MainAxisAlignment.spaceAround,
@@ -100,10 +104,13 @@ class otp extends StatelessWidget {
             ),
             25.verticalSpace,
             GestureDetector(
-              onTap: () {
+              onTap: () async {
+                final controller =
+                    Provider.of<OtpViewModel>(context, listen: false);
+                controller.otp();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (context) => const Confirmpass()),
                 );
               },
               child: Container(

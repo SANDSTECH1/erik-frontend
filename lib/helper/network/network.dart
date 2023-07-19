@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
-String token = "";
+String userToken = "";
 
 class NetworkHelper {
   getApi(String url) async {
@@ -14,11 +14,12 @@ class NetworkHelper {
       // Uri.parse('$url?$query'),
       Uri.parse(url),
       headers: {
-        'x-access-token': token,
+        'x-access-token': userToken,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     );
+    print(userToken);
     if (response.statusCode == 200) {
       final body = response.body;
       final jsonBody = json.decode(body);
@@ -32,7 +33,7 @@ class NetworkHelper {
     try {
       final response = await http.post(Uri.parse(url),
           headers: {
-            'x-access-token': token,
+            'x-access-token': userToken,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
@@ -51,7 +52,7 @@ class NetworkHelper {
     data.forEach((key, value) {
       request.fields['$key'] = value;
     });
-    final headers = {'x-access-token': token};
+    final headers = {'x-access-token': userToken};
     request.headers.addAll(headers);
     for (var i = 0; i < file.length; i++) {
       var multipartFile = await http.MultipartFile.fromPath(
@@ -77,7 +78,7 @@ class NetworkHelper {
     data.forEach((key, value) {
       request.fields['$key'] = value;
     });
-    final headers = {'x-access-token': token};
+    final headers = {'x-access-token': userToken};
     request.headers.addAll(headers);
     var multipartFile = await http.MultipartFile.fromPath(
         // file.path.split('.').last.toString().toUpperCase() == "MOV"
@@ -111,4 +112,16 @@ class ApiUrls {
 
   //For Users
   String login = "$baseUrl/userLogin";
+  String forgetpass = "$baseUrl/forgetPassword";
+  String otp = "$baseUrl/verifyOtp";
+  String resetpass = "$baseUrl/resetPassword";
+  String image = "$baseUrl/updateImage";
+  String createtasks = "$baseUrl/createtask";
+  String gettasks = "$baseUrl/gettask";
+  String updatetasks = "$baseUrl/updatetask";
+  String deletetasks = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";
+  String subtasks = "$baseUrl/createsubtask";
+  String getsubtasks = "$baseUrl/getsubtask";
+  String deletesubtasks = "$baseUrl/deleteSubTask/6480ea798b1a2003ad27f5c7";
+  String updatesubtasks = "$baseUrl/updateSubTask/6480ea798b1a2003ad27f5c7";
 }
