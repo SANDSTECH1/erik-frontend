@@ -1,6 +1,6 @@
 import 'package:erick/features/onboarding/view/Confirmpass.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
-import 'package:erick/view/calender_screen.dart';
+import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/onboarding/view/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -185,12 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   30.verticalSpace,
                   GestureDetector(
                     onTap: () {
-                      controller.login();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const calender_screen()),
-                      );
+                      controller.login(context);
                     },
                     child: Container(
                       width: 447.w,

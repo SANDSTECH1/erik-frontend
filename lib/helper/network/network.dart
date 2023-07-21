@@ -7,7 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class NetworkHelper {
-  getApi(String url) async {
+  getApi(
+    String url,
+  ) async {
     // final query = params?.entries.map((e) => '${e.key}=${e.value}').join('&');
     final response = await http.get(
       // Uri.parse('$url?$query'),
@@ -19,6 +21,7 @@ class NetworkHelper {
       },
     );
     print(userToken);
+    print(response.body);
     if (response.statusCode == 200) {
       final body = response.body;
       final jsonBody = json.decode(body);
@@ -116,7 +119,8 @@ class ApiUrls {
   String otp = "$baseUrl/verifyOtp";
   String resetpass = "$baseUrl/resetPassword";
   String image = "$baseUrl/updateImage";
-  String createtasks = "$baseUrl/createtask";
+  String createtask = "$baseUrl/createtask";
+  String getuser = "$baseUrl/getUser";
   String gettasks = "$baseUrl/gettask";
   String updatetasks = "$baseUrl/updatetask";
   String deletetasks = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";

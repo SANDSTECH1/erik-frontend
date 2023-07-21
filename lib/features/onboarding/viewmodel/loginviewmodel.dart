@@ -4,6 +4,9 @@ import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/onboarding/view/Confirmpass.dart';
 import 'package:erick/features/onboarding/view/OTP.dart';
 import 'package:erick/features/onboarding/view/login.dart';
+import 'package:erick/features/tasks/view/assigntask.dart';
+import 'package:erick/features/tasks/view/calender_screen.dart';
+import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -25,7 +28,7 @@ class LoginViewModel with ChangeNotifier {
   // String userToken = '';
   // String get usertoken => userToken;
 
-  login() async {
+  login(context) async {
     final response = await NetworkHelper().postApi(ApiUrls().login, {
       "email": useremailcontroller.text,
       "password": userpasswordcontroller.text
@@ -35,6 +38,11 @@ class LoginViewModel with ChangeNotifier {
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
       _user = userModel.fromJson(jsonBody['data']);
+      userToken = jsonBody['data']['userToken'];
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AssignTask()),
+      );
     } else if (response.statusCode == 401) {
       showtoast(jsonBody['message']);
     } else {

@@ -1,5 +1,6 @@
-import 'package:erick/view/task_screen.dart';
-import 'package:erick/widgets/assigntask.dart';
+import 'package:erick/features/tasks/view/assigntask.dart';
+import 'package:erick/features/tasks/view/task_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';

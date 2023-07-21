@@ -1,13 +1,28 @@
+import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/widgets/subtask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AssignTask extends StatelessWidget {
+class AssignTask extends StatefulWidget {
   const AssignTask({super.key});
 
   @override
+  State<AssignTask> createState() => _AssignTaskState();
+}
+
+class _AssignTaskState extends State<AssignTask> {
+  @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<TaskViewModel>(context);
+
+    // controller.getmembers();
+    DateTime _selectedDay = DateTime.now(); // Initially set to the current date
+    DateTime _focusedDay = DateTime.now();
+    DateTime _selectedDate = DateTime.now();
+    // Initially set to the current date
+
     CalendarFormat calendarFormat = CalendarFormat.month;
     DateTime focusedDay = DateTime.now();
     DateTime? selectedDay;
@@ -16,6 +31,32 @@ class AssignTask extends StatelessWidget {
         DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
     final kLastDay = DateTime(
         DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
+
+    TimeOfDay _selectedTime = TimeOfDay.now();
+
+    void _showTimePicker() async {
+      final pickedTime = await showTimePicker(
+        context: context,
+        initialTime: _selectedTime,
+      );
+      print("33 ${_selectedTime}");
+
+      if (pickedTime != null) {
+        print("334 ${_selectedTime}");
+
+        setState(() {
+          _selectedTime = pickedTime;
+          controller.timecontroller = _selectedTime.format(context);
+        });
+      }
+    }
+    //    @override
+    // void initState() {
+    //   super.initState();
+    //   // Set the initial value of the day controller
+    //   final _selectedDay dateFormatter = _selectedDay('yyyy-MM-dd');
+    //   controller.daycontroller.text = dateFormatter.format(_selectedDay);
+    // }
 
     return Material(
       child: SizedBox(
@@ -124,34 +165,47 @@ class AssignTask extends StatelessWidget {
                                 width: 198.w,
                                 child: ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: 20,
+                                    itemCount: controller.usersdata.length,
                                     itemBuilder: (context, index) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Image.asset(
-                                                'assets/icons/erickpic.png',
-                                                width: 36.w,
-                                              ),
-                                              1.horizontalSpace,
-                                              Text(
-                                                'ERICK',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        const Color(0xff163300),
-                                                    fontSize: 16.sp),
-                                              ),
-                                            ],
-                                          ),
-                                          const Icon(
-                                            Icons.check_box,
-                                            color: Color(0xff163300),
-                                          )
-                                        ],
+                                      return GestureDetector(
+                                        onTap: () {
+                                          controller.changeSelectedUser(
+                                              index,
+                                              !controller
+                                                  .usersdata[index].selected);
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Image.asset(
+                                                  'assets/icons/erickpic.png',
+                                                  width: 36.w,
+                                                ),
+                                                1.horizontalSpace,
+                                                Text(
+                                                  controller
+                                                      .usersdata[index].name
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: const Color(
+                                                          0xff163300),
+                                                      fontSize: 16.sp),
+                                                ),
+                                              ],
+                                            ),
+                                            controller.usersdata[index].selected
+                                                ? Icon(
+                                                    Icons.check_box,
+                                                    color: Color(0xff163300),
+                                                  )
+                                                : SizedBox()
+                                          ],
+                                        ),
                                       );
                                     }),
                               )
@@ -170,7 +224,6 @@ class AssignTask extends StatelessWidget {
                             firstDay: kFirstDay,
                             lastDay: kLastDay,
                             focusedDay: focusedDay,
-                            calendarFormat: CalendarFormat.month,
                             weekNumbersVisible: false,
                             headerStyle: HeaderStyle(
                                 leftChevronIcon: const Icon(
@@ -190,6 +243,10 @@ class AssignTask extends StatelessWidget {
                                 formatButtonVisible: false),
                             calendarStyle: CalendarStyle(
                               isTodayHighlighted: true,
+                              selectedDecoration: const BoxDecoration(
+                                color: Colors.grey,
+                              ),
+
                               disabledTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
                               disabledDecoration: const BoxDecoration(
@@ -200,6 +257,7 @@ class AssignTask extends StatelessWidget {
                               // cellPadding: const EdgeInsets.all(30),
                               outsideTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
+
                               outsideDecoration: const BoxDecoration(
                                 color: Color(0xffFFDBC2),
                               ),
@@ -207,11 +265,13 @@ class AssignTask extends StatelessWidget {
                                   color: Colors.black, fontSize: 12.sp),
                               weekendDecoration: const BoxDecoration(
                                 color: Color(0xffFFDBC2),
+                                // color: Colors.red,
                               ),
                               holidayTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
                               holidayDecoration: const BoxDecoration(
                                 color: Color(0xffFFDBC2),
+                                // color: Colors.red,
                               ),
                               todayTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
@@ -220,9 +280,9 @@ class AssignTask extends StatelessWidget {
                               ),
                               selectedTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
-                              selectedDecoration: const BoxDecoration(
-                                color: Color(0xffFFDBC2),
-                              ),
+                              // selectedDecoration: const BoxDecoration(
+                              //   color: Colors.grey,
+                              // ),
                               defaultTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
                               defaultDecoration: const BoxDecoration(
@@ -235,28 +295,43 @@ class AssignTask extends StatelessWidget {
 
                               // Using `isSameDay` is recommended to disregard
                               // the time-part of compared DateTime objects.
+                              'Selected Date: ${_selectedDay.toString()}';
                               return isSameDay(selectedDay, day);
                             },
                             onDaySelected: (selectedDay, focusedDay) {
-                              if (!isSameDay(selectedDay, selectedDay)) {
-                                // Call `setState()` when updating the selected day
-                                // setState(() {
-                                //   selectedDay = selectedDay;
-                                //   focusedDay = focusedDay;
-                                // });
-                              }
+                              print("selectedDayyy ${selectedDay}");
+                              controller.daycontroller = selectedDay.toString();
+
+                              print('Selected Date: ${selectedDay.toString()}');
+                              print(
+                                  'Selected Date2: ${controller.daycontroller.toString()}');
+                              // if (!isSameDay(selectedDay, selectedDay)) {
+                              //   //Call `setState()` when updating the selected day
+                              //   setState(() {
+                              //     selectedDay = selectedDay;
+                              //     focusedDay = focusedDay;
+
+                              //     controller.daycontroller =
+                              //         _selectedDay.toString();
+
+                              //     'Selected Date: ${_selectedDay.toString()}';
+                              //     'Selected Date2: ${controller.daycontroller.toString()}';
+                              //   });
+                              // }
                             },
                             onFormatChanged: (format) {
                               if (calendarFormat != format) {
-                                // Call `setState()` when updating calendar format
-                                // setState(() {
-                                //   calendarFormat = format;
-                                // });
+                                //Call `setState()` when updating calendar format
+                                setState(() {
+                                  calendarFormat = format;
+                                  'Selected Date: ${_selectedDay.toString()}';
+                                });
                               }
                             },
                             onPageChanged: (focusedDay) {
                               // No need to call `setState()` here
                               focusedDay = focusedDay;
+                              'Selected Date: ${_selectedDay.toString()}';
                             },
                           ),
                         ),
@@ -266,14 +341,30 @@ class AssignTask extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Icon(Icons.access_time_filled_sharp),
-                                  2.horizontalSpace,
-                                  const Text(
-                                    'Time',
+                                  GestureDetector(
+                                    onTap:
+                                        _showTimePicker, // Show time picker when tapped
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                            Icons.access_time_filled_sharp),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Time',
+                                          style: TextStyle(
+                                              color: Color(0xff163300)),
+                                        ),
+                                        const Icon(Icons.arrow_drop_down),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    _selectedTime.format(context),
                                     style: TextStyle(color: Color(0xff163300)),
                                   ),
-                                  const Icon(Icons.arrow_drop_down)
                                 ],
                               ),
                               Row(
@@ -405,7 +496,9 @@ class AssignTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
-                            enabled: false, // to trigger disabledBorder
+                            //enabled: false,
+                            controller: controller
+                                .taskTitlecontroller, // to trigger disabledBorder
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
@@ -452,12 +545,13 @@ class AssignTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
+                            controller: controller.taskDescriptioncontroller,
                             keyboardType: TextInputType.multiline,
                             minLines:
                                 5, //Normal textInputField will be displayed
                             maxLines:
                                 10, // when user presses enter it will adapt to it
-                            enabled: false, // to trigger disabledBorder
+                            //enabled: false, // to trigger disabledBorder
                             decoration: InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
@@ -546,7 +640,8 @@ class AssignTask extends StatelessWidget {
                               20.horizontalSpace,
                               GestureDetector(
                                 onTap: () {
-                                  Navigator.pop(context);
+                                  controller.createTask(context);
+                                  //Navigator.pop(context);
                                 },
                                 child: Container(
                                   width: 100.w,
