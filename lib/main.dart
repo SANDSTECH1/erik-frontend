@@ -1,9 +1,7 @@
 import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
-import 'package:erick/features/tasks/view/calender_screen.dart';
-import 'package:erick/features/tasks/view/task_screen.dart';
+import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -47,5 +45,7 @@ List<SingleChildWidget> providers(BuildContext context) {
   return [
     ChangeNotifierProvider<LoginViewModel>(create: (_) => LoginViewModel()),
     ChangeNotifierProvider<TaskViewModel>(create: (_) => TaskViewModel()),
+    ChangeNotifierProvider<CalendarViewModel>(
+        create: (_) => CalendarViewModel()),
   ];
 }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 String userToken = "";
 
@@ -24,6 +25,17 @@ class TaskViewModel with ChangeNotifier {
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
+
+  CalendarFormat calendarFormat = CalendarFormat.month;
+  DateTime focusedDay = DateTime.now();
+
+  final kFirstDay = DateTime(
+      DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
+  final kLastDay = DateTime(
+      DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
+
+  TimeOfDay selectedTime = TimeOfDay.now();
+
   TaskViewModel() {
     getmembers();
   }
@@ -39,8 +51,8 @@ class TaskViewModel with ChangeNotifier {
     // print(ids);
     // print(taskTitlecontroller.text);
     // print(taskDescriptioncontroller.text);
-    print("timecontroller${timecontroller}");
-    print("daycontroller ${daycontroller}");
+    print("timecontroller$timecontroller");
+    print("daycontroller $daycontroller");
 
     String date = daycontroller; // Assuming the value is "2023-07-21"
     String time = timecontroller; // Assuming the value is "8:58 AM"
@@ -62,7 +74,7 @@ class TaskViewModel with ChangeNotifier {
       _tasks = createTaskModel.fromJson(jsonBody['data']);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => calender_screen()),
+        MaterialPageRoute(builder: (context) => const calender_screen()),
       );
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
@@ -85,6 +97,12 @@ class TaskViewModel with ChangeNotifier {
 
   changeSelectedUser(int, value) {
     _users[int].selected = value;
+    notifyListeners();
+  }
+
+  changeTime(pickedTime, context) {
+    selectedTime = pickedTime;
+    timecontroller = selectedTime.format(context);
     notifyListeners();
   }
 }

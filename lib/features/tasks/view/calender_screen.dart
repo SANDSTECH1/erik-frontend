@@ -1,35 +1,17 @@
 import 'package:erick/features/tasks/view/assigntask.dart';
-import 'package:erick/features/tasks/view/task_screen.dart';
+import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:intl/intl.dart';
 
 class calender_screen extends StatelessWidget {
   const calender_screen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final dateFormat = DateFormat('MMMM');
-
-    final weekdayFormat = DateFormat('EEEE');
-
-    final datesByMonth = [];
-    for (var i = 1; i < 13; i++) {
-      final lastDayOfMonth = DateTime(now.year, i + 1, 0);
-      final firstDayOfMonth = DateTime(now.year, i, 1);
-      final dates = [];
-      for (var j = 0; j < lastDayOfMonth.day; j++) {
-        final date = firstDayOfMonth.add(Duration(days: j));
-        final formattedDate = DateFormat('dd').format(date);
-        final formattedWeekday = weekdayFormat.format(date);
-        // dates.add('$formattedDate ($formattedWeekday)');
-        dates.add({'date': formattedDate, 'week': formattedWeekday});
-      }
-      datesByMonth.add(dates);
-    }
+    final calendarcontroller = Provider.of<CalendarViewModel>(context);
 
     return Scaffold(
         body: Row(
@@ -161,7 +143,9 @@ class calender_screen extends StatelessWidget {
                             ),
                             child: Center(
                               child: Text(
-                                datesByMonth[0][index]['week'],
+                                calendarcontroller.datesByMonth[
+                                        calendarcontroller.activeShowMonth]
+                                    [index]['week'],
                                 style: TextStyle(
                                     color: const Color(0xff000000),
                                     fontSize: 14.sp),
@@ -175,14 +159,13 @@ class calender_screen extends StatelessWidget {
                       child: Container(
                         child: GridView.builder(
                           padding: const EdgeInsets.all(0),
-                          itemCount: datesByMonth[0].length,
+                          itemCount: calendarcontroller.datesByMonth[6].length,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 7,
                             childAspectRatio: 1,
                           ),
                           itemBuilder: (BuildContext context, int index) {
-                            final dayOfMonth = index + 1;
                             return Container(
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey),
@@ -192,22 +175,30 @@ class calender_screen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      datesByMonth[0][index]['date'].toString(),
+                                      calendarcontroller
+                                          .datesByMonth[calendarcontroller
+                                              .activeShowMonth][index]['date']
+                                          .toString(),
                                       style: TextStyle(
                                           color: const Color(0xff000000),
                                           fontSize: 14.sp),
                                     ),
                                     5.verticalSpace,
-                                    datesByMonth[0][index]['date'].toString() ==
+                                    calendarcontroller.datesByMonth[
+                                                    calendarcontroller
+                                                        .activeShowMonth][index]
+                                                    ['date']
+                                                .toString() ==
                                             "02"
                                         ? GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const TaskScreen()),
-                                              );
+                                              calendarcontroller.showdetails(
+                                                  calendarcontroller
+                                                              .datesByMonth[
+                                                          calendarcontroller
+                                                              .activeShowMonth]
+                                                      [index]['date'],
+                                                  context);
                                             },
                                             child: Container(
                                               width: 63.w,

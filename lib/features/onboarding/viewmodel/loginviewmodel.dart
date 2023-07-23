@@ -41,9 +41,9 @@ class LoginViewModel with ChangeNotifier {
       userToken = jsonBody['data']['userToken'];
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => AssignTask()),
+        MaterialPageRoute(builder: (context) => const calender_screen()),
       );
-    } else if (response.statusCode == 401) {
+    } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
       throw Exception(
@@ -64,7 +64,7 @@ class LoginViewModel with ChangeNotifier {
       // verify(otpValue, userforgotemailcontroller.text, context);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => otp()),
+        MaterialPageRoute(builder: (context) => const otp()),
       );
     } else if (response.statusCode == 400) {
       print("sad");
@@ -116,7 +116,7 @@ class LoginViewModel with ChangeNotifier {
     if (response.statusCode == 200) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     } else if (response.statusCode == 401) {
       showtoast(jsonBody['message']);

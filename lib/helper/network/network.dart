@@ -1,10 +1,8 @@
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
-import 'package:erick/helper/logger/logger.dart';
 import 'package:http_parser/http_parser.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:logger/logger.dart';
 
 class NetworkHelper {
   getApi(
@@ -22,11 +20,12 @@ class NetworkHelper {
     );
     print(userToken);
     print(response.body);
-    if (response.statusCode == 200) {
-      final body = response.body;
-      final jsonBody = json.decode(body);
-      return jsonBody;
-    }
+    return response;
+    // if (response.statusCode == 200) {
+    //   final body = response.body;
+    //   final jsonBody = json.decode(body);
+    //   return jsonBody;
+    // }
   }
 
   postApi(String url, data) async {
@@ -44,7 +43,7 @@ class NetworkHelper {
 
       return response;
     } catch (e) {
-      throw Exception('Error: ${e}');
+      throw Exception('Error: $e');
     }
   }
 
@@ -128,4 +127,5 @@ class ApiUrls {
   String getsubtasks = "$baseUrl/getsubtask";
   String deletesubtasks = "$baseUrl/deleteSubTask/6480ea798b1a2003ad27f5c7";
   String updatesubtasks = "$baseUrl/updateSubTask/6480ea798b1a2003ad27f5c7";
+  String getTaskByDate = "$baseUrl/getTaskByDate";
 }

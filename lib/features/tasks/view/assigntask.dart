@@ -5,59 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AssignTask extends StatefulWidget {
+class AssignTask extends StatelessWidget {
   const AssignTask({super.key});
 
   @override
-  State<AssignTask> createState() => _AssignTaskState();
-}
-
-class _AssignTaskState extends State<AssignTask> {
-  @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-
-    // controller.getmembers();
-    DateTime _selectedDay = DateTime.now(); // Initially set to the current date
-    DateTime _focusedDay = DateTime.now();
-    DateTime _selectedDate = DateTime.now();
-    // Initially set to the current date
-
-    CalendarFormat calendarFormat = CalendarFormat.month;
-    DateTime focusedDay = DateTime.now();
     DateTime? selectedDay;
-    final todayDate = DateTime.now();
-    final kFirstDay = DateTime(
-        DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
-    final kLastDay = DateTime(
-        DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
-
-    TimeOfDay _selectedTime = TimeOfDay.now();
-
-    void _showTimePicker() async {
-      final pickedTime = await showTimePicker(
-        context: context,
-        initialTime: _selectedTime,
-      );
-      print("33 ${_selectedTime}");
-
-      if (pickedTime != null) {
-        print("334 ${_selectedTime}");
-
-        setState(() {
-          _selectedTime = pickedTime;
-          controller.timecontroller = _selectedTime.format(context);
-        });
-      }
-    }
-    //    @override
-    // void initState() {
-    //   super.initState();
-    //   // Set the initial value of the day controller
-    //   final _selectedDay dateFormatter = _selectedDay('yyyy-MM-dd');
-    //   controller.daycontroller.text = dateFormatter.format(_selectedDay);
-    // }
-
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -199,11 +153,11 @@ class _AssignTaskState extends State<AssignTask> {
                                               ],
                                             ),
                                             controller.usersdata[index].selected
-                                                ? Icon(
+                                                ? const Icon(
                                                     Icons.check_box,
                                                     color: Color(0xff163300),
                                                   )
-                                                : SizedBox()
+                                                : const SizedBox()
                                           ],
                                         ),
                                       );
@@ -221,9 +175,9 @@ class _AssignTaskState extends State<AssignTask> {
                           width: 470.w,
                           height: 478.h,
                           child: TableCalendar(
-                            firstDay: kFirstDay,
-                            lastDay: kLastDay,
-                            focusedDay: focusedDay,
+                            firstDay: controller.kFirstDay,
+                            lastDay: controller.kLastDay,
+                            focusedDay: controller.focusedDay,
                             weekNumbersVisible: false,
                             headerStyle: HeaderStyle(
                                 leftChevronIcon: const Icon(
@@ -295,43 +249,24 @@ class _AssignTaskState extends State<AssignTask> {
 
                               // Using `isSameDay` is recommended to disregard
                               // the time-part of compared DateTime objects.
-                              'Selected Date: ${_selectedDay.toString()}';
                               return isSameDay(selectedDay, day);
                             },
                             onDaySelected: (selectedDay, focusedDay) {
-                              print("selectedDayyy ${selectedDay}");
                               controller.daycontroller = selectedDay.toString();
-
-                              print('Selected Date: ${selectedDay.toString()}');
-                              print(
-                                  'Selected Date2: ${controller.daycontroller.toString()}');
-                              // if (!isSameDay(selectedDay, selectedDay)) {
-                              //   //Call `setState()` when updating the selected day
+                            },
+                            onFormatChanged: (format) {
+                              // if (controller.calendarFormat != format) {
+                              //   //Call `setState()` when updating calendar format
                               //   setState(() {
-                              //     selectedDay = selectedDay;
-                              //     focusedDay = focusedDay;
-
-                              //     controller.daycontroller =
-                              //         _selectedDay.toString();
-
-                              //     'Selected Date: ${_selectedDay.toString()}';
-                              //     'Selected Date2: ${controller.daycontroller.toString()}';
+                              //     controller.calendarFormat = format;
+                              //     // 'Selected Date: ${selectedDay0.toString()}';
                               //   });
                               // }
                             },
-                            onFormatChanged: (format) {
-                              if (calendarFormat != format) {
-                                //Call `setState()` when updating calendar format
-                                setState(() {
-                                  calendarFormat = format;
-                                  'Selected Date: ${_selectedDay.toString()}';
-                                });
-                              }
-                            },
                             onPageChanged: (focusedDay) {
                               // No need to call `setState()` here
-                              focusedDay = focusedDay;
-                              'Selected Date: ${_selectedDay.toString()}';
+                              controller.focusedDay = focusedDay;
+                              // 'Selected Date: ${selectedDay0.toString()}';
                             },
                           ),
                         ),
@@ -345,25 +280,39 @@ class _AssignTaskState extends State<AssignTask> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
-                                    onTap:
-                                        _showTimePicker, // Show time picker when tapped
-                                    child: Row(
+                                    onTap: () async {
+                                      final pickedTime = await showTimePicker(
+                                        context: context,
+                                        initialTime: controller.selectedTime,
+                                      );
+
+                                      if (pickedTime != null) {
+                                        print("334 $controller.selectedTime");
+                                        controller.changeTime(
+                                            pickedTime, context);
+                                        // setState(() {
+                                        //   selectedTime = pickedTime;
+                                        //   controller.timecontroller = selectedTime.format(context);
+                                        // });
+                                      }
+                                    }, // Show time picker when tapped
+                                    child: const Row(
                                       children: [
-                                        const Icon(
-                                            Icons.access_time_filled_sharp),
-                                        const SizedBox(width: 8),
-                                        const Text(
+                                        Icon(Icons.access_time_filled_sharp),
+                                        SizedBox(width: 8),
+                                        Text(
                                           'Time',
                                           style: TextStyle(
                                               color: Color(0xff163300)),
                                         ),
-                                        const Icon(Icons.arrow_drop_down),
+                                        Icon(Icons.arrow_drop_down),
                                       ],
                                     ),
                                   ),
                                   Text(
-                                    _selectedTime.format(context),
-                                    style: TextStyle(color: Color(0xff163300)),
+                                    controller.selectedTime.format(context),
+                                    style: const TextStyle(
+                                        color: Color(0xff163300)),
                                   ),
                                 ],
                               ),
