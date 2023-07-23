@@ -1,4 +1,3 @@
-import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/helper/logger/logger.dart';
@@ -20,8 +19,6 @@ class TaskViewModel with ChangeNotifier {
 
   final TextEditingController taskDescriptioncontroller =
       TextEditingController();
-  late createTaskModel _tasks;
-  createTaskModel get taskdata => _tasks;
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
@@ -71,7 +68,6 @@ class TaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      _tasks = createTaskModel.fromJson(jsonBody['data']);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),

@@ -1,32 +1,3 @@
-class getMembersModel {
-  bool? success;
-  String? message;
-  List<userListData>? data;
-
-  getMembersModel({this.success, this.message, this.data});
-
-  getMembersModel.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    message = json['message'];
-    if (json['data'] != null) {
-      data = <userListData>[];
-      json['data'].forEach((v) {
-        data!.add(new userListData.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
 class userListData {
   String? sId;
   String? name;
@@ -66,17 +37,17 @@ class userListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['selected'] = this.selected;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['password'] = this.password;
-    data['image'] = this.image;
-    data['otpVerified'] = this.otpVerified;
-    data['tasks'] = this.tasks;
-    data['subtasks'] = this.subtasks;
-    data['__v'] = this.iV;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['selected'] = selected;
+    data['name'] = name;
+    data['email'] = email;
+    data['password'] = password;
+    data['image'] = image;
+    data['otpVerified'] = otpVerified;
+    data['tasks'] = tasks;
+    data['subtasks'] = subtasks;
+    data['__v'] = iV;
     return data;
   }
 }
