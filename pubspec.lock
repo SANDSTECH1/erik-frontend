@@ -66,18 +66,18 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: aeb0b80a8b3709709c9cc496cdc027c5b3216796bc0af0ce1007eaf24464fd4c
+      sha256: "2118df84ef0c3ca93f96123a616ae8540879991b8b57af2f81b76a7ada49b2a4"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   flutter_screenutil:
     dependency: "direct main"
     description:
       name: flutter_screenutil
-      sha256: "0a122936b450324cbdfd51be0819cc6fcebb093eb65585e9cd92263f7a1a8a39"
+      sha256: "1b61f8c4cbf965104b6ca7160880ff1af6755aad7fec70b58444245132453745"
       url: "https://pub.dev"
     source: hosted
-    version: "5.7.0"
+    version: "5.8.4"
   flutter_spinkit:
     dependency: "direct main"
     description:
@@ -140,10 +140,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: "5e4a9cd06d447758280a8ac2405101e0e2094d2a1dbdd3756aec3fe7775ba593"
+      sha256: "0a217c6c989d21039f1498c3ed9f3ed71b354e69873f13a8dfc3c9fe76f1b452"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.1"
   logger:
     dependency: "direct main"
     description:
@@ -257,26 +257,26 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_calendar
-      sha256: "53c5ed191af6c9aaed8631f72eae7d56fe3e629b511845ce80f9310a1b02472c"
+      sha256: "31eb2bca4656dac4cd208b41ef0687e19b582272bc40414d7000384c1c9b5cae"
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.41"
+    version: "21.2.10"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "05b079cb1be26a8d5c1afe714172d2eed9178049f4a7dc773b2cbb8b053eff8d"
+      sha256: "8db8f55c77f56968681447d3837c10f27a9e861e238a898fda116c7531def979"
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.41"
+    version: "21.2.10"
   syncfusion_flutter_datepicker:
     dependency: transitive
     description:
       name: syncfusion_flutter_datepicker
-      sha256: "1213fae21e01781903d8cc8d7d332cb56ee9f05032661bc0e2c852525f1a0c40"
+      sha256: "6b0dacfe2f968de2b9107e2dc24fcaa2499415ae655df8f0d3ad0356eb090213"
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.41"
+    version: "21.2.10"
   table_calendar:
     dependency: "direct main"
     description:
@@ -305,10 +305,10 @@ packages:
     dependency: transitive
     description:
       name: timezone
-      sha256: "24c8fcdd49a805d95777a39064862133ff816ebfffe0ceff110fb5960e557964"
+      sha256: "1cfd8ddc2d1cfd836bc93e67b9be88c3adaeca6f40a00ca999104c30693cdca0"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.1"
+    version: "0.9.2"
   typed_data:
     dependency: transitive
     description:
@@ -327,4 +327,4 @@ packages:
     version: "2.1.4"
 sdks:
   dart: ">=3.0.0 <4.0.0"
-  flutter: ">=2.0.0"
+  flutter: ">=3.10.0"

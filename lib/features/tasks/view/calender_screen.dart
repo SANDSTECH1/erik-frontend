@@ -189,7 +189,7 @@ class calender_screen extends StatelessWidget {
                                                         .activeShowMonth][index]
                                                     ['date']
                                                 .toString() ==
-                                            "02"
+                                            "27"
                                         ? GestureDetector(
                                             onTap: () {
                                               calendarcontroller.showdetails(

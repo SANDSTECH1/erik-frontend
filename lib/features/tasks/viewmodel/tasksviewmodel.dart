@@ -84,8 +84,11 @@ class TaskViewModel with ChangeNotifier {
     final response = await NetworkHelper().getApi(
       ApiUrls().getuser,
     );
-    logger.d(response);
-    _users = response['data']
+    logger.d(response.body);
+    final jsonBody = json.decode(response.body);
+    logger.d(jsonBody['data']);
+
+    _users = jsonBody['data']
         .map<userListData>((m) => userListData.fromJson(m))
         .toList();
     notifyListeners();

@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:erick/features/tasks/model/tasks.dart';
+import 'package:erick/features/tasks/view/task_screen.dart';
+import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +14,8 @@ class CalendarViewModel with ChangeNotifier {
   final weekdayFormat = DateFormat('EEEE');
   final datesByMonth = [];
   final year = 2023;
-
-  int activeShowMonth = 6; //Month on which calendar is active
+  String date = '';
+  int activeShowMonth = 6;
 
   CalendarViewModel() {
     addDatesGrid();
@@ -34,25 +37,54 @@ class CalendarViewModel with ChangeNotifier {
     }
   }
 
-  showdetails(date, context) async {
-    print("$date-${activeShowMonth + 1}-$year");
+  // areTasksAssigned(DateTime date) {
+  //   final tasks = ['data'] as List<dynamic>;
+  //   final targetDate = DateFormat('dd').format(date);
+  //   return tasks.any((task) => task['date'] == targetDate);
+  // }
 
-    final response =
-        await NetworkHelper().getApi("${ApiUrls().getTaskByDate}/$date");
+  showdetails(targetDate, context) async {
+    //print("$targetDate-${activeShowMonth + 1}-$year");
+    print('$year-${activeShowMonth + 1}-$targetDate');
+    //print(targetDate);
+
+    final response = await NetworkHelper().getApi(
+        "${ApiUrls().getTaskByDate}?targetDate=$year-${activeShowMonth + 1}-$targetDate");
 
     final body = response.body;
     final jsonBody = json.decode(body);
+    //final List<Map<String, dynamic>> taskDataList = jsonBody['data'];
+    List<taskByDate> _getTasks = jsonBody['data']
+        .map<taskByDate>((m) => taskByDate.fromJson(m))
+        .toList();
     if (response.statusCode == 200) {
       print(jsonBody['data']);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => TaskScreen(
+                  tasks: _getTasks,
+                )),
+      );
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
       // throw Exception(
       //     'Failed to make the API request. Status code: ${response.statusCode}');
     }
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => const TaskScreen()),
-    // );
   }
+
+  // gettasks() async {
+  //   final response = await NetworkHelper().getApi(
+  //     ApiUrls().gettask,
+  //   );
+  //   logger.d(response.body);
+  //   final jsonBody = json.decode(response.body);
+  //   logger.d(jsonBody['data']);
+
+  //   _getTasks = jsonBody['data']
+  //       .map<taskByDate>((m) => taskByDate.fromJson(m))
+  //       .toList();
+  //   notifyListeners();
+  // }
 }

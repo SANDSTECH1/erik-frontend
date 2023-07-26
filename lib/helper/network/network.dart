@@ -120,7 +120,7 @@ class ApiUrls {
   String image = "$baseUrl/updateImage";
   String createtask = "$baseUrl/createtask";
   String getuser = "$baseUrl/getUser";
-  String gettasks = "$baseUrl/gettask";
+  String gettask = "$baseUrl/gettask";
   String updatetasks = "$baseUrl/updatetask";
   String deletetasks = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";
   String subtasks = "$baseUrl/createsubtask";
