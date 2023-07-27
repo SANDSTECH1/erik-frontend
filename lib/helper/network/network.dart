@@ -21,11 +21,6 @@ class NetworkHelper {
     print(userToken);
     print(response.body);
     return response;
-    // if (response.statusCode == 200) {
-    //   final body = response.body;
-    //   final jsonBody = json.decode(body);
-    //   return jsonBody;
-    // }
   }
 
   postApi(String url, data) async {
@@ -107,6 +102,35 @@ class NetworkHelper {
       return resData;
     }
   }
+
+  Future<http.Response> putApi(String url, Map<String, dynamic> data) async {
+    final response = await http.put(
+      Uri.parse(url),
+      headers: {
+        'x-access-token': userToken,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(data),
+    );
+    print(userToken);
+    print(response.body);
+    return response;
+  }
+
+  Future<http.Response> deleteApi(String url) async {
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {
+        'x-access-token': userToken,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    );
+    print(userToken);
+    print(response.body);
+    return response;
+  }
 }
 
 class ApiUrls {
@@ -120,9 +144,9 @@ class ApiUrls {
   String image = "$baseUrl/updateImage";
   String createtask = "$baseUrl/createtask";
   String getuser = "$baseUrl/getUser";
-  String gettasks = "$baseUrl/gettask";
-  String updatetasks = "$baseUrl/updatetask";
-  String deletetasks = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";
+  String gettask = "$baseUrl/gettask";
+  String updatetask = "$baseUrl/updatetask";
+  String deletetask = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";
   String subtasks = "$baseUrl/createsubtask";
   String getsubtasks = "$baseUrl/getsubtask";
   String deletesubtasks = "$baseUrl/deleteSubTask/6480ea798b1a2003ad27f5c7";

@@ -1,5 +1,8 @@
+import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
+import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
+import 'package:erick/features/tasks/view/edittasks.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -16,6 +19,7 @@ class TaskViewModel with ChangeNotifier {
 
   String daycontroller = "";
   String timecontroller = "";
+  DateTime? selectedDay;
 
   final TextEditingController taskDescriptioncontroller =
       TextEditingController();
@@ -40,11 +44,11 @@ class TaskViewModel with ChangeNotifier {
   createTask(
     context,
   ) async {
-    List assignedmemners =
+    List assignedmembers =
         _users.where((element) => element.selected == true).toList();
-    print(assignedmemners.length);
+    print(assignedmembers.length);
     List<String> ids =
-        assignedmemners.map((user) => user.sId.toString()).toList();
+        assignedmembers.map((user) => user.sId.toString()).toList();
     // print(ids);
     // print(taskTitlecontroller.text);
     // print(taskDescriptioncontroller.text);
@@ -80,14 +84,87 @@ class TaskViewModel with ChangeNotifier {
     }
   }
 
+  editTask(context, taskByDate task) async {
+    List<String> ids =
+        task.assignedUsers!.map((user) => user.sId.toString()).toList();
+
+    String combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
+
+    final response = await NetworkHelper().putApi(ApiUrls().updatetask, {
+      "id": task.sId, // Assuming you have an id field in your taskByDate class
+      "title": task.title,
+      "description": task.description,
+      "assignedUsers": ids,
+      "scheduledDateTime": combinedDateTime,
+    });
+
+    logger.d(response.body);
+    final body = response.body;
+    final jsonBody = json.decode(body);
+    if (response.statusCode == 200) {
+      // Handle successful update, e.g., show a toast or navigate to another screen
+      showtoast('Task updated successfully');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => EditTask(tasks: task)),
+      );
+    } else if (response.statusCode == 400) {
+      showtoast(jsonBody['message']);
+    } else {
+      // Handle error
+      showtoast('Failed to update the task');
+    }
+  }
+
+  // deleteTask() async {
+  //   final response = await NetworkHelper().deleteApi(ApiUrls().deletetask);
+  //   if (response.statusCode == 200) {
+  //     // Handle successful DELETE response
+  //   } else {
+  //     // Handle error
+  //   }
+  //   return response;
+  // }
+
+  void editTaskclick(BuildContext context, taskByDate task) {
+    taskDescriptioncontroller.text = task.description.toString();
+    taskTitlecontroller.text = task.title.toString();
+    final parsedDateTime = DateTime.parse(task.scheduledDateTime.toString());
+    final formattedTime =
+        DateFormat('hh:mm a').format(parsedDateTime.toLocal());
+    final formattedDate =
+        DateFormat('yyyy-MM-dd').format(parsedDateTime.toLocal());
+    selectedTime =
+        TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime));
+
+    daycontroller = formattedDate;
+    selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
+    print(formattedDate);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditTask(tasks: task),
+      ),
+    );
+  }
+
   getmembers() async {
     final response = await NetworkHelper().getApi(
       ApiUrls().getuser,
     );
-    logger.d(response);
-    _users = response['data']
+    logger.d(response.body);
+    final jsonBody = json.decode(response.body);
+    logger.d(jsonBody['data']);
+
+    _users = jsonBody['data']
         .map<userListData>((m) => userListData.fromJson(m))
         .toList();
+    notifyListeners();
+  }
+
+  changeselectedate(s) {
+    selectedDay = s;
+    daycontroller = s.toString();
     notifyListeners();
   }
 
@@ -103,7 +180,10 @@ class TaskViewModel with ChangeNotifier {
   }
 }
 
-String combineDateAndTime(String date, String time) {
+String combineDateAndTime(String? date, String? time) {
+  if (date == null || time == null) {
+    throw ArgumentError("Date and time must not be null.");
+  }
   final DateTime selectedDate = DateFormat("yyyy-MM-dd").parse(date);
   final TimeOfDay selectedTime = TimeOfDay(
     hour: int.parse(time.split(":")[0]),

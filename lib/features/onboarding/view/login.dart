@@ -76,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: 447.w,
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       controller: controller.useremailcontroller,
                       decoration: InputDecoration(
                         focusedBorder: OutlineInputBorder(
@@ -120,6 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: 447.w,
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       controller: controller.userpasswordcontroller,
                       decoration: InputDecoration(
                         suffixIcon: const Icon(Icons.visibility_outlined),

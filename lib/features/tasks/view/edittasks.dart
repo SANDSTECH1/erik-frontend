@@ -6,15 +6,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AssignTask extends StatelessWidget {
-  const AssignTask({
+class EditTask extends StatelessWidget {
+  final taskByDate tasks;
+  const EditTask({
     super.key,
+    required this.tasks,
   });
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-    DateTime? selectedDay;
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -200,9 +201,6 @@ class AssignTask extends StatelessWidget {
                                 formatButtonVisible: false),
                             calendarStyle: CalendarStyle(
                               isTodayHighlighted: true,
-                              selectedDecoration: const BoxDecoration(
-                                color: Colors.grey,
-                              ),
 
                               disabledTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
@@ -237,9 +235,9 @@ class AssignTask extends StatelessWidget {
                               ),
                               selectedTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
-                              // selectedDecoration: const BoxDecoration(
-                              //   color: Colors.grey,
-                              // ),
+                              selectedDecoration: const BoxDecoration(
+                                color: Colors.grey,
+                              ),
                               defaultTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
                               defaultDecoration: const BoxDecoration(
@@ -252,10 +250,10 @@ class AssignTask extends StatelessWidget {
 
                               // Using `isSameDay` is recommended to disregard
                               // the time-part of compared DateTime objects.
-                              return isSameDay(selectedDay, day);
+                              return isSameDay(controller.selectedDay, day);
                             },
                             onDaySelected: (selectedDay, focusedDay) {
-                              controller.daycontroller = selectedDay.toString();
+                              controller.changeselectedate(selectedDay);
                             },
                             onFormatChanged: (format) {
                               // if (controller.calendarFormat != format) {
@@ -556,19 +554,19 @@ class AssignTask extends StatelessWidget {
                                 onTap: () {
                                   Navigator.pop(context);
 
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                            contentPadding: EdgeInsets.zero,
-                                            shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10.0))),
-                                            content: Builder(
-                                              builder: (context) {
-                                                return const SubAssignTask();
-                                              },
-                                            ),
-                                          ));
+                                  // showDialog(
+                                  //     context: context,
+                                  //     builder: (_) => AlertDialog(
+                                  //           contentPadding: EdgeInsets.zero,
+                                  //           shape: const RoundedRectangleBorder(
+                                  //               borderRadius: BorderRadius.all(
+                                  //                   Radius.circular(10.0))),
+                                  //           content: Builder(
+                                  //             builder: (context) {
+                                  //               return const SubEditTask();
+                                  //             },
+                                  //           ),
+                                  //         ));
                                 },
                                 child: Container(
                                   width: 100.w,
