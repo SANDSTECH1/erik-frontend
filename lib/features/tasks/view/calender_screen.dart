@@ -1,5 +1,6 @@
 import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
+import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,9 @@ class calender_screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final calendarcontroller = Provider.of<CalendarViewModel>(context);
+    final controller = Provider.of<TaskViewModel>(context);
+    int totalDaysInMonth = calendarcontroller
+        .datesByMonth[calendarcontroller.activeShowMonth].length;
 
     return Scaffold(
         body: Row(
@@ -61,6 +65,12 @@ class calender_screen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
+                          IconButton(
+                            onPressed: () {
+                              calendarcontroller.previousMonth();
+                            },
+                            icon: Icon(Icons.arrow_back),
+                          ),
                           // Container(
                           //   child: const Icon(Icons.arrow_back),
                           // ),
@@ -70,12 +80,18 @@ class calender_screen extends StatelessWidget {
                           5.horizontalSpace,
                           Container(
                             child: Text(
-                              "MARCH, 2023",
+                              '${calendarcontroller.dateFormat.format(DateTime(calendarcontroller.year, calendarcontroller.activeShowMonth + 1))} ${calendarcontroller.year}',
                               style: TextStyle(
                                   fontSize: 16.sp,
                                   color: const Color(0xff000000),
                                   fontWeight: FontWeight.bold),
                             ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              calendarcontroller.nextMonth();
+                            },
+                            icon: Icon(Icons.arrow_forward),
                           ),
                         ],
                       ),
@@ -159,7 +175,8 @@ class calender_screen extends StatelessWidget {
                       child: Container(
                         child: GridView.builder(
                           padding: const EdgeInsets.all(0),
-                          itemCount: calendarcontroller.datesByMonth[6].length,
+                          //itemCount: calendarcontroller.datesByMonth[6].length,
+                          itemCount: totalDaysInMonth,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 7,
@@ -167,120 +184,165 @@ class calender_screen extends StatelessWidget {
                                   crossAxisSpacing: 0,
                                   mainAxisSpacing: 0),
                           itemBuilder: (BuildContext context, int index) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                // color: Colors.red,
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      calendarcontroller
-                                          .datesByMonth[calendarcontroller
-                                              .activeShowMonth][index]['date']
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: const Color(0xff000000),
-                                          fontSize: 14.sp),
-                                    ),
-                                    5.verticalSpace,
-                                    calendarcontroller.datesByMonth[
+                            if (index < totalDaysInMonth) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  // color: Colors.red,
+                                  border: Border.all(color: Colors.grey),
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        (index <
+                                                calendarcontroller
+                                                    .datesByMonth[
+                                                        calendarcontroller
+                                                            .activeShowMonth]
+                                                    .length)
+                                            ? calendarcontroller.datesByMonth[
                                                     calendarcontroller
                                                         .activeShowMonth][index]
                                                     ['date']
-                                                .toString() ==
-                                            "27"
-                                        ? GestureDetector(
-                                            onTap: () {
-                                              calendarcontroller.showdetails(
-                                                  calendarcontroller
-                                                              .datesByMonth[
-                                                          calendarcontroller
-                                                              .activeShowMonth]
-                                                      [index]['date'],
-                                                  context);
-                                            },
-                                            child: Container(
-                                              width: 63.w,
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: const Color(
-                                                          0xff163300))),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Text("See All Task",
-                                                        style: TextStyle(
-                                                            color: const Color(
-                                                                0xff163300),
-                                                            fontSize: 12.sp,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                    2.horizontalSpace,
-                                                    const Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      size: 12,
-                                                      color: Color(0xff163300),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
+                                                .toString()
+                                            : '',
+                                        style: TextStyle(
+                                          color: const Color(0xff000000),
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                      5.verticalSpace,
+                                      Visibility(
+                                        visible: (index <
+                                                calendarcontroller
+                                                    .datesByMonth[
+                                                        calendarcontroller
+                                                            .activeShowMonth]
+                                                    .length) &&
+                                            calendarcontroller.datesByMonth[
+                                                    calendarcontroller
+                                                        .activeShowMonth][index]
+                                                .containsKey('date') &&
+                                            calendarcontroller.datesByMonth[
+                                                        calendarcontroller
+                                                            .activeShowMonth]
+                                                        [index]['date']
+                                                    .toString() ==
+                                                "27",
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            calendarcontroller.showdetails(
+                                              calendarcontroller.datesByMonth[
+                                                      calendarcontroller
+                                                          .activeShowMonth]
+                                                  [index]['date'],
+                                              context,
+                                            );
+                                          },
+                                          child: Container(
+                                            width: 63.w,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0xff163300)),
                                             ),
-                                          )
-                                        : GestureDetector(
-                                            onTap: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (_) => AlertDialog(
-                                                        contentPadding:
-                                                            EdgeInsets.zero,
-                                                        shape: const RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius.all(
-                                                                    Radius.circular(
-                                                                        10.0))),
-                                                        content: Builder(
-                                                          builder: (context) {
-                                                            return const AssignTask();
-                                                          },
-                                                        ),
-                                                      ));
-                                              // showDialog(
-                                              //     context: context,
-                                              //     builder: (BuildContext context) {
-                                              //       return const AssignTask();
-                                              //     });
-                                            },
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Icon(
-                                                  Icons.add_circle,
-                                                  color: Color(0xff163300),
-                                                ),
-                                                4.horizontalSpace,
-                                                Text(
-                                                  'Assign Task',
-                                                  style: TextStyle(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "See All Task",
+                                                    style: TextStyle(
                                                       color: const Color(
                                                           0xff163300),
-                                                      fontSize: 14.sp),
-                                                )
-                                              ],
+                                                      fontSize: 12.sp,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  2.horizontalSpace,
+                                                  const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 12,
+                                                    color: Color(0xff163300),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          )
-                                  ],
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: !(index <
+                                                calendarcontroller
+                                                    .datesByMonth[
+                                                        calendarcontroller
+                                                            .activeShowMonth]
+                                                    .length) ||
+                                            !calendarcontroller.datesByMonth[
+                                                    calendarcontroller
+                                                        .activeShowMonth][index]
+                                                .containsKey('date') ||
+                                            calendarcontroller.datesByMonth[
+                                                        calendarcontroller
+                                                            .activeShowMonth]
+                                                        [index]['date']
+                                                    .toString() !=
+                                                "27",
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (_) => AlertDialog(
+                                                contentPadding: EdgeInsets.zero,
+                                                shape:
+                                                    const RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              10.0)),
+                                                ),
+                                                content: Builder(
+                                                  builder: (context) {
+                                                    return const AssignTask();
+                                                  },
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(
+                                                Icons.add_circle,
+                                                color: Color(0xff163300),
+                                              ),
+                                              4.horizontalSpace,
+                                              Text(
+                                                'Assign Task',
+                                                style: TextStyle(
+                                                  color:
+                                                      const Color(0xff163300),
+                                                  fontSize: 14.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              // Empty container for days beyond the last day of the month
+                              return Container();
+                            }
                           },
                         ),
                       ),

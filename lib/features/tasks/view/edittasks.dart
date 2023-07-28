@@ -177,7 +177,7 @@ class EditTask extends StatelessWidget {
                         Container(
                           color: const Color(0xffFFF7F0),
                           width: 470.w,
-                          height: 480.h,
+                          height: 490.h,
                           child: TableCalendar(
                             firstDay: controller.kFirstDay,
                             lastDay: controller.kLastDay,

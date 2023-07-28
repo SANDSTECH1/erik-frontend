@@ -80,7 +80,7 @@ class TaskScreen extends StatelessWidget {
                           5.horizontalSpace,
                           Container(
                             child: Text(
-                              "MARCH, 2023",
+                              '${calendarcontroller.dateFormat.format(DateTime(calendarcontroller.year, calendarcontroller.activeShowMonth + 1))} ${calendarcontroller.year}',
                               style: TextStyle(
                                   fontSize: 16.sp,
                                   color: const Color(0xff000000),
@@ -305,25 +305,28 @@ class TaskScreen extends StatelessWidget {
                                                   5.horizontalSpace,
                                                   GestureDetector(
                                                     onTap: () {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder:
-                                                              (_) =>
-                                                                  AlertDialog(
-                                                                    contentPadding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    shape: const RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.all(Radius.circular(10.0))),
-                                                                    content:
-                                                                        Builder(
-                                                                      builder:
-                                                                          (context) {
-                                                                        return const ViewTask();
-                                                                      },
-                                                                    ),
-                                                                  ));
+                                                      taskcontroller.viewtasks(
+                                                          context,
+                                                          tasks[index]);
+                                                      // showDialog(
+                                                      //     context: context,
+                                                      //     builder:
+                                                      //         (_) =>
+                                                      //             AlertDialog(
+                                                      //               contentPadding:
+                                                      //                   EdgeInsets
+                                                      //                       .zero,
+                                                      //               shape: const RoundedRectangleBorder(
+                                                      //                   borderRadius:
+                                                      //                       BorderRadius.all(Radius.circular(10.0))),
+                                                      //               content:
+                                                      //                   Builder(
+                                                      //                 builder:
+                                                      //                     (context) {
+                                                      //                   return
+                                                      //                 },
+                                                      //               ),
+                                                      //             ));
                                                     },
                                                     child: Row(
                                                       children: [
@@ -445,13 +448,13 @@ class TaskScreen extends StatelessWidget {
                                                                       shape: const RoundedRectangleBorder(
                                                                           borderRadius:
                                                                               BorderRadius.all(Radius.circular(10.0))),
-                                                                      content:
-                                                                          Builder(
-                                                                        builder:
-                                                                            (context) {
-                                                                          return const ViewTask();
-                                                                        },
-                                                                      ),
+                                                                      // content:
+                                                                      //     Builder(
+                                                                      //   builder:
+                                                                      //       (context) {
+                                                                      //     return const ViewTask();
+                                                                      //   },
+                                                                      // ),
                                                                     ));
                                                           },
                                                           child: Row(

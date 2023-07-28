@@ -1,16 +1,14 @@
 import 'package:erick/features/tasks/model/tasks.dart';
+import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class ViewSubTasks extends StatelessWidget {
+class ViewTask extends StatelessWidget {
   final taskByDate tasks;
-  const ViewSubTasks({
-    super.key,
-    required this.tasks,
-  });
+  const ViewTask({super.key, required this.tasks});
 
   @override
   Widget build(BuildContext context) {
@@ -141,18 +139,12 @@ class ViewSubTasks extends StatelessWidget {
                   ),
                   23.verticalSpace,
                   Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                    ],
-                  )
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: List.generate(
+                        taskcontroller.usersdata.length,
+                        (index) => AssignTo(taskcontroller.usersdata[index]),
+                      ))
                 ],
               ),
             )
@@ -163,7 +155,7 @@ class ViewSubTasks extends StatelessWidget {
   }
 }
 
-Widget AssignTo() {
+Widget AssignTo(userListData user) {
   return Container(
     width: 100.w,
     height: 50.h,
@@ -179,7 +171,7 @@ Widget AssignTo() {
         ),
         4.horizontalSpace,
         Text(
-          'Mark Allen',
+          user.name.toString(),
           style: TextStyle(color: Colors.black, fontSize: 20.sp),
         ),
         6.horizontalSpace,

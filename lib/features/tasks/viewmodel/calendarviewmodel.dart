@@ -39,12 +39,6 @@ class CalendarViewModel with ChangeNotifier {
     }
   }
 
-  // areTasksAssigned(DateTime date) {
-  //   final tasks = ['data'] as List<dynamic>;
-  //   final targetDate = DateFormat('dd').format(date);
-  //   return tasks.any((task) => task['date'] == targetDate);
-  // }
-
   showdetails(targetDate, context) async {
     //print("$targetDate-${activeShowMonth + 1}-$year");
     print('$year-${activeShowMonth + 1}-$targetDate');
@@ -59,6 +53,8 @@ class CalendarViewModel with ChangeNotifier {
     List<taskByDate> _getTasks = jsonBody['data']
         .map<taskByDate>((m) => taskByDate.fromJson(m))
         .toList();
+    List<String> dates = [targetDate];
+    updateAssignedDates(dates);
     if (response.statusCode == 200) {
       print(jsonBody['data']);
       Navigator.push(
@@ -76,29 +72,27 @@ class CalendarViewModel with ChangeNotifier {
     }
   }
 
-  // void editTask(BuildContext context, List<taskByDate> tasks) {
-  //   List<taskByDate> _getTasks = jsonBody['data']
-  //       .map<taskByDate>((m) => taskByDate.fromJson(m))
-  //       .toList();
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => TaskScreen(tasks: _getTasks),
-  //     ),
-  //   );
-  // }
+  void previousMonth() {
+    if (activeShowMonth > 0) {
+      activeShowMonth--;
+      notifyListeners();
+    }
+  }
 
-  // gettasks() async {
-  //   final response = await NetworkHelper().getApi(
-  //     ApiUrls().gettask,
-  //   );
-  //   logger.d(response.body);
-  //   final jsonBody = json.decode(response.body);
-  //   logger.d(jsonBody['data']);
+  void nextMonth() {
+    if (activeShowMonth < 11) {
+      activeShowMonth++;
+      notifyListeners();
+    }
+  }
 
-  //   _getTasks = jsonBody['data']
-  //       .map<taskByDate>((m) => taskByDate.fromJson(m))
-  //       .toList();
-  //   notifyListeners();
-  // }
+  List<String> assignedDates = [];
+
+  // Other existing code...
+
+  // Method to update the assignedDates list when tasks are assigned.
+  void updateAssignedDates(List<String> dates) {
+    assignedDates = dates;
+    notifyListeners();
+  }
 }

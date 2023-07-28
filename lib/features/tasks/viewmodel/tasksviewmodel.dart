@@ -3,9 +3,11 @@ import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/tasks/view/edittasks.dart';
+import 'package:erick/features/tasks/view/viewtasks.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
+import 'package:erick/widgets/viewtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -21,6 +23,7 @@ class TaskViewModel with ChangeNotifier {
 
   String daycontroller = "";
   String timecontroller = "";
+  String getFormattedMonthAndYearcontroller = "";
   DateTime? selectedDay;
 
   final TextEditingController taskDescriptioncontroller =
@@ -51,16 +54,15 @@ class TaskViewModel with ChangeNotifier {
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
-    // print(ids);
-    // print(taskTitlecontroller.text);
-    // print(taskDescriptioncontroller.text);
+
     print("timecontroller$timecontroller");
     print("daycontroller $daycontroller");
     print(estimatedTimecontroller);
     print(pricecontroller);
 
     String date = daycontroller; // Assuming the value is "2023-07-21"
-    String time = timecontroller; // Assuming the value is "8:58 AM"
+    String time = timecontroller;
+    // Assuming the value is "8:58 AM"
 
     String combinedDateTime = combineDateAndTime(date, time);
     print(combinedDateTime); // Output: "2023-07-21T08:58:00"
@@ -146,13 +148,20 @@ class TaskViewModel with ChangeNotifier {
         await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
     if (response.statusCode == 200) {
       showtoast('Task deleted successfully');
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => calender_screen()),
+      //);
     } else {
       showtoast('Failed to delete the task');
     }
     return response;
   }
 
-  void editTaskclick(BuildContext context, taskByDate task) {
+  void editTaskclick(
+    BuildContext context,
+    taskByDate task,
+  ) {
     taskDescriptioncontroller.text = task.description.toString();
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
@@ -166,16 +175,6 @@ class TaskViewModel with ChangeNotifier {
     selectedTime =
         TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime));
 
-    // final formattedTime1 =
-    //     DateFormat('hh:mm a').format(parsedDateTime1.toLocal());
-    // final formattedDate1 =
-    //     DateFormat('yyyy-MM-dd').format(parsedDateTime1.toLocal());
-    // selectedTime =
-    //     TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime1));
-
-    // daycontroller = formattedDate1;
-    // selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
-
     daycontroller = formattedDate;
     selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
     print(formattedDate);
@@ -185,6 +184,26 @@ class TaskViewModel with ChangeNotifier {
       MaterialPageRoute(
         builder: (context) => EditTask(tasks: task),
       ),
+    );
+  }
+
+  void viewtasks(BuildContext context, taskByDate taskss) {
+    taskDescriptioncontroller.text = taskss.description.toString();
+    taskTitlecontroller.text = taskss.title.toString();
+    print(taskss.description.toString());
+    print(taskss.title.toString());
+    List assignedmembers =
+        _users.where((element) => element.selected == true).toList();
+    print(assignedmembers.length);
+    List<String> ids =
+        assignedmembers.map((user) => user.sId.toString()).toList();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ViewTask(
+                tasks: taskss,
+              )),
     );
   }
 

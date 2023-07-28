@@ -176,7 +176,7 @@ class AssignTask extends StatelessWidget {
                         Container(
                           color: const Color(0xffFFF7F0),
                           width: 436.w,
-                          height: 478.h,
+                          height: 490.h,
                           child: TableCalendar(
                             firstDay: controller.kFirstDay,
                             lastDay: controller.kLastDay,
@@ -277,181 +277,162 @@ class AssignTask extends StatelessWidget {
                           children: [
                             SizedBox(
                               width: 400.w,
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
-                                        final pickedTime = await showTimePicker(
-                                          context: context,
-                                          initialTime: controller.selectedTime,
-                                        );
+                              child: Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final pickedTime = await showTimePicker(
+                                        context: context,
+                                        initialTime: controller.selectedTime,
+                                      );
 
-                                        if (pickedTime != null) {
-                                          print("334 $controller.selectedTime");
-                                          controller.changeTime(
-                                              pickedTime, context);
-                                          // setState(() {
-                                          //   selectedTime = pickedTime;
-                                          //   controller.timecontroller = selectedTime.format(context);
-                                          // });
-                                        }
-                                      }, // Show time picker when tapped
-                                      child: const Row(
-                                        children: [
-                                          Icon(Icons.access_time_filled_sharp),
-                                          // SizedBox(width: 8),
-                                          Text(
-                                            'Time',
-                                            style: TextStyle(
-                                                color: Color(0xff163300)),
-                                          ),
-                                          Icon(Icons.arrow_drop_down),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      controller.selectedTime.format(context),
-                                      style: const TextStyle(
-                                          color: Color(0xff163300)),
-                                    ),
-                                    const Icon(Icons.access_time_filled_sharp),
-                                    2.horizontalSpace,
-                                    const Text(
-                                      'Estimated Time :',
-                                      style:
-                                          TextStyle(color: Color(0xff163300)),
-                                    ),
-                                    SizedBox(
-                                      width: 50.w,
-                                      height: 30.h,
-                                      child: TextField(
-                                        controller:
-                                            controller.estimatedTimecontroller,
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15.sp),
-                                        decoration: InputDecoration(
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 0.0,
-                                                  horizontal: 10),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(4.r)),
-                                              borderSide: const BorderSide(
-                                                width: 1,
-                                              )),
-                                          errorBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(4.r)),
-                                              borderSide: const BorderSide(
-                                                  width: 1,
-                                                  color: Colors.grey)),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(4.r)),
-                                                  borderSide: const BorderSide(
-                                                      width: 1,
-                                                      color: Colors.grey)),
-                                          hintText: "",
-                                          hintStyle: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black),
+                                      if (pickedTime != null) {
+                                        print("334 $controller.selectedTime");
+                                        controller.changeTime(
+                                            pickedTime, context);
+                                        // setState(() {
+                                        //   selectedTime = pickedTime;
+                                        //   controller.timecontroller = selectedTime.format(context);
+                                        // });
+                                      }
+                                    }, // Show time picker when tapped
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.access_time_filled_sharp),
+                                        // SizedBox(width: 8),
+                                        Text(
+                                          'Time',
+                                          style: TextStyle(
+                                              color: Color(0xff163300)),
                                         ),
-                                        obscureText: false,
-                                      ),
+                                        Icon(Icons.arrow_drop_down),
+                                      ],
                                     ),
-                                    const Icon(Icons.money),
-                                    2.horizontalSpace,
-                                    const Text(
-                                      'Price :  ',
-                                      style:
-                                          TextStyle(color: Color(0xff163300)),
-                                    ),
-                                    SizedBox(
-                                      width: 50.w,
-                                      height: 30.h,
-                                      child: TextField(
-                                        controller: controller.pricecontroller,
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 15.sp),
-                                        decoration: InputDecoration(
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 0.0,
-                                                  horizontal: 10),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          disabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(4.r)),
-                                            borderSide: const BorderSide(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(4.r)),
-                                              borderSide: const BorderSide(
-                                                width: 1,
-                                              )),
-                                          errorBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(4.r)),
-                                              borderSide: const BorderSide(
-                                                  width: 1,
-                                                  color: Colors.grey)),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(4.r)),
-                                                  borderSide: const BorderSide(
-                                                      width: 1,
-                                                      color: Colors.grey)),
-                                          hintText: "",
-                                          hintStyle: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black),
+                                  ),
+                                  Text(
+                                    controller.selectedTime.format(context),
+                                    style: const TextStyle(
+                                        color: Color(0xff163300)),
+                                  ),
+                                  const Icon(Icons.access_time_filled_sharp),
+                                  2.horizontalSpace,
+                                  const Text(
+                                    'Estimated Time :',
+                                    style: TextStyle(color: Color(0xff163300)),
+                                  ),
+                                  SizedBox(
+                                    width: 50.w,
+                                    height: 30.h,
+                                    child: TextField(
+                                      controller:
+                                          controller.estimatedTimecontroller,
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 15.sp),
+                                      decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 0.0, horizontal: 10),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
                                         ),
-                                        obscureText: false,
+                                        disabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
+                                        ),
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                              width: 1,
+                                            )),
+                                        errorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                                width: 1, color: Colors.grey)),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                                width: 1, color: Colors.grey)),
+                                        hintText: "",
+                                        hintStyle: const TextStyle(
+                                            fontSize: 16, color: Colors.black),
                                       ),
+                                      obscureText: false,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const Icon(Icons.money),
+                                  2.horizontalSpace,
+                                  const Text(
+                                    'Price :  ',
+                                    style: TextStyle(color: Color(0xff163300)),
+                                  ),
+                                  SizedBox(
+                                    width: 50.w,
+                                    height: 30.h,
+                                    child: TextField(
+                                      controller: controller.pricecontroller,
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 15.sp),
+                                      decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 0.0, horizontal: 10),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
+                                        ),
+                                        disabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(4.r)),
+                                          borderSide: const BorderSide(
+                                              width: 1, color: Colors.grey),
+                                        ),
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                              width: 1,
+                                            )),
+                                        errorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                                width: 1, color: Colors.grey)),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(4.r)),
+                                            borderSide: const BorderSide(
+                                                width: 1, color: Colors.grey)),
+                                        hintText: "",
+                                        hintStyle: const TextStyle(
+                                            fontSize: 16, color: Colors.black),
+                                      ),
+                                      obscureText: false,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
