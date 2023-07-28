@@ -16,6 +16,8 @@ String userToken = "";
 
 class TaskViewModel with ChangeNotifier {
   final TextEditingController taskTitlecontroller = TextEditingController();
+  final TextEditingController estimatedTimecontroller = TextEditingController();
+  final TextEditingController pricecontroller = TextEditingController();
 
   String daycontroller = "";
   String timecontroller = "";
@@ -54,6 +56,8 @@ class TaskViewModel with ChangeNotifier {
     // print(taskDescriptioncontroller.text);
     print("timecontroller$timecontroller");
     print("daycontroller $daycontroller");
+    print(estimatedTimecontroller);
+    print(pricecontroller);
 
     String date = daycontroller; // Assuming the value is "2023-07-21"
     String time = timecontroller; // Assuming the value is "8:58 AM"
@@ -66,6 +70,8 @@ class TaskViewModel with ChangeNotifier {
       "description": taskDescriptioncontroller.text,
       "assignedUsers": ids,
       "scheduledDateTime": combinedDateTime,
+      "estimatedTime": combinedDateTime,
+      "price": pricecontroller.text,
     });
 
     logger.d(response.body);
@@ -84,51 +90,74 @@ class TaskViewModel with ChangeNotifier {
     }
   }
 
-  editTask(context, taskByDate task) async {
-    List<String> ids =
-        task.assignedUsers!.map((user) => user.sId.toString()).toList();
-
-    String combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
-
-    final response = await NetworkHelper().putApi(ApiUrls().updatetask, {
-      "id": task.sId, // Assuming you have an id field in your taskByDate class
-      "title": task.title,
-      "description": task.description,
-      "assignedUsers": ids,
-      "scheduledDateTime": combinedDateTime,
-    });
-
-    logger.d(response.body);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    if (response.statusCode == 200) {
-      // Handle successful update, e.g., show a toast or navigate to another screen
-      showtoast('Task updated successfully');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => EditTask(tasks: task)),
+  void editTask(BuildContext context, taskByDate task) async {
+    try {
+      List assignedmembers =
+          _users.where((element) => element.selected == true).toList();
+      print(assignedmembers.length);
+      List<String> ids =
+          assignedmembers.map((user) => user.sId.toString()).toList();
+      //final combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
+      String date = daycontroller; // Assuming the value is "2023-07-21"
+      String time = timecontroller; // Assuming the value is "8:58 AM"
+      print(
+        {
+          "title": taskTitlecontroller.text,
+          "description": taskDescriptioncontroller.text,
+          "assignedUsers": ids,
+          "estimatedTime": estimatedTimecontroller.text,
+          "price": pricecontroller.text,
+        },
       );
-    } else if (response.statusCode == 400) {
-      showtoast(jsonBody['message']);
-    } else {
-      // Handle error
-      showtoast('Failed to update the task');
+      String combinedDateTime = combineDateAndTime(date, time);
+      final response = await NetworkHelper().putApi(
+        "${ApiUrls().updatetask}/${task.sId}",
+        {
+          "title": taskTitlecontroller.text,
+          "description": taskDescriptioncontroller.text,
+          "assignedUsers": ids,
+          "estimatedTime": estimatedTimecontroller.text,
+          "price": pricecontroller.text,
+          "scheduledDateTime": combinedDateTime
+        },
+      );
+      final body = response.body;
+      final jsonBody = json.decode(body);
+
+      if (response.statusCode == 200) {
+        // Handle successful update, e.g., show a toast or navigate to another screen
+        showtoast('Task updated successfully');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => calender_screen()),
+        );
+      } else if (response.statusCode == 400) {
+        showtoast(jsonBody['message']);
+      } else {
+        showtoast('Failed to update the task');
+      }
+    } catch (e) {
+      showtoast('Error updating task: $e');
     }
   }
 
-  // deleteTask() async {
-  //   final response = await NetworkHelper().deleteApi(ApiUrls().deletetask);
-  //   if (response.statusCode == 200) {
-  //     // Handle successful DELETE response
-  //   } else {
-  //     // Handle error
-  //   }
-  //   return response;
-  // }
+  deleteTask(context, taskByDate task) async {
+    final response =
+        await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
+    if (response.statusCode == 200) {
+      showtoast('Task deleted successfully');
+    } else {
+      showtoast('Failed to delete the task');
+    }
+    return response;
+  }
 
   void editTaskclick(BuildContext context, taskByDate task) {
     taskDescriptioncontroller.text = task.description.toString();
     taskTitlecontroller.text = task.title.toString();
+    pricecontroller.text = task.price.toString();
+    //final parsedDateTime1 = DateTime.parse(task.estimatedTime.toString());
+    estimatedTimecontroller.text = task.estimatedTime.toString();
     final parsedDateTime = DateTime.parse(task.scheduledDateTime.toString());
     final formattedTime =
         DateFormat('hh:mm a').format(parsedDateTime.toLocal());
@@ -137,9 +166,20 @@ class TaskViewModel with ChangeNotifier {
     selectedTime =
         TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime));
 
+    // final formattedTime1 =
+    //     DateFormat('hh:mm a').format(parsedDateTime1.toLocal());
+    // final formattedDate1 =
+    //     DateFormat('yyyy-MM-dd').format(parsedDateTime1.toLocal());
+    // selectedTime =
+    //     TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime1));
+
+    // daycontroller = formattedDate1;
+    // selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
+
     daycontroller = formattedDate;
     selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
     print(formattedDate);
+    //print(formattedDate1);
     Navigator.push(
       context,
       MaterialPageRoute(

@@ -138,7 +138,7 @@ class TaskScreen extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
-                    final task = tasks[index];
+                    //final task = tasks[index];
                     return Expanded(
                       child: Column(
                         children: [
@@ -245,10 +245,6 @@ class TaskScreen extends StatelessWidget {
                                                             ),
                                                             GestureDetector(
                                                               onTap: () {
-                                                                // TaskViewModel()
-                                                                // .editTask(
-                                                                //     context,
-                                                                //     task);
                                                                 Navigator.pop(
                                                                     context);
                                                                 taskcontroller
@@ -345,17 +341,27 @@ class TaskScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                                   5.horizontalSpace,
-                                                  Row(
-                                                    children: [
-                                                      const Icon(Icons.delete),
-                                                      2.horizontalSpace,
-                                                      Text(
-                                                        'DELETE',
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16.sp),
-                                                      )
-                                                    ],
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.pop(context);
+                                                      taskcontroller.deleteTask(
+                                                          context,
+                                                          tasks[index]);
+                                                    },
+                                                    child: Row(
+                                                      children: [
+                                                        const Icon(
+                                                            Icons.delete),
+                                                        2.horizontalSpace,
+                                                        Text(
+                                                          'DELETE',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              fontSize: 16.sp),
+                                                        )
+                                                      ],
+                                                    ),
                                                   )
                                                 ],
                                               ),

@@ -162,12 +162,14 @@ class calender_screen extends StatelessWidget {
                           itemCount: calendarcontroller.datesByMonth[6].length,
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            childAspectRatio: 1,
-                          ),
+                                  crossAxisCount: 7,
+                                  childAspectRatio: 1,
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0),
                           itemBuilder: (BuildContext context, int index) {
                             return Container(
                               decoration: BoxDecoration(
+                                // color: Colors.red,
                                 border: Border.all(color: Colors.grey),
                               ),
                               child: Center(

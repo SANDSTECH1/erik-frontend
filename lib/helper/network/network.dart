@@ -146,7 +146,7 @@ class ApiUrls {
   String getuser = "$baseUrl/getUser";
   String gettask = "$baseUrl/gettask";
   String updatetask = "$baseUrl/updatetask";
-  String deletetask = "$baseUrl/deletetask/6480e9b38b1a2003ad27f5a4";
+  String deletetask = "$baseUrl/deletetask";
   String subtasks = "$baseUrl/createsubtask";
   String getsubtasks = "$baseUrl/getsubtask";
   String deletesubtasks = "$baseUrl/deleteSubTask/6480ea798b1a2003ad27f5c7";

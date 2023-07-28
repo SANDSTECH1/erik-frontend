@@ -6,6 +6,8 @@ class userListData {
   String? image;
   bool? otpVerified;
   bool selected = false;
+  String? estimatedTime;
+  String? price;
 
   List<String>? tasks;
   List<String>? subtasks;
@@ -19,6 +21,8 @@ class userListData {
       this.image,
       this.otpVerified,
       this.tasks,
+      this.estimatedTime,
+      this.price,
       required this.selected,
       this.subtasks,
       this.iV});
@@ -30,6 +34,8 @@ class userListData {
     password = json['password'];
     image = json['image'];
     otpVerified = json['otpVerified'];
+    estimatedTime = json['estimatedTime'];
+    price = json['price'];
     selected = false;
     tasks = json['tasks'].cast<String>();
     subtasks = json['subtasks'].cast<String>();
@@ -45,6 +51,8 @@ class userListData {
     data['password'] = password;
     data['image'] = image;
     data['otpVerified'] = otpVerified;
+    data['estimatedTime'] = estimatedTime;
+    data['price'] = price;
     data['tasks'] = tasks;
     data['subtasks'] = subtasks;
     data['__v'] = iV;

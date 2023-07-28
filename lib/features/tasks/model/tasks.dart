@@ -8,6 +8,8 @@ class taskByDate {
   List<SubTasks>? subTasks;
   userModel? createdBy;
   String? scheduledDateTime;
+  String? estimatedTime;
+  String? price;
   int? iV;
 
   taskByDate(
@@ -17,6 +19,8 @@ class taskByDate {
       this.assignedUsers,
       this.subTasks,
       this.createdBy,
+      this.estimatedTime,
+      this.price,
       this.scheduledDateTime,
       this.iV});
 
@@ -41,6 +45,8 @@ class taskByDate {
         ? new userModel.fromJson(json['createdBy'])
         : null;
     scheduledDateTime = json['scheduledDateTime'];
+    estimatedTime = json['estimatedTime'];
+    price = json['price'];
     iV = json['__v'];
   }
 
@@ -59,6 +65,8 @@ class taskByDate {
       data['createdBy'] = this.createdBy!.toJson();
     }
     data['scheduledDateTime'] = this.scheduledDateTime;
+    data['estimatedTime'] = this.estimatedTime;
+    data['price'] = this.price;
     data['__v'] = this.iV;
     return data;
   }
