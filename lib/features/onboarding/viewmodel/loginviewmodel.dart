@@ -7,6 +7,7 @@ import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/tasks/view/task_screen.dart';
+import 'package:erick/helper/loader/loader.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -28,26 +29,43 @@ class LoginViewModel with ChangeNotifier {
   // String userToken = '';
   // String get usertoken => userToken;
 
-  login(context) async {
-    final response = await NetworkHelper().postApi(ApiUrls().login, {
-      "email": useremailcontroller.text,
-      "password": userpasswordcontroller.text
-    });
-    logger.d(response.body);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    if (response.statusCode == 200) {
-      _user = userModel.fromJson(jsonBody['data']);
-      userToken = jsonBody['data']['userToken'];
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
-      );
-    } else if (response.statusCode == 400) {
-      showtoast(jsonBody['message']);
-    } else {
-      throw Exception(
-          'Failed to make the API request. Status code: ${response.statusCode}');
+  Future<void> hideLoader(BuildContext context) async {
+    Navigator.of(context).pop();
+  }
+
+  Future<void> login(BuildContext context) async {
+    try {
+      // Show the loader before making the API request
+      showLoader(context);
+
+      final response = await NetworkHelper().postApi(ApiUrls().login, {
+        "email": useremailcontroller.text,
+        "password": userpasswordcontroller.text,
+      });
+
+      // Hide the loader after getting the API response
+      hideLoader(context);
+
+      logger.d(response.body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
+      if (response.statusCode == 200) {
+        _user = userModel.fromJson(jsonBody['data']);
+        userToken = jsonBody['data']['userToken'];
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const calender_screen()),
+        );
+      } else if (response.statusCode == 400) {
+        showtoast(jsonBody['message']);
+      } else {
+        throw Exception(
+            'Failed to make the API request. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle any errors that might occur during the API request or navigation
+      print('Error occurred: $e');
+      showtoast('An error occurred. Please try again.');
     }
   }
 

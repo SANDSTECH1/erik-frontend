@@ -346,10 +346,111 @@ class TaskScreen extends StatelessWidget {
                                                   5.horizontalSpace,
                                                   GestureDetector(
                                                     onTap: () {
-                                                      Navigator.pop(context);
-                                                      taskcontroller.deleteTask(
-                                                          context,
-                                                          tasks[index]);
+                                                      showDialog(
+                                                        barrierColor:
+                                                            Colors.transparent,
+                                                        context: context,
+                                                        builder: (_) =>
+                                                            AlertDialog(
+                                                          backgroundColor:
+                                                              Color(0xffFFF1E8),
+                                                          // contentPadding:
+                                                          //     EdgeInsets.zero,
+                                                          shape:
+                                                              const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.all(
+                                                                    Radius.circular(
+                                                                        10.0)),
+                                                          ),
+                                                          content: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              // Your confirmation message
+                                                              Text(
+                                                                'Are You Sure?',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        14.sp,
+                                                                    color: Colors
+                                                                        .grey),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 20.0),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      width:
+                                                                          71.w,
+                                                                      height:
+                                                                          26.h,
+                                                                      decoration: BoxDecoration(
+                                                                          border:
+                                                                              Border.all(color: Colors.black),
+                                                                          borderRadius: BorderRadius.circular(10)),
+                                                                      child: Center(
+                                                                          child: Text(
+                                                                        'CANCEL',
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 10.sp,
+                                                                            color: Colors.black),
+                                                                      )),
+                                                                    ),
+                                                                  ),
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      taskcontroller.deleteTask(
+                                                                          context,
+                                                                          tasks[
+                                                                              index]);
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      width:
+                                                                          71.w,
+                                                                      height:
+                                                                          26.h,
+                                                                      decoration: BoxDecoration(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          border:
+                                                                              Border.all(color: Colors.black),
+                                                                          borderRadius: BorderRadius.circular(10)),
+                                                                      child: Center(
+                                                                          child: Text(
+                                                                        'DELETE',
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 10.sp,
+                                                                            color: Colors.white),
+                                                                      )),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
                                                     },
                                                     child: Row(
                                                       children: [

@@ -1,3 +1,4 @@
+import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/widgets/subtask.dart';
@@ -8,14 +9,16 @@ import 'package:table_calendar/table_calendar.dart';
 
 class EditTask extends StatelessWidget {
   final taskByDate tasks;
-  const EditTask({
-    super.key,
-    required this.tasks,
-  });
+  final List<String> assignedUserIds;
+  const EditTask(
+      {super.key, required this.tasks, required this.assignedUserIds});
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
+    for (var user in controller.usersdata) {
+      user.selected = assignedUserIds.contains(user.sId.toString());
+    }
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -125,6 +128,10 @@ class EditTask extends StatelessWidget {
                                     shrinkWrap: true,
                                     itemCount: controller.usersdata.length,
                                     itemBuilder: (context, index) {
+                                      final user = controller.usersdata[index];
+                                      final selected = (assignedUserIds
+                                          .contains(user.sId.toString()));
+
                                       return GestureDetector(
                                         onTap: () {
                                           controller.changeSelectedUser(
@@ -144,19 +151,18 @@ class EditTask extends StatelessWidget {
                                                 ),
                                                 1.horizontalSpace,
                                                 Text(
-                                                  controller
-                                                      .usersdata[index].name
-                                                      .toString(),
+                                                  user.name.toString(),
                                                   style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: const Color(
-                                                          0xff163300),
-                                                      fontSize: 16.sp),
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        const Color(0xff163300),
+                                                    fontSize: 16.sp,
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                            controller.usersdata[index].selected
+                                            //controller.usersdata[index].selected
+                                            selected
                                                 ? const Icon(
                                                     Icons.check_box,
                                                     color: Color(0xff163300),

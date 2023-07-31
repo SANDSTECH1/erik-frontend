@@ -17,7 +17,7 @@ class CalendarViewModel with ChangeNotifier {
   final datesByMonth = [];
   final year = 2023;
   String date = '';
-  int activeShowMonth = 6;
+  int activeShowMonth = 7;
 
   CalendarViewModel() {
     addDatesGrid();
@@ -40,35 +40,40 @@ class CalendarViewModel with ChangeNotifier {
   }
 
   showdetails(targetDate, context) async {
-    //print("$targetDate-${activeShowMonth + 1}-$year");
     print('$year-${activeShowMonth + 1}-$targetDate');
-    //print(targetDate);
 
     final response = await NetworkHelper().getApi(
         "${ApiUrls().getTaskByDate}?targetDate=$year-${activeShowMonth + 1}-$targetDate");
 
     final body = response.body;
     final jsonBody = json.decode(body);
-    //final List<Map<String, dynamic>> taskDataList = jsonBody['data'];
-    List<taskByDate> _getTasks = jsonBody['data']
-        .map<taskByDate>((m) => taskByDate.fromJson(m))
-        .toList();
-    List<String> dates = [targetDate];
-    updateAssignedDates(dates);
-    if (response.statusCode == 200) {
-      print(jsonBody['data']);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => TaskScreen(
-                  tasks: _getTasks,
-                )),
-      );
-    } else if (response.statusCode == 400) {
-      showtoast(jsonBody['message']);
+
+    if (jsonBody['data'] == null) {
+      // No tasks found, show a message to the user
+      showtoast('No tasks found for the selected date.');
     } else {
-      // throw Exception(
-      //     'Failed to make the API request. Status code: ${response.statusCode}');
+      List<taskByDate> _getTasks = jsonBody['data']
+          .map<taskByDate>((m) => taskByDate.fromJson(m))
+          .toList();
+      List<String> dates = [targetDate];
+      updateAssignedDates(dates);
+
+      if (response.statusCode == 200) {
+        print(jsonBody['data']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TaskScreen(
+              tasks: _getTasks,
+            ),
+          ),
+        );
+      } else if (response.statusCode == 400) {
+        showtoast(jsonBody['message']);
+      } else {
+        // throw Exception(
+        //     'Failed to make the API request. Status code: ${response.statusCode}');
+      }
     }
   }
 

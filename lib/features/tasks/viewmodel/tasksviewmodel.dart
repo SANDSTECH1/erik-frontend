@@ -1,3 +1,4 @@
+import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/assigntask.dart';
@@ -38,7 +39,7 @@ class TaskViewModel with ChangeNotifier {
   final kFirstDay = DateTime(
       DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
   final kLastDay = DateTime(
-      DateTime.now().year, DateTime.now().month + 3, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month + 12, DateTime.now().day);
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -148,10 +149,10 @@ class TaskViewModel with ChangeNotifier {
         await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
     if (response.statusCode == 200) {
       showtoast('Task deleted successfully');
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => calender_screen()),
-      //);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => calender_screen()),
+      );
     } else {
       showtoast('Failed to delete the task');
     }
@@ -162,10 +163,14 @@ class TaskViewModel with ChangeNotifier {
     BuildContext context,
     taskByDate task,
   ) {
+    List assignedmembers =
+        _users.where((element) => element.selected == true).toList();
+    print(assignedmembers.length);
+    List<String> ids =
+        assignedmembers.map((user) => user.sId.toString()).toList();
     taskDescriptioncontroller.text = task.description.toString();
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
-    //final parsedDateTime1 = DateTime.parse(task.estimatedTime.toString());
     estimatedTimecontroller.text = task.estimatedTime.toString();
     final parsedDateTime = DateTime.parse(task.scheduledDateTime.toString());
     final formattedTime =
@@ -178,11 +183,15 @@ class TaskViewModel with ChangeNotifier {
     daycontroller = formattedDate;
     selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
     print(formattedDate);
+    //print('Assigned User IDs: $assignedUserIds');
     //print(formattedDate1);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditTask(tasks: task),
+        builder: (context) => EditTask(
+          tasks: task,
+          assignedUserIds: ids,
+        ),
       ),
     );
   }
@@ -190,8 +199,6 @@ class TaskViewModel with ChangeNotifier {
   void viewtasks(BuildContext context, taskByDate taskss) {
     taskDescriptioncontroller.text = taskss.description.toString();
     taskTitlecontroller.text = taskss.title.toString();
-    print(taskss.description.toString());
-    print(taskss.title.toString());
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
@@ -222,6 +229,7 @@ class TaskViewModel with ChangeNotifier {
   }
 
   changeselectedate(s) {
+    print(s);
     selectedDay = s;
     daycontroller = s.toString();
     notifyListeners();

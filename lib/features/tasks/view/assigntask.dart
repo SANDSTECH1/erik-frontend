@@ -14,7 +14,7 @@ class AssignTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-    DateTime? selectedDay;
+    //DateTime? selectedDay;
     return Material(
       child: SizedBox(
         width: 800.w,
@@ -200,9 +200,6 @@ class AssignTask extends StatelessWidget {
                                 formatButtonVisible: false),
                             calendarStyle: CalendarStyle(
                               isTodayHighlighted: true,
-                              selectedDecoration: const BoxDecoration(
-                                color: Colors.grey,
-                              ),
 
                               disabledTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
@@ -237,9 +234,9 @@ class AssignTask extends StatelessWidget {
                               ),
                               selectedTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
-                              // selectedDecoration: const BoxDecoration(
-                              //   color: Colors.grey,
-                              // ),
+                              selectedDecoration: const BoxDecoration(
+                                color: Colors.grey,
+                              ),
                               defaultTextStyle: TextStyle(
                                   color: Colors.black, fontSize: 12.sp),
                               defaultDecoration: const BoxDecoration(
@@ -252,10 +249,10 @@ class AssignTask extends StatelessWidget {
 
                               // Using `isSameDay` is recommended to disregard
                               // the time-part of compared DateTime objects.
-                              return isSameDay(selectedDay, day);
+                              return isSameDay(controller.selectedDay, day);
                             },
                             onDaySelected: (selectedDay, focusedDay) {
-                              controller.daycontroller = selectedDay.toString();
+                              controller.changeselectedate(selectedDay);
                             },
                             onFormatChanged: (format) {
                               // if (controller.calendarFormat != format) {
