@@ -447,8 +447,10 @@ class SubAssignTask extends StatelessWidget {
                             // 20.horizontalSpace,
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context);
-                                controller.createSubTask(context);
+                                //Navigator.pop(context);
+                                controller.createSubTask(
+                                  context,
+                                );
                               },
                               child: Container(
                                 width: 100.w,

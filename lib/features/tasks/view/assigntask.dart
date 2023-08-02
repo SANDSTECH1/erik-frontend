@@ -1,3 +1,4 @@
+import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/features/subtasks/view/subtask.dart';
@@ -14,6 +15,7 @@ class AssignTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
+    final subcontroller = Provider.of<SubTaskViewModel>(context);
     return Material(
       child: SizedBox(
         width: 800.w,
@@ -544,6 +546,7 @@ class AssignTask extends StatelessWidget {
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pop(context);
+                                  subcontroller.createSubTask(context);
 
                                   showDialog(
                                       context: context,

@@ -1,14 +1,11 @@
-import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
-import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/tasks/view/edittasks.dart';
 import 'package:erick/features/tasks/view/viewtasks.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
-import 'package:erick/features/subtasks/view/viewtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -73,7 +70,7 @@ class TaskViewModel with ChangeNotifier {
       "description": taskDescriptioncontroller.text,
       "assignedUsers": ids,
       "scheduledDateTime": combinedDateTime,
-      "estimatedTime": estimatedTimecontroller,
+      "estimatedTime": combinedDateTime,
       "price": pricecontroller.text,
     });
 

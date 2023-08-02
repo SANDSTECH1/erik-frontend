@@ -1,4 +1,3 @@
-import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
@@ -9,9 +8,6 @@ import 'package:erick/helper/toast/toast.dart';
 import 'package:erick/features/subtasks/view/viewtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-
-import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 String userToken = "";
 
@@ -24,29 +20,24 @@ class SubTaskViewModel with ChangeNotifier {
 
   String daycontroller = "";
   String timecontroller = "";
-  String getFormattedMonthAndYearcontroller = "";
+
   DateTime? selectedDay;
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
 
-  CalendarFormat calendarFormat = CalendarFormat.month;
-  DateTime focusedDay = DateTime.now();
-
-  final kFirstDay = DateTime(
-      DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
-  final kLastDay = DateTime(
-      DateTime.now().year, DateTime.now().month + 12, DateTime.now().day);
+  List<taskByDate> _subtasks = [];
+  List<taskByDate> get subtasksdata => _subtasks;
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
   SubTaskViewModel() {
     getmembers();
   }
-// Function to create subtasks for each subtask data
-  Future<void> createSubTasksForAll(List<subtasks> subtasksList) async {
-    for (subtasks subtaskData in subtasksList) {
-      String taskId = subtaskData.task ?? "";
+  void createSubTasksForAll() async {
+    for (taskByDate taskData in _subtasks) {
+      String taskId =
+          taskData.sId ?? ""; // Get the taskId from the taskByDate object
       await createSubTask(taskId);
     }
   }
@@ -55,16 +46,14 @@ class SubTaskViewModel with ChangeNotifier {
     context,
   ) async {
     String taskId = "";
-    // print("timecontroller$timecontroller");
-    // print("daycontroller $daycontroller");
-    print(estimatedTimecontroller);
-    print(pricecontroller);
+    print(subtaskTitlecontroller.text);
+    print(subtaskDescriptioncontroller.text);
+    //print(taskId);
 
     final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
       "title": subtaskTitlecontroller.text,
       "description": subtaskDescriptioncontroller.text,
       "task": taskId,
-      // "scheduledDateTime": combinedDateTime,
       "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
@@ -73,10 +62,10 @@ class SubTaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const calender_screen()),
+      // );
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
@@ -92,19 +81,6 @@ class SubTaskViewModel with ChangeNotifier {
       print(assignedmembers.length);
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
-      //final combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
-      String date = daycontroller; // Assuming the value is "2023-07-21"
-      String time = timecontroller; // Assuming the value is "8:58 AM"
-      print(
-        {
-          "title": subtaskTitlecontroller.text,
-          "description": subtaskDescriptioncontroller.text,
-          "task": ids,
-          "estimatedTime": estimatedTimecontroller.text,
-          "price": pricecontroller.text,
-        },
-      );
-
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatesubtasks}/${subtask.sId}",
         {
@@ -163,19 +139,7 @@ class SubTaskViewModel with ChangeNotifier {
     subtaskTitlecontroller.text = subtask.title.toString();
     pricecontroller.text = subtask.price.toString();
     estimatedTimecontroller.text = subtask.estimatedTime.toString();
-    final parsedDateTime = DateTime.parse(subtask.scheduledDateTime.toString());
-    final formattedTime =
-        DateFormat('hh:mm a').format(parsedDateTime.toLocal());
-    final formattedDate =
-        DateFormat('yyyy-MM-dd').format(parsedDateTime.toLocal());
-    selectedTime =
-        TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime));
 
-    daycontroller = formattedDate;
-    selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
-    print(formattedDate);
-    //print('Assigned User IDs: $assignedUserIds');
-    //print(formattedDate1);
     Navigator.push(
       context,
       MaterialPageRoute(
