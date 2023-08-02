@@ -1,7 +1,7 @@
 import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/widgets/subtask.dart';
+import 'package:erick/features/subtasks/view/subtask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';

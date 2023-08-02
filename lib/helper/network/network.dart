@@ -141,15 +141,15 @@ class ApiUrls {
   String forgetpass = "$baseUrl/forgetPassword";
   String otp = "$baseUrl/verifyOtp";
   String resetpass = "$baseUrl/resetPassword";
-  String image = "$baseUrl/updateImage";
+  String putimage = "$baseUrl/updateImage";
   String createtask = "$baseUrl/createtask";
   String getuser = "$baseUrl/getUser";
   String gettask = "$baseUrl/gettask";
   String updatetask = "$baseUrl/updatetask";
   String deletetask = "$baseUrl/deletetask";
-  String subtasks = "$baseUrl/createsubtask";
+  String createsubtask = "$baseUrl/createsubtask";
   String getsubtasks = "$baseUrl/getsubtask";
-  String deletesubtasks = "$baseUrl/deleteSubTask/6480ea798b1a2003ad27f5c7";
-  String updatesubtasks = "$baseUrl/updateSubTask/6480ea798b1a2003ad27f5c7";
+  String deletesubtasks = "$baseUrl/deleteSubTask";
+  String updatesubtasks = "$baseUrl/updateSubTask";
   String getTaskByDate = "$baseUrl/getTaskByDate";
 }

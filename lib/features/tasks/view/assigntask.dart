@@ -1,6 +1,6 @@
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/widgets/subtask.dart';
+import 'package:erick/features/subtasks/view/subtask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,6 @@ class AssignTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-    //DateTime? selectedDay;
     return Material(
       child: SizedBox(
         width: 800.w,

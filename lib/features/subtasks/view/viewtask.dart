@@ -1,20 +1,20 @@
+import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
-import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
+import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class ViewSubTasks extends StatelessWidget {
-  final taskByDate tasks;
+  final taskByDate subtasks;
   const ViewSubTasks({
     super.key,
-    required this.tasks,
+    required this.subtasks,
   });
 
   @override
   Widget build(BuildContext context) {
-    final taskcontroller = Provider.of<TaskViewModel>(context);
+    final subtaskcontroller = Provider.of<SubTaskViewModel>(context);
 
     return Material(
       child: SizedBox(
@@ -63,7 +63,7 @@ class ViewSubTasks extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          taskcontroller.taskTitlecontroller.text,
+                          subtaskcontroller.subtaskTitlecontroller.text,
                           style: TextStyle(color: Colors.grey, fontSize: 20.sp),
                         ),
                         Row(
@@ -83,7 +83,8 @@ class ViewSubTasks extends StatelessWidget {
                   SizedBox(
                     width: 450.w,
                     child: TextField(
-                      controller: taskcontroller.taskDescriptioncontroller,
+                      controller:
+                          subtaskcontroller.subtaskDescriptioncontroller,
                       keyboardType: TextInputType.multiline,
                       minLines: 13, //Normal textInputField will be displayed
                       maxLines:
@@ -129,6 +130,17 @@ class ViewSubTasks extends StatelessWidget {
                     ),
                   ),
                   23.verticalSpace,
+                  // Align(
+                  //   alignment: Alignment.topLeft,
+                  //   child: Text(
+                  //     'Assigned To',
+                  //     style: TextStyle(
+                  //         color: Colors.black,
+                  //         fontSize: 20.sp,
+                  //         fontWeight: FontWeight.bold),
+                  //   ),
+                  // ),
+                  23.verticalSpace,
                   Align(
                     alignment: Alignment.topLeft,
                     child: Text(
@@ -141,18 +153,12 @@ class ViewSubTasks extends StatelessWidget {
                   ),
                   23.verticalSpace,
                   Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                      AssignTo(),
-                    ],
-                  )
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: List.generate(
+                        subtaskcontroller.usersdata.length,
+                        (index) => AssignTo(subtaskcontroller.usersdata[index]),
+                      ))
                 ],
               ),
             )
@@ -163,7 +169,7 @@ class ViewSubTasks extends StatelessWidget {
   }
 }
 
-Widget AssignTo() {
+Widget AssignTo(userListData user) {
   return Container(
     width: 100.w,
     height: 50.h,
@@ -179,7 +185,7 @@ Widget AssignTo() {
         ),
         4.horizontalSpace,
         Text(
-          'Mark Allen',
+          user.name.toString(),
           style: TextStyle(color: Colors.black, fontSize: 20.sp),
         ),
         6.horizontalSpace,

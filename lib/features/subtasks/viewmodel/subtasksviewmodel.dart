@@ -1,10 +1,8 @@
-import 'package:erick/features/onboarding/model/user.dart';
+import 'package:erick/features/subtasks/model/getSubtasks.dart';
+import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
-import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
-import 'package:erick/features/tasks/view/edittasks.dart';
-import 'package:erick/features/tasks/view/viewtasks.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -17,18 +15,17 @@ import 'package:table_calendar/table_calendar.dart';
 
 String userToken = "";
 
-class TaskViewModel with ChangeNotifier {
-  final TextEditingController taskTitlecontroller = TextEditingController();
+class SubTaskViewModel with ChangeNotifier {
+  final TextEditingController subtaskTitlecontroller = TextEditingController();
   final TextEditingController estimatedTimecontroller = TextEditingController();
   final TextEditingController pricecontroller = TextEditingController();
+  final TextEditingController subtaskDescriptioncontroller =
+      TextEditingController();
 
   String daycontroller = "";
   String timecontroller = "";
   String getFormattedMonthAndYearcontroller = "";
   DateTime? selectedDay;
-
-  final TextEditingController taskDescriptioncontroller =
-      TextEditingController();
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
@@ -43,37 +40,32 @@ class TaskViewModel with ChangeNotifier {
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  TaskViewModel() {
+  SubTaskViewModel() {
     getmembers();
   }
+// Function to create subtasks for each subtask data
+  Future<void> createSubTasksForAll(List<subtasks> subtasksList) async {
+    for (subtasks subtaskData in subtasksList) {
+      String taskId = subtaskData.task ?? "";
+      await createSubTask(taskId);
+    }
+  }
 
-  createTask(
+  createSubTask(
     context,
   ) async {
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
-    List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
-
-    print("timecontroller$timecontroller");
-    print("daycontroller $daycontroller");
+    String taskId = "";
+    // print("timecontroller$timecontroller");
+    // print("daycontroller $daycontroller");
     print(estimatedTimecontroller);
     print(pricecontroller);
 
-    String date = daycontroller; // Assuming the value is "2023-07-21"
-    String time = timecontroller;
-    // Assuming the value is "8:58 AM"
-
-    String combinedDateTime = combineDateAndTime(date, time);
-    print(combinedDateTime); // Output: "2023-07-21T08:58:00"
-
-    final response = await NetworkHelper().postApi(ApiUrls().createtask, {
-      "title": taskTitlecontroller.text,
-      "description": taskDescriptioncontroller.text,
-      "assignedUsers": ids,
-      "scheduledDateTime": combinedDateTime,
-      "estimatedTime": estimatedTimecontroller,
+    final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
+      "title": subtaskTitlecontroller.text,
+      "description": subtaskDescriptioncontroller.text,
+      "task": taskId,
+      // "scheduledDateTime": combinedDateTime,
+      "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
 
@@ -93,7 +85,7 @@ class TaskViewModel with ChangeNotifier {
     }
   }
 
-  void editTask(BuildContext context, taskByDate task) async {
+  void editTask(BuildContext context, taskByDate subtask) async {
     try {
       List assignedmembers =
           _users.where((element) => element.selected == true).toList();
@@ -103,17 +95,24 @@ class TaskViewModel with ChangeNotifier {
       //final combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
       String date = daycontroller; // Assuming the value is "2023-07-21"
       String time = timecontroller; // Assuming the value is "8:58 AM"
-
-      String combinedDateTime = combineDateAndTime(date, time);
-      final response = await NetworkHelper().putApi(
-        "${ApiUrls().updatetask}/${task.sId}",
+      print(
         {
-          "title": taskTitlecontroller.text,
-          "description": taskDescriptioncontroller.text,
-          "assignedUsers": ids,
+          "title": subtaskTitlecontroller.text,
+          "description": subtaskDescriptioncontroller.text,
+          "task": ids,
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
-          "scheduledDateTime": combinedDateTime
+        },
+      );
+
+      final response = await NetworkHelper().putApi(
+        "${ApiUrls().updatesubtasks}/${subtask.sId}",
+        {
+          "title": subtaskTitlecontroller.text,
+          "description": subtaskDescriptioncontroller.text,
+          "task": ids,
+          "estimatedTime": estimatedTimecontroller.text,
+          "price": pricecontroller.text,
         },
       );
       final body = response.body;
@@ -136,9 +135,9 @@ class TaskViewModel with ChangeNotifier {
     }
   }
 
-  deleteTask(context, taskByDate task) async {
-    final response =
-        await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
+  deleteTask(context, taskByDate subtask) async {
+    final response = await NetworkHelper()
+        .deleteApi("${ApiUrls().deletesubtasks}/${subtask.sId}");
     if (response.statusCode == 200) {
       showtoast('Task deleted successfully');
       Navigator.push(
@@ -151,20 +150,20 @@ class TaskViewModel with ChangeNotifier {
     return response;
   }
 
-  void editTaskclick(
+  void editTaskclicks(
     BuildContext context,
-    taskByDate task,
+    taskByDate subtask,
   ) {
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
-    taskDescriptioncontroller.text = task.description.toString();
-    taskTitlecontroller.text = task.title.toString();
-    pricecontroller.text = task.price.toString();
-    estimatedTimecontroller.text = task.estimatedTime.toString();
-    final parsedDateTime = DateTime.parse(task.scheduledDateTime.toString());
+    subtaskDescriptioncontroller.text = subtask.description.toString();
+    subtaskTitlecontroller.text = subtask.title.toString();
+    pricecontroller.text = subtask.price.toString();
+    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+    final parsedDateTime = DateTime.parse(subtask.scheduledDateTime.toString());
     final formattedTime =
         DateFormat('hh:mm a').format(parsedDateTime.toLocal());
     final formattedDate =
@@ -180,17 +179,17 @@ class TaskViewModel with ChangeNotifier {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditTask(
-          tasks: task,
-          assignedUserIds: ids,
+        builder: (context) => SubAssignTask(
+          subtasks: subtask,
+          // assignedUserIds: ids,
         ),
       ),
     );
   }
 
-  void viewtasks(BuildContext context, taskByDate taskss) {
-    taskDescriptioncontroller.text = taskss.description.toString();
-    taskTitlecontroller.text = taskss.title.toString();
+  void viewtasks(BuildContext context, taskByDate subtaskss) {
+    subtaskDescriptioncontroller.text = subtaskss.description.toString();
+    subtaskTitlecontroller.text = subtaskss.title.toString();
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
@@ -200,8 +199,8 @@ class TaskViewModel with ChangeNotifier {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ViewTask(
-                tasks: taskss,
+          builder: (context) => ViewSubTasks(
+                subtasks: subtaskss,
               )),
     );
   }
@@ -237,41 +236,4 @@ class TaskViewModel with ChangeNotifier {
     timecontroller = selectedTime.format(context);
     notifyListeners();
   }
-
-  putimage(String url, data, file, type) async {
-    try {
-      final response = await NetworkHelper().mediaFormUpload(
-          "http://localhost:4000/api/v1/updateImage", [], file, "image");
-      if (response['success'] == true) {
-        print('Image update successful');
-      } else {
-        print('Failed to update image: ${response['message']}');
-      }
-    } catch (e) {
-      print('Error updating image: $e');
-    }
-  }
-}
-
-String combineDateAndTime(String? date, String? time) {
-  if (date == null || time == null) {
-    throw ArgumentError("Date and time must not be null.");
-  }
-  final DateTime selectedDate = DateFormat("yyyy-MM-dd").parse(date);
-  final TimeOfDay selectedTime = TimeOfDay(
-    hour: int.parse(time.split(":")[0]),
-    minute: int.parse(time.split(":")[1].split(" ")[0]),
-  );
-
-  final DateTime combinedDateTime = DateTime(
-    selectedDate.year,
-    selectedDate.month,
-    selectedDate.day,
-    selectedTime.hour,
-    selectedTime.minute,
-  );
-
-  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss");
-  final String formattedDateTime = format.format(combinedDateTime);
-  return formattedDateTime;
 }

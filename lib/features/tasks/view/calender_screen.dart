@@ -136,47 +136,66 @@ class calender_screen extends StatelessWidget {
                   ),
                 ),
               ),
-              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 20),
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          contentPadding: EdgeInsets.zero,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                            contentPadding: EdgeInsets.zero,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            content: Builder(
+                              builder: (context) {
+                                return AssignTask(); // Replace this with your AssignTask widget
+                              },
+                            ),
                           ),
-                          content: Builder(
-                            builder: (context) {
-                              return const AssignTask();
-                            },
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 180,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  Icons.add_circle,
+                                  color: Color(0xff163300),
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Assign Task',
+                                  style: TextStyle(
+                                    color: const Color(0xff163300),
+                                    fontSize: 22.0,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        const Icon(
-                          Icons.add_circle,
-                          color: Color(0xff163300),
-                        ),
-                        4.horizontalSpace,
-                        Text(
-                          'Assign Task',
-                          style: TextStyle(
-                            color: const Color(0xff163300),
-                            fontSize: 28.sp,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ]),
+                ],
+              ),
               30.verticalSpace,
               Expanded(
                 child: Column(
