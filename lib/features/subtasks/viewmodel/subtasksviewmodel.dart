@@ -9,6 +9,8 @@ import 'package:erick/features/subtasks/view/viewtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+
 String userToken = "";
 
 class SubTaskViewModel with ChangeNotifier {
@@ -34,26 +36,15 @@ class SubTaskViewModel with ChangeNotifier {
   SubTaskViewModel() {
     getmembers();
   }
-  void createSubTasksForAll() async {
-    for (taskByDate taskData in _subtasks) {
-      String taskId =
-          taskData.sId ?? ""; // Get the taskId from the taskByDate object
-      await createSubTask(taskId);
-    }
-  }
 
-  createSubTask(
-    context,
-  ) async {
-    String taskId = "";
+  createSubTask(context, taskid) async {
     print(subtaskTitlecontroller.text);
     print(subtaskDescriptioncontroller.text);
     //print(taskId);
-
     final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
-      "title": subtaskTitlecontroller.text,
-      "description": subtaskDescriptioncontroller.text,
-      "task": taskId,
+      "subTaskTitle": subtaskTitlecontroller.text,
+      "subTaskDescription": subtaskDescriptioncontroller.text,
+      "task": taskid,
       "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
@@ -62,10 +53,10 @@ class SubTaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => const calender_screen()),
-      // );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const calender_screen()),
+      );
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
@@ -74,19 +65,14 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  void editTask(BuildContext context, taskByDate subtask) async {
+  void editTask(BuildContext context, taskByDate task) async {
     try {
-      List assignedmembers =
-          _users.where((element) => element.selected == true).toList();
-      print(assignedmembers.length);
-      List<String> ids =
-          assignedmembers.map((user) => user.sId.toString()).toList();
       final response = await NetworkHelper().putApi(
-        "${ApiUrls().updatesubtasks}/${subtask.sId}",
+        "${ApiUrls().updatesubtasks}/${task.sId}",
         {
-          "title": subtaskTitlecontroller.text,
-          "description": subtaskDescriptioncontroller.text,
-          "task": ids,
+          "subTaskTitle": subtaskTitlecontroller.text,
+          "subTaskDescription": subtaskDescriptioncontroller.text,
+          "task": task,
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
         },
@@ -111,9 +97,9 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  deleteTask(context, taskByDate subtask) async {
+  deleteTask(context, taskid) async {
     final response = await NetworkHelper()
-        .deleteApi("${ApiUrls().deletesubtasks}/${subtask.sId}");
+        .deleteApi("${ApiUrls().deletesubtasks}/${taskid}");
     if (response.statusCode == 200) {
       showtoast('Task deleted successfully');
       Navigator.push(
@@ -128,23 +114,18 @@ class SubTaskViewModel with ChangeNotifier {
 
   void editTaskclicks(
     BuildContext context,
-    taskByDate subtask,
+    taskid,
   ) {
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
-    List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
-    subtaskDescriptioncontroller.text = subtask.description.toString();
-    subtaskTitlecontroller.text = subtask.title.toString();
-    pricecontroller.text = subtask.price.toString();
-    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+    subtaskDescriptioncontroller.text = taskid.description.toString();
+    subtaskTitlecontroller.text = taskid.title.toString();
+    pricecontroller.text = taskid.price.toString();
+    estimatedTimecontroller.text = taskid.estimatedTime.toString();
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SubAssignTask(
-          subtasks: subtask,
+        builder: (context) => editSubAssignTask(
+          id: taskid,
           // assignedUserIds: ids,
         ),
       ),
@@ -170,6 +151,7 @@ class SubTaskViewModel with ChangeNotifier {
   }
 
   getmembers() async {
+    print("getmember");
     final response = await NetworkHelper().getApi(
       ApiUrls().getuser,
     );
@@ -200,4 +182,27 @@ class SubTaskViewModel with ChangeNotifier {
     timecontroller = selectedTime.format(context);
     notifyListeners();
   }
+}
+
+String combineDateAndTime(String? date, String? time) {
+  if (date == null || time == null) {
+    throw ArgumentError("Date and time must not be null.");
+  }
+  final DateTime selectedDate = DateFormat("yyyy-MM-dd").parse(date);
+  final TimeOfDay selectedTime = TimeOfDay(
+    hour: int.parse(time.split(":")[0]),
+    minute: int.parse(time.split(":")[1].split(" ")[0]),
+  );
+
+  final DateTime combinedDateTime = DateTime(
+    selectedDate.year,
+    selectedDate.month,
+    selectedDate.day,
+    selectedTime.hour,
+    selectedTime.minute,
+  );
+
+  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss");
+  final String formattedDateTime = format.format(combinedDateTime);
+  return formattedDateTime;
 }

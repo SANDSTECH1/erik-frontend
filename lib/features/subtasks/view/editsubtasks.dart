@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
-class SubAssignTask extends StatelessWidget {
-  final taskByDate subtasks;
-  const SubAssignTask({super.key, required this.subtasks});
+class editSubAssignTask extends StatelessWidget {
+  final id;
+  const editSubAssignTask({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -432,8 +432,8 @@ class SubAssignTask extends StatelessWidget {
                             20.horizontalSpace,
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context);
-                                controller.editTaskclicks(context, subtasks);
+                                // Navigator.pop(context);
+                                controller.editTaskclicks(context, id);
                               },
                               child: Container(
                                 width: 100.w,

@@ -82,12 +82,25 @@ class TaskViewModel with ChangeNotifier {
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),
       );
+      taskTitlecontroller.clear();
+      taskDescriptioncontroller.clear();
+      daycontroller = '';
+      timecontroller = '';
+      estimatedTimecontroller.clear();
+      pricecontroller.clear();
+      clearAssignedUsers();
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
       // throw Exception(
       //     'Failed to make the API request. Status code: ${response.statusCode}');
     }
+    taskTitlecontroller.clear();
+    taskDescriptioncontroller.clear();
+    daycontroller = '';
+    timecontroller = '';
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
   }
 
   void editTask(BuildContext context, taskByDate task) async {
@@ -123,6 +136,13 @@ class TaskViewModel with ChangeNotifier {
           context,
           MaterialPageRoute(builder: (context) => calender_screen()),
         );
+        taskTitlecontroller.clear();
+        taskDescriptioncontroller.clear();
+        daycontroller = '';
+        timecontroller = '';
+        estimatedTimecontroller.clear();
+        pricecontroller.clear();
+        clearAssignedUsers();
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
       } else {
@@ -131,6 +151,12 @@ class TaskViewModel with ChangeNotifier {
     } catch (e) {
       showtoast('Error updating task: $e');
     }
+    taskTitlecontroller.clear();
+    taskDescriptioncontroller.clear();
+    daycontroller = '';
+    timecontroller = '';
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
   }
 
   deleteTask(context, taskByDate task) async {
@@ -161,7 +187,10 @@ class TaskViewModel with ChangeNotifier {
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
     estimatedTimecontroller.text = task.estimatedTime.toString();
-    final parsedDateTime = DateTime.parse(task.scheduledDateTime.toString());
+    final int milliseconds = int.parse(task.scheduledDateTime ?? "0");
+    final DateTime parsedDateTime =
+        DateTime.fromMillisecondsSinceEpoch(milliseconds);
+
     final formattedTime =
         DateFormat('hh:mm a').format(parsedDateTime.toLocal());
     final formattedDate =
@@ -171,6 +200,7 @@ class TaskViewModel with ChangeNotifier {
 
     daycontroller = formattedDate;
     selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
+
     print(formattedDate);
     //print('Assigned User IDs: $assignedUserIds');
     //print(formattedDate1);
@@ -204,6 +234,7 @@ class TaskViewModel with ChangeNotifier {
   }
 
   getmembers() async {
+    print('memberscall');
     final response = await NetworkHelper().getApi(
       ApiUrls().getuser,
     );
@@ -218,9 +249,13 @@ class TaskViewModel with ChangeNotifier {
   }
 
   changeselectedate(s) {
-    print(s);
-    selectedDay = s;
-    daycontroller = s.toString();
+    if (s == null) {
+      selectedDay = null;
+      daycontroller = '';
+    } else {
+      selectedDay = s;
+      daycontroller = s.toString();
+    }
     notifyListeners();
   }
 
@@ -230,8 +265,22 @@ class TaskViewModel with ChangeNotifier {
   }
 
   changeTime(pickedTime, context) {
-    selectedTime = pickedTime;
-    timecontroller = selectedTime.format(context);
+    if (pickedTime == null) {
+      // If pickedTime is null, it means the time selection was canceled, so clear the time.
+      selectedTime = TimeOfDay.now();
+      timecontroller = '';
+    } else {
+      // Otherwise, update the selected time.
+      selectedTime = pickedTime;
+      timecontroller = selectedTime.format(context);
+    }
+    notifyListeners();
+  }
+
+  void clearAssignedUsers() {
+    _users.forEach((user) {
+      user.selected = false;
+    });
     notifyListeners();
   }
 
@@ -254,21 +303,27 @@ String combineDateAndTime(String? date, String? time) {
   if (date == null || time == null) {
     throw ArgumentError("Date and time must not be null.");
   }
-  final DateTime selectedDate = DateFormat("yyyy-MM-dd").parse(date);
-  final TimeOfDay selectedTime = TimeOfDay(
-    hour: int.parse(time.split(":")[0]),
-    minute: int.parse(time.split(":")[1].split(" ")[0]),
+
+  // Parse the date and time strings separately
+  DateTime parsedDate = DateTime.parse(date);
+  DateTime parsedTime = DateFormat("h:mm a").parse(time);
+
+  // Combine the date and time
+  DateTime combinedDateTime = DateTime(
+    parsedDate.year,
+    parsedDate.month,
+    parsedDate.day,
+    parsedTime.hour,
+    parsedTime.minute,
   );
 
-  final DateTime combinedDateTime = DateTime(
-    selectedDate.year,
-    selectedDate.month,
-    selectedDate.day,
-    selectedTime.hour,
-    selectedTime.minute,
-  );
+  // Get the milliseconds since the epoch
+  int millisecondsSinceEpoch = combinedDateTime.millisecondsSinceEpoch;
 
-  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss");
+  print(millisecondsSinceEpoch); // Output: 1677768000000
+
+  // Convert the DateTime back to a formatted string if needed
+  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss'Z'");
   final String formattedDateTime = format.format(combinedDateTime);
   return formattedDateTime;
 }

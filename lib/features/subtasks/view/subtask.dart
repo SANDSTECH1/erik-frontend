@@ -2,13 +2,14 @@ import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class SubAssignTask extends StatelessWidget {
-  const SubAssignTask({super.key});
+  final id;
+  const SubAssignTask({super.key, required this.id});
 
   @override
   Widget build(BuildContext context) {
+    print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
     return Material(
       child: SizedBox(
@@ -25,7 +26,7 @@ class SubAssignTask extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Assign Task",
+                      "Sub Assign Task",
                       style: TextStyle(color: Colors.white, fontSize: 17.sp),
                     ),
                     GestureDetector(
@@ -112,7 +113,7 @@ class SubAssignTask extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              height: 750.h,
+                              height: 700.h,
                               width: 198.w,
                               child: ListView.builder(
                                   shrinkWrap: true,
@@ -448,9 +449,7 @@ class SubAssignTask extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 //Navigator.pop(context);
-                                controller.createSubTask(
-                                  context,
-                                );
+                                controller.createSubTask(context, id);
                               },
                               child: Container(
                                 width: 100.w,

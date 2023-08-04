@@ -166,7 +166,7 @@ class AssignTask extends StatelessWidget {
                                         ),
                                       );
                                     }),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -253,7 +253,13 @@ class AssignTask extends StatelessWidget {
                               return isSameDay(controller.selectedDay, day);
                             },
                             onDaySelected: (selectedDay, focusedDay) {
-                              controller.changeselectedate(selectedDay);
+                              if (controller.selectedDay == selectedDay) {
+                                // If the selected day is already selected, clear the selection
+                                controller.changeselectedate(null);
+                              } else {
+                                // Otherwise, set the selected day
+                                controller.changeselectedate(selectedDay);
+                              }
                             },
                             onFormatChanged: (format) {
                               // if (controller.calendarFormat != format) {
@@ -543,45 +549,45 @@ class AssignTask extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  subcontroller.createSubTask(context);
+                              // GestureDetector(
+                              //   onTap: () {
+                              //     Navigator.pop(context);
+                              //     subcontroller.createSubTask(context);
 
-                                  showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                            contentPadding: EdgeInsets.zero,
-                                            shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(10.0))),
-                                            content: Builder(
-                                              builder: (context) {
-                                                return const SubAssignTask();
-                                              },
-                                            ),
-                                          ));
-                                },
-                                child: Container(
-                                  width: 100.w,
-                                  decoration: BoxDecoration(
-                                      color: const Color(0xff9FE870),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(4.r))),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(9.w),
-                                    child: Center(
-                                      child: Text(
-                                        'ADD SUBTASK',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14.sp),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              20.horizontalSpace,
+                              //     showDialog(
+                              //         context: context,
+                              //         builder: (_) => AlertDialog(
+                              //               contentPadding: EdgeInsets.zero,
+                              //               shape: const RoundedRectangleBorder(
+                              //                   borderRadius: BorderRadius.all(
+                              //                       Radius.circular(10.0))),
+                              //               content: Builder(
+                              //                 builder: (context) {
+                              //                   return const SubAssignTask();
+                              //                 },
+                              //               ),
+                              //             ));
+                              //   },
+                              //   child: Container(
+                              //     width: 100.w,
+                              //     decoration: BoxDecoration(
+                              //         color: const Color(0xff9FE870),
+                              //         borderRadius: BorderRadius.all(
+                              //             Radius.circular(4.r))),
+                              //     child: Padding(
+                              //       padding: EdgeInsets.all(9.w),
+                              //       child: Center(
+                              //         child: Text(
+                              //           'ADD SUBTASK',
+                              //           style: TextStyle(
+                              //               color: Colors.white,
+                              //               fontSize: 14.sp),
+                              //         ),
+                              //       ),
+                              //     ),
+                              //   ),
+                              // ),
+                              // 20.horizontalSpace,
                               GestureDetector(
                                 onTap: () {
                                   controller.createTask(context);

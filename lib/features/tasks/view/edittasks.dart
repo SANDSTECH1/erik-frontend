@@ -7,6 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+import '../../subtasks/viewmodel/subtasksviewmodel.dart';
+
 class EditTask extends StatelessWidget {
   final taskByDate tasks;
   final List<String> assignedUserIds;
@@ -16,6 +18,8 @@ class EditTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
+    final subcontroller = Provider.of<SubTaskViewModel>(context);
+
     for (var user in controller.usersdata) {
       user.selected = assignedUserIds.contains(user.sId.toString());
     }
@@ -581,6 +585,25 @@ class EditTask extends StatelessWidget {
                               GestureDetector(
                                 onTap: () {
                                   Navigator.pop(context);
+
+                                  showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                            contentPadding: EdgeInsets.zero,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(10.0))),
+                                            content: Builder(
+                                              builder: (context) {
+                                                return SubAssignTask(
+                                                  id: tasks.sId,
+                                                );
+                                              },
+                                            ),
+                                          ));
+
+                                  // Navigator.pop(context);
+                                  // subcontroller.editTaskclicks(context, tasks);
 
                                   // showDialog(
                                   //     context: context,
