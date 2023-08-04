@@ -3,6 +3,7 @@ import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/tasks/view/edittasks.dart';
 import 'package:erick/features/tasks/view/viewtasks.dart';
+import 'package:erick/helper/loader/loader.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -78,6 +79,8 @@ class TaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
+      //showLoader(context);
+      showtoast("Task Created Successfully");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),
@@ -89,11 +92,12 @@ class TaskViewModel with ChangeNotifier {
       estimatedTimecontroller.clear();
       pricecontroller.clear();
       clearAssignedUsers();
+      changeselectedate(selectedDay);
+      changeTime(selectedTime, context);
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
-      // throw Exception(
-      //     'Failed to make the API request. Status code: ${response.statusCode}');
+      showtoast('Failed to create the task');
     }
     taskTitlecontroller.clear();
     taskDescriptioncontroller.clear();
@@ -151,12 +155,6 @@ class TaskViewModel with ChangeNotifier {
     } catch (e) {
       showtoast('Error updating task: $e');
     }
-    taskTitlecontroller.clear();
-    taskDescriptioncontroller.clear();
-    daycontroller = '';
-    timecontroller = '';
-    estimatedTimecontroller.clear();
-    pricecontroller.clear();
   }
 
   deleteTask(context, taskByDate task) async {

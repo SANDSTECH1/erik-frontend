@@ -1,3 +1,4 @@
+import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
@@ -8,7 +9,8 @@ import 'package:provider/provider.dart';
 
 class TaskScreen extends StatelessWidget {
   final List<taskByDate> tasks;
-  const TaskScreen({super.key, required this.tasks});
+  final List<SubTasks> subtasks;
+  const TaskScreen({super.key, required this.tasks, required this.subtasks});
 
   @override
   Widget build(BuildContext context) {
@@ -457,7 +459,8 @@ class TaskScreen extends StatelessWidget {
                                 20.verticalSpace,
                                 ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: tasks[index].subTasks!.length,
+                                    itemCount: //subtasks.length,
+                                        tasks[index].subTasks!.length,
                                     itemBuilder: ((context, i) {
                                       return Column(
                                         children: [
@@ -471,10 +474,15 @@ class TaskScreen extends StatelessWidget {
                                                 child: Padding(
                                                   padding: EdgeInsets.only(
                                                       left: 13.w),
-                                                  child: Text(tasks[index]
-                                                      .subTasks![i]
-                                                      .subTaskTitle
-                                                      .toString()),
+                                                  child: Text(
+                                                    tasks[index]
+                                                        .subTasks![i]
+                                                        .subTaskTitle
+                                                        .toString(),
+                                                    // subtasks[index]
+                                                    //     .subTaskTitle
+                                                    //     .toString()
+                                                  ),
                                                 )),
                                           ),
                                           Container(
@@ -489,6 +497,9 @@ class TaskScreen extends StatelessWidget {
                                                         .subTasks![i]
                                                         .subTaskDescription
                                                         .toString(),
+                                                    // subtasks[index]
+                                                    //     .subTaskDescription
+                                                    //     .toString(),
                                                     style: TextStyle(
                                                         color: Colors.grey,
                                                         fontSize: 11.sp),
@@ -574,7 +585,8 @@ class TaskScreen extends StatelessWidget {
                                                                             context);
                                                                         subtaskcontroller.editTaskclicks(
                                                                             context,
-                                                                            tasks[index]);
+                                                                            subtasks[index]);
+                                                                        //subtaskcontroller.editTaskclicks(context, subtasks);
                                                                       },
                                                                       child:
                                                                           Container(
@@ -630,7 +642,7 @@ class TaskScreen extends StatelessWidget {
                                                               subtaskcontroller
                                                                   .viewtasks(
                                                                       context,
-                                                                      tasks[
+                                                                      subtasks[
                                                                           index]);
                                                             },
                                                             child: Row(
@@ -715,7 +727,8 @@ class TaskScreen extends StatelessWidget {
                                                                             onTap:
                                                                                 () {
                                                                               Navigator.pop(context);
-                                                                              subtaskcontroller.deleteTask(context, tasks[index]);
+                                                                              //subtaskcontroller.deleteTask(context, tasks[index]);
+                                                                              subtaskcontroller.deleteTask(context, subtasks[index]);
                                                                             },
                                                                             child:
                                                                                 Container(

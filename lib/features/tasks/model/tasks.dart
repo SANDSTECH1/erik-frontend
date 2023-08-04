@@ -78,7 +78,9 @@ class SubTasks {
   String? subTaskDescription;
   String? task;
   String? scheduledDateTime;
-  String? createdBy;
+  String? estimatedTime;
+  String? price;
+  //userModel? createdBy;
   int? iV;
 
   SubTasks(
@@ -87,7 +89,9 @@ class SubTasks {
       this.subTaskDescription,
       this.task,
       this.scheduledDateTime,
-      this.createdBy,
+      //this.createdBy,
+      this.estimatedTime,
+      this.price,
       this.iV});
 
   SubTasks.fromJson(Map<String, dynamic> json) {
@@ -96,7 +100,11 @@ class SubTasks {
     subTaskDescription = json['subTaskDescription'];
     task = json['task'];
     scheduledDateTime = json['scheduledDateTime'];
-    createdBy = json['createdBy'];
+    // createdBy = json['createdBy'] != null
+    //     ? new userModel.fromJson(json['createdBy'])
+    //     : null;
+    estimatedTime = json['estimatedTime'];
+    price = json['price'];
     iV = json['__v'];
   }
 
@@ -107,7 +115,11 @@ class SubTasks {
     data['subTaskDescription'] = this.subTaskDescription;
     data['task'] = this.task;
     data['scheduledDateTime'] = this.scheduledDateTime;
-    data['createdBy'] = this.createdBy;
+    // if (this.createdBy != null) {
+    //   data['createdBy'] = this.createdBy!.toJson();
+    // }
+    data['estimatedTime'] = this.estimatedTime;
+    data['price'] = this.price;
     data['__v'] = this.iV;
     return data;
   }

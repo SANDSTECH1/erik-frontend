@@ -433,7 +433,7 @@ class editSubAssignTask extends StatelessWidget {
                             GestureDetector(
                               onTap: () {
                                 // Navigator.pop(context);
-                                controller.editTaskclicks(context, id);
+                                controller.editTask(context, id);
                               },
                               child: Container(
                                 width: 100.w,

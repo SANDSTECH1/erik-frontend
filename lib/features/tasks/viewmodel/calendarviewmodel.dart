@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/helper/network/network.dart';
@@ -52,16 +53,19 @@ class CalendarViewModel with ChangeNotifier {
       List<taskByDate> _getTasks = jsonBody['data']
           .map<taskByDate>((m) => taskByDate.fromJson(m))
           .toList();
+      List<SubTasks> _getSubTasks =
+          jsonBody['data'].map<SubTasks>((m) => SubTasks.fromJson(m)).toList();
       List<String> dates = [targetDate];
       updateAssignedDates(dates);
 
       if (response.statusCode == 200) {
-        print(jsonBody['data']);
+        // print(jsonBody['data']);
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TaskScreen(
               tasks: _getTasks,
+              subtasks: _getSubTasks,
             ),
           ),
         );

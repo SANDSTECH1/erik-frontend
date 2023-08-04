@@ -1,3 +1,4 @@
+import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class ViewSubTasks extends StatelessWidget {
-  final taskByDate subtasks;
+  final SubTasks subtasks;
   const ViewSubTasks({
     super.key,
     required this.subtasks,

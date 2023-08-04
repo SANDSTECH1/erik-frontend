@@ -1,3 +1,4 @@
+import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
@@ -27,10 +28,6 @@ class SubTaskViewModel with ChangeNotifier {
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
-
-  List<taskByDate> _subtasks = [];
-  List<taskByDate> get subtasksdata => _subtasks;
-
   TimeOfDay selectedTime = TimeOfDay.now();
 
   SubTaskViewModel() {
@@ -48,11 +45,23 @@ class SubTaskViewModel with ChangeNotifier {
       "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
+    subtaskDescriptioncontroller.clear();
+    subtaskTitlecontroller.clear();
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
+    clearAssignedUsers();
 
     logger.d(response.body);
     final body = response.body;
     final jsonBody = json.decode(body);
+    print(
+      subtaskTitlecontroller.text,
+    );
+    print(
+      subtaskDescriptioncontroller.text,
+    );
     if (response.statusCode == 200) {
+      showtoast("SubTask Created Successfully");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),
@@ -60,29 +69,41 @@ class SubTaskViewModel with ChangeNotifier {
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
-      // throw Exception(
-      //     'Failed to make the API request. Status code: ${response.statusCode}');
+      showtoast(" Failed To Create SubTask");
     }
   }
 
-  void editTask(BuildContext context, taskByDate task) async {
+  void editTask(BuildContext context, SubTasks taskid) async {
     try {
       final response = await NetworkHelper().putApi(
-        "${ApiUrls().updatesubtasks}/${task.sId}",
+        "${ApiUrls().updatesubtasks}/${taskid.sId}",
         {
           "subTaskTitle": subtaskTitlecontroller.text,
           "subTaskDescription": subtaskDescriptioncontroller.text,
-          "task": task,
+          "task": taskid,
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
         },
       );
+      print(taskid.sId);
+      subtaskDescriptioncontroller.clear();
+      subtaskTitlecontroller.clear();
+      estimatedTimecontroller.clear();
+      pricecontroller.clear();
+      clearAssignedUsers();
       final body = response.body;
       final jsonBody = json.decode(body);
-
+      print(
+        {
+          "subTaskTitle": subtaskTitlecontroller.text,
+          "subTaskDescription": subtaskDescriptioncontroller.text,
+          "task": taskid,
+          "estimatedTime": estimatedTimecontroller.text,
+          "price": pricecontroller.text,
+        },
+      );
       if (response.statusCode == 200) {
-        // Handle successful update, e.g., show a toast or navigate to another screen
-        showtoast('Task updated successfully');
+        showtoast("SubTask Updated Successfully");
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => calender_screen()),
@@ -97,9 +118,10 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  deleteTask(context, taskid) async {
+  deleteTask(context, SubTasks taskid) async {
     final response = await NetworkHelper()
-        .deleteApi("${ApiUrls().deletesubtasks}/${taskid}");
+        .deleteApi("${ApiUrls().deletesubtasks}/${taskid.sId}");
+    print(taskid.sId);
     if (response.statusCode == 200) {
       showtoast('Task deleted successfully');
       Navigator.push(
@@ -114,38 +136,36 @@ class SubTaskViewModel with ChangeNotifier {
 
   void editTaskclicks(
     BuildContext context,
-    taskid,
+    SubTasks subTasks,
   ) {
-    subtaskDescriptioncontroller.text = taskid.description.toString();
-    subtaskTitlecontroller.text = taskid.title.toString();
-    pricecontroller.text = taskid.price.toString();
-    estimatedTimecontroller.text = taskid.estimatedTime.toString();
-
+    subtaskDescriptioncontroller.text = subTasks.subTaskDescription.toString();
+    subtaskTitlecontroller.text = subTasks.subTaskTitle.toString();
+    pricecontroller.text = subTasks.price.toString();
+    estimatedTimecontroller.text = subTasks.estimatedTime.toString();
+    print("subTaskDescription: ${subtaskDescriptioncontroller.text}");
+    print("subTaskTitle: ${subtaskTitlecontroller.text}");
+    print("pricecontroller: ${pricecontroller.text}");
+    print("estimatedTimecontroller: ${estimatedTimecontroller.text}");
+    print(subTasks.sId);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => editSubAssignTask(
-          id: taskid,
+          id: subTasks,
           // assignedUserIds: ids,
         ),
       ),
     );
   }
 
-  void viewtasks(BuildContext context, taskByDate subtaskss) {
-    subtaskDescriptioncontroller.text = subtaskss.description.toString();
-    subtaskTitlecontroller.text = subtaskss.title.toString();
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
-    List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
-
+  void viewtasks(BuildContext context, SubTasks subtasks) {
+    subtaskDescriptioncontroller.text = subtasks.subTaskDescription.toString();
+    subtaskTitlecontroller.text = subtasks.subTaskTitle.toString();
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => ViewSubTasks(
-                subtasks: subtaskss,
+                subtasks: subtasks,
               )),
     );
   }
@@ -180,6 +200,13 @@ class SubTaskViewModel with ChangeNotifier {
   changeTime(pickedTime, context) {
     selectedTime = pickedTime;
     timecontroller = selectedTime.format(context);
+    notifyListeners();
+  }
+
+  void clearAssignedUsers() {
+    _users.forEach((user) {
+      user.selected = false;
+    });
     notifyListeners();
   }
 }

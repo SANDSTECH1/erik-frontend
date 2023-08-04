@@ -18,7 +18,6 @@ class EditTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-    final subcontroller = Provider.of<SubTaskViewModel>(context);
 
     for (var user in controller.usersdata) {
       user.selected = assignedUserIds.contains(user.sId.toString());
