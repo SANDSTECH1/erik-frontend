@@ -4,7 +4,6 @@ import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 class ViewTask extends StatelessWidget {
   final taskByDate tasks;

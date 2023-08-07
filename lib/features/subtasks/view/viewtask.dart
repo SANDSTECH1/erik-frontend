@@ -1,7 +1,7 @@
-import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
+import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +16,7 @@ class ViewSubTasks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subtaskcontroller = Provider.of<SubTaskViewModel>(context);
+    final taskcontroller = Provider.of<TaskViewModel>(context);
 
     return Material(
       child: SizedBox(
@@ -157,8 +158,8 @@ class ViewSubTasks extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        subtaskcontroller.usersdata.length,
-                        (index) => AssignTo(subtaskcontroller.usersdata[index]),
+                        taskcontroller.usersdata.length,
+                        (index) => AssignTo(taskcontroller.usersdata[index]),
                       ))
                 ],
               ),

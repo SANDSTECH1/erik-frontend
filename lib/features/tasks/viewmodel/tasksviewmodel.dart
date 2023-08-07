@@ -54,15 +54,8 @@ class TaskViewModel with ChangeNotifier {
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
 
-    print("timecontroller$timecontroller");
-    print("daycontroller $daycontroller");
-    print(estimatedTimecontroller);
-    print(pricecontroller);
-
     String date = daycontroller; // Assuming the value is "2023-07-21"
     String time = timecontroller;
-    // Assuming the value is "8:58 AM"
-
     String combinedDateTime = combineDateAndTime(date, time);
     print(combinedDateTime); // Output: "2023-07-21T08:58:00"
 
@@ -89,22 +82,18 @@ class TaskViewModel with ChangeNotifier {
       taskDescriptioncontroller.clear();
       daycontroller = '';
       timecontroller = '';
+      combinedDateTime = '';
       estimatedTimecontroller.clear();
       pricecontroller.clear();
       clearAssignedUsers();
-      changeselectedate(selectedDay);
-      changeTime(selectedTime, context);
+      changeselectedate(null);
+      clearSelectedTime();
+      //changeTime(selectedTime, null);
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
       showtoast('Failed to create the task');
     }
-    taskTitlecontroller.clear();
-    taskDescriptioncontroller.clear();
-    daycontroller = '';
-    timecontroller = '';
-    estimatedTimecontroller.clear();
-    pricecontroller.clear();
   }
 
   void editTask(BuildContext context, taskByDate task) async {
@@ -144,6 +133,7 @@ class TaskViewModel with ChangeNotifier {
         taskDescriptioncontroller.clear();
         daycontroller = '';
         timecontroller = '';
+        combinedDateTime = "";
         estimatedTimecontroller.clear();
         pricecontroller.clear();
         clearAssignedUsers();
@@ -279,6 +269,12 @@ class TaskViewModel with ChangeNotifier {
     _users.forEach((user) {
       user.selected = false;
     });
+    notifyListeners();
+  }
+
+  void clearSelectedTime() {
+    selectedTime = TimeOfDay.now();
+    timecontroller = '';
     notifyListeners();
   }
 

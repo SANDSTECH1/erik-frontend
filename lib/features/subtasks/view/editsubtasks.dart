@@ -1,5 +1,5 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
-import 'package:erick/features/tasks/model/tasks.dart';
+import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +10,9 @@ class editSubAssignTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<SubTaskViewModel>(context);
+    final controller = Provider.of<SubTaskViewModel>(context, listen: false);
+
+    final taskcontroller = Provider.of<TaskViewModel>(context);
 
     return Material(
       child: SizedBox(
@@ -118,13 +120,13 @@ class editSubAssignTask extends StatelessWidget {
                               width: 198.w,
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: controller.usersdata.length,
+                                  itemCount: taskcontroller.usersdata.length,
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
-                                        controller.changeSelectedUser(
+                                        taskcontroller.changeSelectedUser(
                                             index,
-                                            !controller
+                                            !taskcontroller
                                                 .usersdata[index].selected);
                                       },
                                       child: Row(
@@ -139,7 +141,8 @@ class editSubAssignTask extends StatelessWidget {
                                               ),
                                               1.horizontalSpace,
                                               Text(
-                                                controller.usersdata[index].name
+                                                taskcontroller
+                                                    .usersdata[index].name
                                                     .toString(),
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.w400,
@@ -149,7 +152,8 @@ class editSubAssignTask extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          controller.usersdata[index].selected
+                                          taskcontroller
+                                                  .usersdata[index].selected
                                               ? const Icon(
                                                   Icons.check_box,
                                                   color: Color(0xff163300),
@@ -182,8 +186,9 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  print("334 $controller.selectedTime");
-                                  controller.changeTime(pickedTime, context);
+                                  print("334 $taskcontroller.selectedTime");
+                                  taskcontroller.changeTime(
+                                      pickedTime, context);
                                   // setState(() {
                                   //   selectedTime = pickedTime;
                                   //   controller.timecontroller = selectedTime.format(context);
@@ -203,7 +208,7 @@ class editSubAssignTask extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              controller.selectedTime.format(context),
+                              taskcontroller.selectedTime.format(context),
                               style: const TextStyle(color: Color(0xff163300)),
                             ),
                             const Icon(Icons.access_time_filled_sharp),

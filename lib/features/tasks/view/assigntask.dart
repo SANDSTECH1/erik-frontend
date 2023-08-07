@@ -295,6 +295,7 @@ class AssignTask extends StatelessWidget {
                                         print("334 $controller.selectedTime");
                                         controller.changeTime(
                                             pickedTime, context);
+
                                         // setState(() {
                                         //   selectedTime = pickedTime;
                                         //   controller.timecontroller = selectedTime.format(context);
@@ -591,6 +592,7 @@ class AssignTask extends StatelessWidget {
                               GestureDetector(
                                 onTap: () {
                                   controller.createTask(context);
+                                  //controller.clearSelectedTime();
                                   //Navigator.pop(context);
                                 },
                                 child: Container(

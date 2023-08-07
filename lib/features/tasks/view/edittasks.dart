@@ -1,4 +1,3 @@
-import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/features/subtasks/view/subtask.dart';
@@ -6,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
-
-import '../../subtasks/viewmodel/subtasksviewmodel.dart';
 
 class EditTask extends StatelessWidget {
   final taskByDate tasks;

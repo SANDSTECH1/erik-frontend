@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:erick/features/subtasks/model/getSubtasks.dart';
+import 'package:erick/features/subtasks/model/subtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/helper/network/network.dart';
@@ -65,7 +66,6 @@ class CalendarViewModel with ChangeNotifier {
           MaterialPageRoute(
             builder: (context) => TaskScreen(
               tasks: _getTasks,
-              subtasks: _getSubTasks,
             ),
           ),
         );
