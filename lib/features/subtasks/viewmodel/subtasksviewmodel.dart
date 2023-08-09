@@ -1,8 +1,8 @@
-import 'package:erick/features/subtasks/model/getSubtasks.dart';
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
+import 'package:erick/helper/loader/loader.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
@@ -29,8 +29,12 @@ class SubTaskViewModel with ChangeNotifier {
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
   TimeOfDay selectedTime = TimeOfDay.now();
+  Future<void> hideLoader(BuildContext context) async {
+    Navigator.of(context).pop();
+  }
 
   createSubTask(context, taskid) async {
+    showLoader(context);
     print(subtaskTitlecontroller.text);
     print(subtaskDescriptioncontroller.text);
     //print(taskId);
@@ -41,25 +45,21 @@ class SubTaskViewModel with ChangeNotifier {
       "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
-    subtaskDescriptioncontroller.clear();
-    subtaskTitlecontroller.clear();
-    estimatedTimecontroller.clear();
-    pricecontroller.clear();
-    clearAssignedUsers();
-
     logger.d(response.body);
     final body = response.body;
     final jsonBody = json.decode(body);
-    print(taskid);
-    print(
-      subtaskDescriptioncontroller.text,
-    );
+
     if (response.statusCode == 200) {
+      hideLoader(context);
       showtoast("SubTask Created Successfully");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),
       );
+      subtaskDescriptioncontroller.clear();
+      subtaskTitlecontroller.clear();
+      estimatedTimecontroller.clear();
+      pricecontroller.clear();
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
@@ -136,6 +136,26 @@ class SubTaskViewModel with ChangeNotifier {
     BuildContext context,
     SubTasks subtask,
   ) {
+    // List assignedmembers =
+    //     _users.where((element) => element.selected == true).toList();
+    // print(assignedmembers.length);
+    // // List<String> ids =
+    // //     assignedmembers.map((user) => user.sId.toString()).toList();
+
+    // List<String> ids =
+    //     subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
+
+    // print('Assigned User IDs: $ids');
+
+    // // Iterate through the assigned user IDs and update the selected property
+    // for (final assignedUserId in ids) {
+    //   final userIndex =
+    //       _users.indexWhere((user) => user.sId.toString() == assignedUserId);
+    //   if (userIndex != -1) {
+    //     _users[userIndex].selected = true;
+    //     print('User with ID $assignedUserId is marked as selected.');
+    //   }
+    // }
     subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
     subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
     pricecontroller.text = subtask.price.toString();
@@ -145,6 +165,7 @@ class SubTaskViewModel with ChangeNotifier {
     print("pricecontroller: ${pricecontroller.text}");
     print("estimatedTimecontroller: ${estimatedTimecontroller.text}");
     print(subtask.sId);
+    showtoast("Edit your Task");
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -164,6 +185,7 @@ class SubTaskViewModel with ChangeNotifier {
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
+    showtoast("View Your Task");
     Navigator.push(
       context,
       MaterialPageRoute(

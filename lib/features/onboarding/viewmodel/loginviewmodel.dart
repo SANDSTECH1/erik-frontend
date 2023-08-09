@@ -4,9 +4,7 @@ import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/onboarding/view/Confirmpass.dart';
 import 'package:erick/features/onboarding/view/OTP.dart';
 import 'package:erick/features/onboarding/view/login.dart';
-import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
-import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/helper/loader/loader.dart';
 import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
@@ -26,8 +24,6 @@ class LoginViewModel with ChangeNotifier {
       TextEditingController();
   late userModel _user;
   userModel get userdata => _user;
-  // String userToken = '';
-  // String get usertoken => userToken;
 
   Future<void> hideLoader(BuildContext context) async {
     Navigator.of(context).pop();
@@ -35,7 +31,6 @@ class LoginViewModel with ChangeNotifier {
 
   Future<void> login(BuildContext context) async {
     try {
-      // Show the loader before making the API request
       showLoader(context);
 
       final response = await NetworkHelper().postApi(ApiUrls().login, {
@@ -43,7 +38,6 @@ class LoginViewModel with ChangeNotifier {
         "password": userpasswordcontroller.text,
       });
 
-      // Hide the loader after getting the API response
       hideLoader(context);
 
       logger.d(response.body);
@@ -52,6 +46,9 @@ class LoginViewModel with ChangeNotifier {
       if (response.statusCode == 200) {
         _user = userModel.fromJson(jsonBody['data']);
         userToken = jsonBody['data']['userToken'];
+        useremailcontroller.clear();
+        userpasswordcontroller.clear();
+        showtoast(jsonBody['message']);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
@@ -63,23 +60,23 @@ class LoginViewModel with ChangeNotifier {
             'Failed to make the API request. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle any errors that might occur during the API request or navigation
       print('Error occurred: $e');
       showtoast('An error occurred. Please try again.');
     }
   }
 
   forgetpass(context) async {
+    showLoader(context);
     final response = await NetworkHelper().postApi(ApiUrls().forgetpass, {
       "email": userforgotemailcontroller.text,
     });
+    hideLoader(context);
     logger.d(response.body);
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      // int otpCode = jsonBody['data']; // Get the OTP code as an integer
-      // String otpValue = otpCode.toString();
-      // verify(otpValue, userforgotemailcontroller.text, context);
+      showtoast(jsonBody['message']);
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const otp()),
@@ -96,17 +93,20 @@ class LoginViewModel with ChangeNotifier {
   Future<void> verify(otp, context) async {
     print(otp);
     print(otp);
+    showLoader(context);
 
     final response = await NetworkHelper().postApi(ApiUrls().otp, {
       "email": userforgotemailcontroller.text,
       "otp": otp,
     });
-
+    hideLoader(context);
     logger.d(response.body);
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
       userToken = jsonBody['data']['userToken'];
+      showtoast(jsonBody['message']);
+      userforgotemailcontroller.clear();
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -124,14 +124,17 @@ class LoginViewModel with ChangeNotifier {
   resetpass(context) async {
     print(passwordcontroller.text);
     print(confirmpasswordcontroller.text);
+    showLoader(context);
 
     final response = await NetworkHelper().postApi(ApiUrls().resetpass, {
       "password": passwordcontroller.text,
       "confirmPassword": confirmpasswordcontroller.text,
     });
+    hideLoader(context);
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
+      showtoast(jsonBody['message']);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),

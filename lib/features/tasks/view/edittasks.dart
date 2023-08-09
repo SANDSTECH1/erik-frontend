@@ -1,4 +1,5 @@
 import 'package:erick/features/tasks/model/tasks.dart';
+import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/features/subtasks/view/subtask.dart';
 import 'package:flutter/material.dart';
@@ -8,17 +9,19 @@ import 'package:table_calendar/table_calendar.dart';
 
 class EditTask extends StatelessWidget {
   final taskByDate tasks;
-  final List<String> assignedUserIds;
-  const EditTask(
-      {super.key, required this.tasks, required this.assignedUserIds});
+  // final List<String> assignedUserIds;
+  const EditTask({
+    super.key,
+    required this.tasks, //required this.assignedUserIds
+  });
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
 
-    for (var user in controller.usersdata) {
-      user.selected = assignedUserIds.contains(user.sId.toString());
-    }
+    // for (var user in controller.usersdata) {
+    //   user.selected = assignedUserIds.contains(user.sId.toString());
+    // }
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -122,22 +125,19 @@ class EditTask extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(
-                                height: 750.h,
+                                height: 700.h,
                                 width: 198.w,
                                 child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: controller.usersdata.length,
                                     itemBuilder: (context, index) {
-                                      final user = controller.usersdata[index];
-                                      final selected = (assignedUserIds
-                                          .contains(user.sId.toString()));
-
                                       return GestureDetector(
                                         onTap: () {
                                           controller.changeSelectedUser(
-                                              index,
-                                              !controller
-                                                  .usersdata[index].selected);
+                                            index,
+                                            !controller
+                                                .usersdata[index].selected,
+                                          );
                                         },
                                         child: Row(
                                           mainAxisAlignment:
@@ -149,9 +149,13 @@ class EditTask extends StatelessWidget {
                                                   'assets/icons/erickpic.png',
                                                   width: 36.w,
                                                 ),
-                                                1.horizontalSpace,
+                                                const SizedBox(
+                                                    width:
+                                                        1), // Add your horizontal space here
                                                 Text(
-                                                  user.name.toString(),
+                                                  controller
+                                                      .usersdata[index].name
+                                                      .toString(),
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     color:
@@ -161,8 +165,7 @@ class EditTask extends StatelessWidget {
                                                 ),
                                               ],
                                             ),
-                                            //controller.usersdata[index].selected
-                                            selected
+                                            controller.usersdata[index].selected
                                                 ? const Icon(
                                                     Icons.check_box,
                                                     color: Color(0xff163300),
@@ -474,6 +477,7 @@ class EditTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
+                            style: TextStyle(color: Colors.black),
                             //enabled: false,
                             controller: controller
                                 .taskTitlecontroller, // to trigger disabledBorder
@@ -523,6 +527,7 @@ class EditTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
+                            style: TextStyle(color: Colors.black),
                             controller: controller.taskDescriptioncontroller,
                             keyboardType: TextInputType.multiline,
                             minLines:

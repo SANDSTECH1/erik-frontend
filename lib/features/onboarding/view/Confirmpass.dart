@@ -87,6 +87,7 @@ class Confirmpass extends StatelessWidget {
               SizedBox(
                 width: 447.w,
                 child: TextField(
+                  style: TextStyle(color: Colors.black),
                   controller: controller.passwordcontroller,
                   //enabled: false, // to trigger disabledBorder
                   decoration: InputDecoration(
@@ -130,6 +131,7 @@ class Confirmpass extends StatelessWidget {
               SizedBox(
                 width: 447.w,
                 child: TextField(
+                  style: TextStyle(color: Colors.black),
                   //enabled: false,
                   controller: controller
                       .confirmpasswordcontroller, // to trigger disabledBorder

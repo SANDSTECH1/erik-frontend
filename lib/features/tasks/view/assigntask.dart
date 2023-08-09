@@ -1,7 +1,4 @@
-import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
-import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/features/subtasks/view/subtask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +12,6 @@ class AssignTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-    final subcontroller = Provider.of<SubTaskViewModel>(context);
     return Material(
       child: SizedBox(
         width: 800.w,
@@ -119,7 +115,7 @@ class AssignTask extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(
-                                height: 750.h,
+                                height: 700.h,
                                 width: 198.w,
                                 child: ListView.builder(
                                     shrinkWrap: true,
@@ -446,6 +442,7 @@ class AssignTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
+                            style: TextStyle(color: Colors.black),
                             //enabled: false,
                             controller: controller
                                 .taskTitlecontroller, // to trigger disabledBorder
@@ -495,6 +492,7 @@ class AssignTask extends StatelessWidget {
                         SizedBox(
                           width: 400.w,
                           child: TextField(
+                            style: TextStyle(color: Colors.black),
                             controller: controller.taskDescriptioncontroller,
                             keyboardType: TextInputType.multiline,
                             minLines:

@@ -1,4 +1,3 @@
-import 'package:erick/features/subtasks/model/subtasks.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';

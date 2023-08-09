@@ -44,10 +44,14 @@ class TaskViewModel with ChangeNotifier {
   TaskViewModel() {
     getmembers();
   }
+  Future<void> hideLoader(BuildContext context) async {
+    Navigator.of(context).pop();
+  }
 
   createTask(
     context,
   ) async {
+    showLoader(context);
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
@@ -72,7 +76,7 @@ class TaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      //showLoader(context);
+      hideLoader(context);
       showtoast("Task Created Successfully");
       Navigator.push(
         context,
@@ -123,7 +127,7 @@ class TaskViewModel with ChangeNotifier {
       final jsonBody = json.decode(body);
 
       if (response.statusCode == 200) {
-        // Handle successful update, e.g., show a toast or navigate to another screen
+        showLoader(context);
         showtoast('Task updated successfully');
         Navigator.push(
           context,
@@ -137,6 +141,8 @@ class TaskViewModel with ChangeNotifier {
         estimatedTimecontroller.clear();
         pricecontroller.clear();
         clearAssignedUsers();
+        changeselectedate(null);
+        clearSelectedTime();
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
       } else {
@@ -166,11 +172,24 @@ class TaskViewModel with ChangeNotifier {
     BuildContext context,
     taskByDate task,
   ) {
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
+    clearAssignedUsers();
+    showLoader(context);
+    hideLoader(context);
     List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
+        task.assignedUsers!.map((user) => user.sId.toString()).toList();
+
+    print('Assigned User IDs: $ids');
+
+    // Iterate through the assigned user IDs and update the selected property
+    for (final assignedUserId in ids) {
+      final userIndex =
+          _users.indexWhere((user) => user.sId.toString() == assignedUserId);
+      if (userIndex != -1) {
+        _users[userIndex].selected = true;
+        print('User with ID $assignedUserId is marked as selected.');
+      }
+    }
+
     taskDescriptioncontroller.text = task.description.toString();
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
@@ -190,17 +209,23 @@ class TaskViewModel with ChangeNotifier {
     selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
 
     print(formattedDate);
-    //print('Assigned User IDs: $assignedUserIds');
-    //print(formattedDate1);
+    hideLoader(context);
+    showtoast("Edit your Task Or Add Subtasks As Well");
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditTask(
           tasks: task,
-          assignedUserIds: ids,
         ),
       ),
     );
+    // taskDescriptioncontroller.clear();
+    // taskTitlecontroller.clear();
+    // pricecontroller.clear();
+    // estimatedTimecontroller.clear();
+    // clearAssignedUsers();
+    // changeselectedate(null);
+    // clearSelectedTime();
   }
 
   void viewtasks(BuildContext context, taskByDate taskss) {
@@ -211,7 +236,7 @@ class TaskViewModel with ChangeNotifier {
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
-
+    showtoast("View Your Task");
     Navigator.push(
       context,
       MaterialPageRoute(

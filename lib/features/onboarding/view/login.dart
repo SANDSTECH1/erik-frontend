@@ -1,10 +1,6 @@
-import 'package:erick/features/onboarding/view/Confirmpass.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
-import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/features/onboarding/view/register.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
@@ -111,8 +107,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide:
                                 const BorderSide(width: 1, color: Colors.grey)),
                         hintText: "Name",
-                        hintStyle:
-                            const TextStyle(fontSize: 16, color: Colors.black),
+                        hintStyle: const TextStyle(
+                            fontSize: 16, color: Color(0xFFB3B1B1)),
                       ),
                       obscureText: false,
                     ),
@@ -157,8 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderSide:
                                 const BorderSide(width: 1, color: Colors.grey)),
                         hintText: "Password",
-                        hintStyle:
-                            const TextStyle(fontSize: 16, color: Colors.black),
+                        hintStyle: const TextStyle(
+                            fontSize: 16, color: Color(0xFFB3B1B1)),
                       ),
                       obscureText: false,
                     ),

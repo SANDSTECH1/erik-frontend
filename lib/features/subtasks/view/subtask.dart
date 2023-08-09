@@ -331,6 +331,7 @@ class SubAssignTask extends StatelessWidget {
                       SizedBox(
                         width: 400.w,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: controller.subtaskTitlecontroller,
                           //enabled: false, // to trigger disabledBorder
                           decoration: InputDecoration(
@@ -379,6 +380,7 @@ class SubAssignTask extends StatelessWidget {
                       SizedBox(
                         width: 400.w,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: controller.subtaskDescriptioncontroller,
                           keyboardType: TextInputType.multiline,
                           minLines: 5, //Normal textInputField will be displayed

@@ -70,6 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               SizedBox(
                 width: 447.w,
                 child: TextField(
+                  style: TextStyle(color: Colors.black),
                   //enabled: false,
                   controller: controller.userforgotemailcontroller,
                   decoration: InputDecoration(

@@ -91,7 +91,7 @@ class otp extends StatelessWidget {
                       fieldWidth: 54.w,
                       fieldStyle: FieldStyle.box,
                       outlineBorderRadius: 5.r,
-                      style: TextStyle(fontSize: 17),
+                      style: TextStyle(fontSize: 17, color: Colors.black),
                       onChanged: (pin) {
                         print("Changed: " + pin);
                       },
