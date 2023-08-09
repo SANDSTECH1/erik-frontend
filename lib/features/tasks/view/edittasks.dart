@@ -1,5 +1,4 @@
 import 'package:erick/features/tasks/model/tasks.dart';
-import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/features/subtasks/view/subtask.dart';
 import 'package:flutter/material.dart';
@@ -9,19 +8,14 @@ import 'package:table_calendar/table_calendar.dart';
 
 class EditTask extends StatelessWidget {
   final taskByDate tasks;
-  // final List<String> assignedUserIds;
   const EditTask({
     super.key,
-    required this.tasks, //required this.assignedUserIds
+    required this.tasks,
   });
 
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<TaskViewModel>(context);
-
-    // for (var user in controller.usersdata) {
-    //   user.selected = assignedUserIds.contains(user.sId.toString());
-    // }
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -602,23 +596,6 @@ class EditTask extends StatelessWidget {
                                               },
                                             ),
                                           ));
-
-                                  // Navigator.pop(context);
-                                  // subcontroller.editTaskclicks(context, tasks);
-
-                                  // showDialog(
-                                  //     context: context,
-                                  //     builder: (_) => AlertDialog(
-                                  //           contentPadding: EdgeInsets.zero,
-                                  //           shape: const RoundedRectangleBorder(
-                                  //               borderRadius: BorderRadius.all(
-                                  //                   Radius.circular(10.0))),
-                                  //           content: Builder(
-                                  //             builder: (context) {
-                                  //               return const SubEditTask();
-                                  //             },
-                                  //           ),
-                                  //         ));
                                 },
                                 child: Container(
                                   width: 100.w,

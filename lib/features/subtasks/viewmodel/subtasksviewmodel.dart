@@ -10,8 +10,6 @@ import 'package:erick/features/subtasks/view/viewtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
-import 'package:intl/intl.dart';
-
 String userToken = "";
 
 class SubTaskViewModel with ChangeNotifier {
@@ -48,7 +46,12 @@ class SubTaskViewModel with ChangeNotifier {
     logger.d(response.body);
     final body = response.body;
     final jsonBody = json.decode(body);
-
+    subtaskDescriptioncontroller.clear();
+    subtaskTitlecontroller.clear();
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
+    clearAssignedUsers();
+    clearSelectedTime();
     if (response.statusCode == 200) {
       hideLoader(context);
       showtoast("SubTask Created Successfully");
@@ -56,10 +59,6 @@ class SubTaskViewModel with ChangeNotifier {
         context,
         MaterialPageRoute(builder: (context) => const calender_screen()),
       );
-      subtaskDescriptioncontroller.clear();
-      subtaskTitlecontroller.clear();
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
     } else {
@@ -84,28 +83,22 @@ class SubTaskViewModel with ChangeNotifier {
           "price": pricecontroller.text,
         },
       );
-      subtaskDescriptioncontroller.clear();
-      subtaskTitlecontroller.clear();
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
-      clearAssignedUsers();
+
       final body = response.body;
       final jsonBody = json.decode(body);
-      print(
-        {
-          "subTaskTitle": subtaskTitlecontroller.text,
-          "subTaskDescription": subtaskDescriptioncontroller.text,
-          "task": taskid,
-          "estimatedTime": estimatedTimecontroller.text,
-          "price": pricecontroller.text,
-        },
-      );
+
       if (response.statusCode == 200) {
         showtoast("SubTask Updated Successfully");
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => calender_screen()),
         );
+        subtaskDescriptioncontroller.clear();
+        subtaskTitlecontroller.clear();
+        estimatedTimecontroller.clear();
+        pricecontroller.clear();
+        clearAssignedUsers();
+        clearSelectedTime();
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
       } else {
@@ -136,26 +129,6 @@ class SubTaskViewModel with ChangeNotifier {
     BuildContext context,
     SubTasks subtask,
   ) {
-    // List assignedmembers =
-    //     _users.where((element) => element.selected == true).toList();
-    // print(assignedmembers.length);
-    // // List<String> ids =
-    // //     assignedmembers.map((user) => user.sId.toString()).toList();
-
-    // List<String> ids =
-    //     subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
-
-    // print('Assigned User IDs: $ids');
-
-    // // Iterate through the assigned user IDs and update the selected property
-    // for (final assignedUserId in ids) {
-    //   final userIndex =
-    //       _users.indexWhere((user) => user.sId.toString() == assignedUserId);
-    //   if (userIndex != -1) {
-    //     _users[userIndex].selected = true;
-    //     print('User with ID $assignedUserId is marked as selected.');
-    //   }
-    // }
     subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
     subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
     pricecontroller.text = subtask.price.toString();
@@ -171,7 +144,6 @@ class SubTaskViewModel with ChangeNotifier {
       MaterialPageRoute(
         builder: (context) => editSubAssignTask(
           id: subtask,
-          // assignedUserIds: ids,
         ),
       ),
     );
@@ -201,27 +173,10 @@ class SubTaskViewModel with ChangeNotifier {
     });
     notifyListeners();
   }
-}
 
-String combineDateAndTime(String? date, String? time) {
-  if (date == null || time == null) {
-    throw ArgumentError("Date and time must not be null.");
+  void clearSelectedTime() {
+    selectedTime = TimeOfDay.now();
+    timecontroller = '';
+    notifyListeners();
   }
-  final DateTime selectedDate = DateFormat("yyyy-MM-dd").parse(date);
-  final TimeOfDay selectedTime = TimeOfDay(
-    hour: int.parse(time.split(":")[0]),
-    minute: int.parse(time.split(":")[1].split(" ")[0]),
-  );
-
-  final DateTime combinedDateTime = DateTime(
-    selectedDate.year,
-    selectedDate.month,
-    selectedDate.day,
-    selectedTime.hour,
-    selectedTime.minute,
-  );
-
-  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss");
-  final String formattedDateTime = format.format(combinedDateTime);
-  return formattedDateTime;
 }

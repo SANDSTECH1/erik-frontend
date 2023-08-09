@@ -49,26 +49,31 @@ class TaskViewModel with ChangeNotifier {
   }
 
   createTask(
-    context,
+    BuildContext context,
   ) async {
     showLoader(context);
+
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
 
-    String date = daycontroller; // Assuming the value is "2023-07-21"
+    String date = daycontroller;
     String time = timecontroller;
-    String combinedDateTime = combineDateAndTime(date, time);
-    print(combinedDateTime); // Output: "2023-07-21T08:58:00"
+    int combinedDateTimeMillis = combineDateAndTime(date, time);
+
+    DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
+        combinedDateTimeMillis,
+        isUtc: true);
+    final formattedDateTime =
+        DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
 
     final response = await NetworkHelper().postApi(ApiUrls().createtask, {
       "title": taskTitlecontroller.text,
       "description": taskDescriptioncontroller.text,
       "assignedUsers": ids,
-      "scheduledDateTime": combinedDateTime,
-      "estimatedTime": combinedDateTime,
+      "scheduledDateTime": formattedDateTime,
+      "estimatedTime": estimatedTimecontroller.text,
       "price": pricecontroller.text,
     });
 
@@ -86,7 +91,7 @@ class TaskViewModel with ChangeNotifier {
       taskDescriptioncontroller.clear();
       daycontroller = '';
       timecontroller = '';
-      combinedDateTime = '';
+      //combinedDateTime = '';
       estimatedTimecontroller.clear();
       pricecontroller.clear();
       clearAssignedUsers();
@@ -102,16 +107,24 @@ class TaskViewModel with ChangeNotifier {
 
   void editTask(BuildContext context, taskByDate task) async {
     try {
+      showLoader(context);
       List assignedmembers =
           _users.where((element) => element.selected == true).toList();
-      print(assignedmembers.length);
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
-      //final combinedDateTime = combineDateAndTime(task.scheduledDateTime, '');
-      String date = daycontroller; // Assuming the value is "2023-07-21"
-      String time = timecontroller; // Assuming the value is "8:58 AM"
 
-      String combinedDateTime = combineDateAndTime(date, time);
+      String date = daycontroller;
+      String time = timecontroller;
+      int combinedDateTimeMillis = combineDateAndTime(date, time);
+
+      DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
+              combinedDateTimeMillis,
+              isUtc: true)
+          .toLocal();
+
+      final formattedDateTimeStr =
+          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
+
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatetask}/${task.sId}",
         {
@@ -120,14 +133,15 @@ class TaskViewModel with ChangeNotifier {
           "assignedUsers": ids,
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
-          "scheduledDateTime": combinedDateTime
+          "scheduledDateTime": formattedDateTimeStr,
         },
       );
+
       final body = response.body;
       final jsonBody = json.decode(body);
 
       if (response.statusCode == 200) {
-        showLoader(context);
+        hideLoader(context);
         showtoast('Task updated successfully');
         Navigator.push(
           context,
@@ -137,7 +151,6 @@ class TaskViewModel with ChangeNotifier {
         taskDescriptioncontroller.clear();
         daycontroller = '';
         timecontroller = '';
-        combinedDateTime = "";
         estimatedTimecontroller.clear();
         pricecontroller.clear();
         clearAssignedUsers();
@@ -194,22 +207,17 @@ class TaskViewModel with ChangeNotifier {
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
     estimatedTimecontroller.text = task.estimatedTime.toString();
+    // Convert UTC scheduledDateTime to local time
     final int milliseconds = int.parse(task.scheduledDateTime ?? "0");
-    final DateTime parsedDateTime =
-        DateTime.fromMillisecondsSinceEpoch(milliseconds);
-
-    final formattedTime =
-        DateFormat('hh:mm a').format(parsedDateTime.toLocal());
-    final formattedDate =
-        DateFormat('yyyy-MM-dd').format(parsedDateTime.toLocal());
-    selectedTime =
-        TimeOfDay.fromDateTime(DateFormat('hh:mm a').parse(formattedTime));
-
-    daycontroller = formattedDate;
-    selectedDay = DateFormat('yyyy-MM-dd').parse(formattedDate);
-
-    print(formattedDate);
-    hideLoader(context);
+    final DateTime utcDateTime =
+        DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
+    final localDateTime = utcDateTime.toLocal();
+    print("UTC Time: $utcDateTime");
+    print("Local Time: $localDateTime");
+    // Format and set local time values
+    selectedTime = TimeOfDay.fromDateTime(localDateTime);
+    daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
+    selectedDay = localDateTime;
     showtoast("Edit your Task Or Add Subtasks As Well");
     Navigator.push(
       context,
@@ -219,13 +227,6 @@ class TaskViewModel with ChangeNotifier {
         ),
       ),
     );
-    // taskDescriptioncontroller.clear();
-    // taskTitlecontroller.clear();
-    // pricecontroller.clear();
-    // estimatedTimecontroller.clear();
-    // clearAssignedUsers();
-    // changeselectedate(null);
-    // clearSelectedTime();
   }
 
   void viewtasks(BuildContext context, taskByDate taskss) {
@@ -318,16 +319,44 @@ class TaskViewModel with ChangeNotifier {
   }
 }
 
-String combineDateAndTime(String? date, String? time) {
+// String combineDateAndTime(String? date, String? time) {
+//   if (date == null || time == null) {
+//     throw ArgumentError("Date and time must not be null.");
+//   }
+
+//   // Parse the date and time strings separately
+//   DateTime parsedDate = DateTime.parse(date);
+//   DateTime parsedTime = DateFormat("h:mm a").parse(time);
+
+//   // Combine the date and time
+//   DateTime combinedDateTime = DateTime(
+//     parsedDate.year,
+//     parsedDate.month,
+//     parsedDate.day,
+//     parsedTime.hour,
+//     parsedTime.minute,
+//   );
+
+//   // Get the milliseconds since the epoch
+//   int millisecondsSinceEpoch = combinedDateTime.millisecondsSinceEpoch;
+
+//   print(millisecondsSinceEpoch); // Output: 1677768000000
+
+//   // Convert the DateTime back to a formatted string if needed
+//   final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss'Z'");
+//   final String formattedDateTime = format.format(combinedDateTime);
+//   return formattedDateTime;
+// }
+final int timeZoneOffsetInMinutes = 0;
+int combineDateAndTime(String? date, String? time) {
   if (date == null || time == null) {
     throw ArgumentError("Date and time must not be null.");
   }
 
-  // Parse the date and time strings separately
   DateTime parsedDate = DateTime.parse(date);
   DateTime parsedTime = DateFormat("h:mm a").parse(time);
 
-  // Combine the date and time
+  // Convert to local time zone (if needed)
   DateTime combinedDateTime = DateTime(
     parsedDate.year,
     parsedDate.month,
@@ -336,13 +365,8 @@ String combineDateAndTime(String? date, String? time) {
     parsedTime.minute,
   );
 
-  // Get the milliseconds since the epoch
-  int millisecondsSinceEpoch = combinedDateTime.millisecondsSinceEpoch;
+  // Convert to UTC before getting milliseconds since epoch
+  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
 
-  print(millisecondsSinceEpoch); // Output: 1677768000000
-
-  // Convert the DateTime back to a formatted string if needed
-  final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss'Z'");
-  final String formattedDateTime = format.format(combinedDateTime);
-  return formattedDateTime;
+  return millisecondsSinceEpoch;
 }
