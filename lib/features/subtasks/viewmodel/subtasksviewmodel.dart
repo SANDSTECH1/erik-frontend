@@ -35,34 +35,43 @@ class SubTaskViewModel with ChangeNotifier {
     showLoader(context);
     print(subtaskTitlecontroller.text);
     print(subtaskDescriptioncontroller.text);
-    //print(taskId);
-    final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
-      "subTaskTitle": subtaskTitlecontroller.text,
-      "subTaskDescription": subtaskDescriptioncontroller.text,
-      "task": taskid,
-      "estimatedTime": estimatedTimecontroller.text,
-      "price": pricecontroller.text,
-    });
-    logger.d(response.body);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    subtaskDescriptioncontroller.clear();
-    subtaskTitlecontroller.clear();
-    estimatedTimecontroller.clear();
-    pricecontroller.clear();
-    clearAssignedUsers();
-    clearSelectedTime();
-    if (response.statusCode == 200) {
-      hideLoader(context);
-      showtoast("SubTask Created Successfully");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
-      );
-    } else if (response.statusCode == 400) {
-      showtoast(jsonBody['message']);
-    } else {
-      showtoast(" Failed To Create SubTask");
+
+    try {
+      final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
+        "subTaskTitle": subtaskTitlecontroller.text,
+        "subTaskDescription": subtaskDescriptioncontroller.text,
+        "task": taskid,
+        "estimatedTime": estimatedTimecontroller.text,
+        "price": pricecontroller.text,
+      });
+
+      logger.d(response.body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
+
+      subtaskDescriptioncontroller.clear();
+      subtaskTitlecontroller.clear();
+      estimatedTimecontroller.clear();
+      pricecontroller.clear();
+      clearAssignedUsers();
+      clearSelectedTime();
+
+      if (response.statusCode == 200) {
+        hideLoader(context);
+        showtoast("SubTask Created Successfully");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const calender_screen()),
+        );
+      } else if (response.statusCode == 400) {
+        showtoast(jsonBody['message']);
+      } else {
+        showtoast("Failed To Create SubTask");
+      }
+    } catch (e) {
+      showtoast("Error creating SubTask: $e");
+    } finally {
+      hideLoader(context); // Hide the loader regardless of success or error
     }
   }
 

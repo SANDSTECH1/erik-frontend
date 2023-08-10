@@ -13,8 +13,6 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-String userToken = "";
-
 class TaskViewModel with ChangeNotifier {
   final TextEditingController taskTitlecontroller = TextEditingController();
   final TextEditingController estimatedTimecontroller = TextEditingController();
@@ -81,12 +79,7 @@ class TaskViewModel with ChangeNotifier {
     final body = response.body;
     final jsonBody = json.decode(body);
     if (response.statusCode == 200) {
-      hideLoader(context);
       showtoast("Task Created Successfully");
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
-      );
       taskTitlecontroller.clear();
       taskDescriptioncontroller.clear();
       daycontroller = '';
@@ -97,9 +90,15 @@ class TaskViewModel with ChangeNotifier {
       clearAssignedUsers();
       changeselectedate(null);
       clearSelectedTime();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const calender_screen()),
+      );
+
       //changeTime(selectedTime, null);
     } else if (response.statusCode == 400) {
       showtoast(jsonBody['message']);
+      hideLoader(context);
     } else {
       showtoast('Failed to create the task');
     }
@@ -143,9 +142,11 @@ class TaskViewModel with ChangeNotifier {
       if (response.statusCode == 200) {
         hideLoader(context);
         showtoast('Task updated successfully');
-        Navigator.push(
+        hideLoader(context);
+        // Use the Navigator.pushReplacement method to navigate to the calendar screen
+        Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => calender_screen()),
+          MaterialPageRoute(builder: (context) => const calender_screen()),
         );
         taskTitlecontroller.clear();
         taskDescriptioncontroller.clear();
@@ -163,6 +164,8 @@ class TaskViewModel with ChangeNotifier {
       }
     } catch (e) {
       showtoast('Error updating task: $e');
+    } finally {
+      hideLoader(context); // Hide the loader regardless of success or error
     }
   }
 
@@ -319,35 +322,6 @@ class TaskViewModel with ChangeNotifier {
   }
 }
 
-// String combineDateAndTime(String? date, String? time) {
-//   if (date == null || time == null) {
-//     throw ArgumentError("Date and time must not be null.");
-//   }
-
-//   // Parse the date and time strings separately
-//   DateTime parsedDate = DateTime.parse(date);
-//   DateTime parsedTime = DateFormat("h:mm a").parse(time);
-
-//   // Combine the date and time
-//   DateTime combinedDateTime = DateTime(
-//     parsedDate.year,
-//     parsedDate.month,
-//     parsedDate.day,
-//     parsedTime.hour,
-//     parsedTime.minute,
-//   );
-
-//   // Get the milliseconds since the epoch
-//   int millisecondsSinceEpoch = combinedDateTime.millisecondsSinceEpoch;
-
-//   print(millisecondsSinceEpoch); // Output: 1677768000000
-
-//   // Convert the DateTime back to a formatted string if needed
-//   final DateFormat format = DateFormat("yyyy-MM-ddTHH:mm:ss'Z'");
-//   final String formattedDateTime = format.format(combinedDateTime);
-//   return formattedDateTime;
-// }
-final int timeZoneOffsetInMinutes = 0;
 int combineDateAndTime(String? date, String? time) {
   if (date == null || time == null) {
     throw ArgumentError("Date and time must not be null.");

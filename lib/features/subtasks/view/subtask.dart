@@ -1,6 +1,5 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/helper/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +10,6 @@ class SubAssignTask extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> hideLoader(BuildContext context) async {
-      Navigator.of(context).pop();
-    }
-
     print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
     final taskcontroller = Provider.of<TaskViewModel>(context);
@@ -459,19 +454,19 @@ class SubAssignTask extends StatelessWidget {
                             // ),
                             // 20.horizontalSpace,
                             GestureDetector(
-                              onTap: () async {
+                              onTap: () {
                                 // Show loading indicator
-                                showLoader(context);
+                                // showLoader(context);
 
-                                // Simulate an asynchronous task, like navigating to the next screen
-                                await Future.delayed(Duration(
-                                    seconds:
-                                        1)); // Replace this with your actual navigation logic
+                                // // Simulate an asynchronous task, like navigating to the next screen
+                                // await Future.delayed(Duration(
+                                //     seconds:
+                                //         1)); // Replace this with your actual navigation logic
 
-                                // Hide loading indicator after the asynchronous task is done
-                                hideLoader(context);
-                                // Navigator.pop(context);
-                                controller.editTask(context, id);
+                                // // Hide loading indicator after the asynchronous task is done
+                                // hideLoader(context);
+                                // // Navigator.pop(context);
+                                // //controller.editTask(context, id);
 
                                 controller.createSubTask(context, id);
                               },
