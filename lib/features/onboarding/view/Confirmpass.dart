@@ -175,6 +175,7 @@ class Confirmpass extends StatelessWidget {
               30.verticalSpace,
               GestureDetector(
                 onTap: () async {
+                  Navigator.pop(context);
                   controller.resetpass(context);
                 },
                 child: Container(

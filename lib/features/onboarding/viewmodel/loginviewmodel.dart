@@ -95,55 +95,87 @@ class LoginViewModel with ChangeNotifier {
     print(otp);
     showLoader(context);
 
-    final response = await NetworkHelper().postApi(ApiUrls().otp, {
-      "email": userforgotemailcontroller.text,
-      "otp": otp,
-    });
-    hideLoader(context);
-    logger.d(response.body);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    if (response.statusCode == 200) {
-      userToken = jsonBody['data']['userToken'];
-      showtoast(jsonBody['message']);
-      userforgotemailcontroller.clear();
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                Confirmpass(token: jsonBody['data']['userToken'])),
-      );
-    } else if (response.statusCode == 401) {
-      showtoast(jsonBody['message']);
-    } else {
-      throw Exception(
-          'Failed to make the API request. Status code: ${response.statusCode}');
+    try {
+      final response = await NetworkHelper().postApi(ApiUrls().otp, {
+        "email": userforgotemailcontroller.text,
+        "otp": otp,
+      });
+      hideLoader(context);
+      logger.d(response.body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
+
+      if (response.statusCode == 200) {
+        userToken = jsonBody['data']['userToken'];
+        showtoast(jsonBody['message']);
+        userforgotemailcontroller.clear();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  Confirmpass(token: jsonBody['data']['userToken'])),
+        );
+      } else if (response.statusCode == 401) {
+        showtoast(jsonBody['message']);
+      } else {
+        throw Exception(
+            'Failed to make the API request. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      hideLoader(context);
+      showtoast('Invalid OTP. Please enter a valid OTP.');
+      print('Error verifying OTP: $e');
     }
   }
 
   resetpass(context) async {
     print(passwordcontroller.text);
     print(confirmpasswordcontroller.text);
+
+    // Validate password length
+    if (passwordcontroller.text.length < 5) {
+      showtoast('Password must be at least 5 characters long.');
+      return;
+    }
+
+    // Validate password match
+    if (passwordcontroller.text != confirmpasswordcontroller.text) {
+      showtoast("Passwords don't match.");
+      return;
+    }
+
     showLoader(context);
 
-    final response = await NetworkHelper().postApi(ApiUrls().resetpass, {
-      "password": passwordcontroller.text,
-      "confirmPassword": confirmpasswordcontroller.text,
-    });
-    hideLoader(context);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    if (response.statusCode == 200) {
-      showtoast(jsonBody['message']);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    } else if (response.statusCode == 401) {
-      showtoast(jsonBody['message']);
-    } else {
-      throw Exception(
-          'Failed to make the API request. Status code: ${response.statusCode}');
+    try {
+      final response = await NetworkHelper().postApi(ApiUrls().resetpass, {
+        "password": passwordcontroller.text,
+        "confirmPassword": confirmpasswordcontroller.text,
+      });
+
+      hideLoader(context);
+      final body = response.body;
+      final jsonBody = json.decode(body);
+      passwordcontroller.clear();
+      confirmpasswordcontroller.clear();
+
+      if (response.statusCode == 200) {
+        showtoast(jsonBody['message']);
+
+        // Only navigate if password reset is successful
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else if (response.statusCode == 401) {
+        showtoast(jsonBody['message']);
+      } else {
+        throw Exception(
+            'Failed to make the API request. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      hideLoader(context);
+      showtoast('An error occurred. Please try again later.');
+      print('Error resetting password: $e');
     }
   }
 }
