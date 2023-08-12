@@ -1,14 +1,23 @@
-import 'package:erick/features/onboarding/view/OTP.dart';
-import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
-class Confirmpass extends StatelessWidget {
+class Confirmpass extends StatefulWidget {
   final token;
-  const Confirmpass({super.key, required this.token});
 
+  Confirmpass({
+    super.key,
+    required this.token,
+  });
+
+  @override
+  State<Confirmpass> createState() => _ConfirmpassState();
+}
+
+class _ConfirmpassState extends State<Confirmpass> {
+  bool isPasswordVisible = false;
+  bool isConfirmPasswordVisible = false;
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<LoginViewModel>(context);
@@ -91,7 +100,18 @@ class Confirmpass extends StatelessWidget {
                   controller: controller.passwordcontroller,
                   //enabled: false, // to trigger disabledBorder
                   decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.visibility_outlined),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
+                      child: Icon(
+                        isPasswordVisible
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(4.r)),
                       borderSide:
@@ -124,7 +144,7 @@ class Confirmpass extends StatelessWidget {
                     hintStyle:
                         TextStyle(fontSize: 16, color: Color(0xFFB3B1B1)),
                   ),
-                  obscureText: false,
+                  obscureText: !isPasswordVisible,
                 ),
               ),
               30.verticalSpace,
@@ -136,7 +156,18 @@ class Confirmpass extends StatelessWidget {
                   controller: controller
                       .confirmpasswordcontroller, // to trigger disabledBorder
                   decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.visibility_outlined),
+                    suffixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isConfirmPasswordVisible = !isConfirmPasswordVisible;
+                        });
+                      },
+                      child: Icon(
+                        isConfirmPasswordVisible
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                      ),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(4.r)),
                       borderSide:
@@ -169,13 +200,12 @@ class Confirmpass extends StatelessWidget {
                     hintStyle:
                         TextStyle(fontSize: 16, color: Color(0xFFB3B1B1)),
                   ),
-                  obscureText: false,
+                  obscureText: !isConfirmPasswordVisible,
                 ),
               ),
               30.verticalSpace,
               GestureDetector(
                 onTap: () async {
-                  Navigator.pop(context);
                   controller.resetpass(context);
                 },
                 child: Container(

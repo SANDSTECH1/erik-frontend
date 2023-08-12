@@ -188,6 +188,19 @@ class editSubAssignTask extends StatelessWidget {
                                 final pickedTime = await showTimePicker(
                                   context: context,
                                   initialTime: controller.selectedTime,
+                                  builder:
+                                      (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: ThemeData(
+                                        buttonTheme: ButtonThemeData(
+                                            textTheme: ButtonTextTheme.primary),
+                                        colorScheme: ColorScheme.fromSwatch(
+                                                primarySwatch: Colors.green)
+                                            .copyWith(secondary: Colors.green),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
                                 );
 
                                 if (pickedTime != null) {

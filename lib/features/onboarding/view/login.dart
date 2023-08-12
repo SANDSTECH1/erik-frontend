@@ -12,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool isPasswordVisible = false;
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -117,47 +118,60 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     width: 447.w,
                     child: TextField(
-                      style: TextStyle(color: Colors.black),
-                      controller: controller.userpasswordcontroller,
-                      decoration: InputDecoration(
-                        suffixIcon: const Icon(Icons.visibility_outlined),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4.r)),
-                          borderSide:
-                              const BorderSide(width: 1, color: Colors.grey),
-                        ),
-                        disabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4.r)),
-                          borderSide:
-                              const BorderSide(width: 1, color: Colors.grey),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(4.r)),
-                          borderSide:
-                              const BorderSide(width: 1, color: Colors.grey),
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(4.r)),
-                            borderSide: const BorderSide(
-                              width: 1,
-                            )),
-                        errorBorder: OutlineInputBorder(
+                        style: TextStyle(color: Colors.black),
+                        controller: controller.userpasswordcontroller,
+                        decoration: InputDecoration(
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isPasswordVisible = !isPasswordVisible;
+                              });
+                            },
+                            child: Icon(
+                              isPasswordVisible
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(4.r)),
                             borderSide:
-                                const BorderSide(width: 1, color: Colors.grey)),
-                        focusedErrorBorder: OutlineInputBorder(
+                                const BorderSide(width: 1, color: Colors.grey),
+                          ),
+                          disabledBorder: OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(4.r)),
                             borderSide:
-                                const BorderSide(width: 1, color: Colors.grey)),
-                        hintText: "Password",
-                        hintStyle: const TextStyle(
-                            fontSize: 16, color: Color(0xFFB3B1B1)),
-                      ),
-                      obscureText: false,
-                    ),
+                                const BorderSide(width: 1, color: Colors.grey),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(4.r)),
+                            borderSide:
+                                const BorderSide(width: 1, color: Colors.grey),
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                width: 1,
+                              )),
+                          errorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey)),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey)),
+                          hintText: "Password",
+                          hintStyle: const TextStyle(
+                              fontSize: 16, color: Color(0xFFB3B1B1)),
+                        ),
+                        obscureText: !isPasswordVisible),
                   ),
                   30.verticalSpace,
                   SizedBox(

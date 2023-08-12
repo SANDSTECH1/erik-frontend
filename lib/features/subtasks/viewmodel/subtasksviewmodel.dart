@@ -35,7 +35,14 @@ class SubTaskViewModel with ChangeNotifier {
     showLoader(context);
     print(subtaskTitlecontroller.text);
     print(subtaskDescriptioncontroller.text);
-
+    if (subtaskTitlecontroller.text.isEmpty ||
+        subtaskDescriptioncontroller.text.isEmpty ||
+        estimatedTimecontroller.text.isEmpty ||
+        pricecontroller.text.isEmpty) {
+      showtoast('Please fill in all required fields');
+      hideLoader(context);
+      return; // Do not proceed
+    }
     try {
       final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
         "subTaskTitle": subtaskTitlecontroller.text,
@@ -80,7 +87,14 @@ class SubTaskViewModel with ChangeNotifier {
     SubTasks taskid,
   ) async {
     print(taskid.sId);
-
+    if (subtaskTitlecontroller.text.isEmpty ||
+        subtaskDescriptioncontroller.text.isEmpty ||
+        estimatedTimecontroller.text.isEmpty ||
+        pricecontroller.text.isEmpty) {
+      showtoast('Please fill in all required fields');
+      hideLoader(context);
+      return; // Do not proceed
+    }
     try {
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatesubtasks}/${taskid.sId}",

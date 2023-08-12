@@ -92,7 +92,6 @@ class LoginViewModel with ChangeNotifier {
 
   Future<void> verify(otp, context) async {
     print(otp);
-    print(otp);
     showLoader(context);
 
     try {
@@ -100,6 +99,7 @@ class LoginViewModel with ChangeNotifier {
         "email": userforgotemailcontroller.text,
         "otp": otp,
       });
+
       hideLoader(context);
       logger.d(response.body);
       final body = response.body;
@@ -118,12 +118,11 @@ class LoginViewModel with ChangeNotifier {
       } else if (response.statusCode == 401) {
         showtoast(jsonBody['message']);
       } else {
-        throw Exception(
-            'Failed to make the API request. Status code: ${response.statusCode}');
+        showtoast('Invalid OTP. Please try again.');
       }
     } catch (e) {
       hideLoader(context);
-      showtoast('Invalid OTP. Please enter a valid OTP.');
+      showtoast('An error occurred. Please try again later.');
       print('Error verifying OTP: $e');
     }
   }
@@ -143,39 +142,28 @@ class LoginViewModel with ChangeNotifier {
       showtoast("Passwords don't match.");
       return;
     }
-
     showLoader(context);
+    final response = await NetworkHelper().postApi(ApiUrls().resetpass, {
+      "password": passwordcontroller.text,
+      "confirmPassword": confirmpasswordcontroller.text,
+    });
 
-    try {
-      final response = await NetworkHelper().postApi(ApiUrls().resetpass, {
-        "password": passwordcontroller.text,
-        "confirmPassword": confirmpasswordcontroller.text,
-      });
-
-      hideLoader(context);
-      final body = response.body;
-      final jsonBody = json.decode(body);
+    hideLoader(context);
+    final body = response.body;
+    final jsonBody = json.decode(body);
+    if (response.statusCode == 200) {
       passwordcontroller.clear();
       confirmpasswordcontroller.clear();
-
-      if (response.statusCode == 200) {
-        showtoast(jsonBody['message']);
-
-        // Only navigate if password reset is successful
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
-      } else if (response.statusCode == 401) {
-        showtoast(jsonBody['message']);
-      } else {
-        throw Exception(
-            'Failed to make the API request. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      hideLoader(context);
-      showtoast('An error occurred. Please try again later.');
-      print('Error resetting password: $e');
+      showtoast(jsonBody['message']);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    } else if (response.statusCode == 401) {
+      showtoast(jsonBody['message']);
+    } else {
+      throw Exception(
+          'Failed to make the API request. Status code: ${response.statusCode}');
     }
   }
 }

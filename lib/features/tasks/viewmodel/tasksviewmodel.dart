@@ -46,61 +46,62 @@ class TaskViewModel with ChangeNotifier {
     Navigator.of(context).pop();
   }
 
-  createTask(
-    BuildContext context,
-  ) async {
-    showLoader(context);
+  void createTask(BuildContext context) async {
+    try {
+      showLoader(context);
 
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
+      List assignedmembers =
+          _users.where((element) => element.selected == true).toList();
+      List<String> ids =
+          assignedmembers.map((user) => user.sId.toString()).toList();
 
-    String date = daycontroller;
-    String time = timecontroller;
-    int combinedDateTimeMillis = combineDateAndTime(date, time);
+      String date = daycontroller;
+      String time = timecontroller;
+      int combinedDateTimeMillis = combineDateAndTime(date, time);
 
-    DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
-        combinedDateTimeMillis,
-        isUtc: true);
-    final formattedDateTime =
-        DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
+      DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
+          combinedDateTimeMillis,
+          isUtc: true);
+      final formattedDateTime =
+          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
 
-    final response = await NetworkHelper().postApi(ApiUrls().createtask, {
-      "title": taskTitlecontroller.text,
-      "description": taskDescriptioncontroller.text,
-      "assignedUsers": ids,
-      "scheduledDateTime": formattedDateTime,
-      "estimatedTime": estimatedTimecontroller.text,
-      "price": pricecontroller.text,
-    });
+      final response = await NetworkHelper().postApi(ApiUrls().createtask, {
+        "title": taskTitlecontroller.text,
+        "description": taskDescriptioncontroller.text,
+        "assignedUsers": ids,
+        "scheduledDateTime": formattedDateTime,
+        "estimatedTime": estimatedTimecontroller.text,
+        "price": pricecontroller.text,
+      });
 
-    logger.d(response.body);
-    final body = response.body;
-    final jsonBody = json.decode(body);
-    if (response.statusCode == 200) {
-      showtoast("Task Created Successfully");
-      taskTitlecontroller.clear();
-      taskDescriptioncontroller.clear();
-      daycontroller = '';
-      timecontroller = '';
-      //combinedDateTime = '';
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
-      clearAssignedUsers();
-      changeselectedate(null);
-      clearSelectedTime();
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
-      );
+      logger.d(response.body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
 
-      //changeTime(selectedTime, null);
-    } else if (response.statusCode == 400) {
-      showtoast(jsonBody['message']);
-      hideLoader(context);
-    } else {
-      showtoast('Failed to create the task');
+      if (response.statusCode == 200) {
+        showtoast("Task Created Successfully");
+        taskTitlecontroller.clear();
+        taskDescriptioncontroller.clear();
+        daycontroller = '';
+        timecontroller = '';
+        estimatedTimecontroller.clear();
+        pricecontroller.clear();
+        clearAssignedUsers();
+        changeselectedate(null);
+        clearSelectedTime();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const calender_screen()),
+        );
+      } else if (response.statusCode == 400) {
+        showtoast(jsonBody['message']);
+      } else {
+        showtoast('Failed to create the task');
+      }
+    } catch (e) {
+      showtoast('Error creating task: $e');
+    } finally {
+      hideLoader(context); // Hide the loader regardless of success or error
     }
   }
 
@@ -112,17 +113,26 @@ class TaskViewModel with ChangeNotifier {
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
 
+      // Check if the time is empty or not
       String date = daycontroller;
       String time = timecontroller;
       int combinedDateTimeMillis = combineDateAndTime(date, time);
 
-      DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
-              combinedDateTimeMillis,
-              isUtc: true)
-          .toLocal();
+      String? formattedDateTimeStr;
 
-      final formattedDateTimeStr =
-          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
+      if (combinedDateTimeMillis != null && combinedDateTimeMillis != 0) {
+        // Use the provided date and time
+        DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
+          combinedDateTimeMillis,
+          isUtc: true,
+        ).toLocal();
+
+        formattedDateTimeStr =
+            DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
+      } else {
+        // Use the existing scheduled time from the task
+        formattedDateTimeStr = task.scheduledDateTime;
+      }
 
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatetask}/${task.sId}",
@@ -142,15 +152,16 @@ class TaskViewModel with ChangeNotifier {
       if (response.statusCode == 200) {
         hideLoader(context);
         showtoast('Task updated successfully');
-        hideLoader(context);
+
         // Use the Navigator.pushReplacement method to navigate to the calendar screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
         );
+
+        // Clear fields and selections
         taskTitlecontroller.clear();
         taskDescriptioncontroller.clear();
-        daycontroller = '';
         timecontroller = '';
         estimatedTimecontroller.clear();
         pricecontroller.clear();

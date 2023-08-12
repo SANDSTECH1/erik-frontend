@@ -285,19 +285,31 @@ class AssignTask extends StatelessWidget {
                                       final pickedTime = await showTimePicker(
                                         context: context,
                                         initialTime: controller.selectedTime,
+                                        builder: (BuildContext context,
+                                            Widget? child) {
+                                          return Theme(
+                                            data: ThemeData(
+                                              buttonTheme: ButtonThemeData(
+                                                  textTheme:
+                                                      ButtonTextTheme.primary),
+                                              colorScheme:
+                                                  ColorScheme.fromSwatch(
+                                                          primarySwatch:
+                                                              Colors.green)
+                                                      .copyWith(
+                                                          secondary:
+                                                              Colors.green),
+                                            ),
+                                            child: child!,
+                                          );
+                                        },
                                       );
 
                                       if (pickedTime != null) {
-                                        print("334 $controller.selectedTime");
                                         controller.changeTime(
                                             pickedTime, context);
-
-                                        // setState(() {
-                                        //   selectedTime = pickedTime;
-                                        //   controller.timecontroller = selectedTime.format(context);
-                                        // });
                                       }
-                                    }, // Show time picker when tapped
+                                    },
                                     child: const Row(
                                       children: [
                                         Icon(Icons.access_time_filled_sharp),
