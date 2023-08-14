@@ -602,8 +602,6 @@ class AssignTask extends StatelessWidget {
                               GestureDetector(
                                 onTap: () {
                                   controller.createTask(context);
-                                  //controller.clearSelectedTime();
-                                  //Navigator.pop(context);
                                 },
                                 child: Container(
                                   width: 100.w,

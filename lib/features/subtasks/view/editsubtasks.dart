@@ -469,8 +469,6 @@ class editSubAssignTask extends StatelessWidget {
                                 hideLoader(context);
                                 // Navigator.pop(context);
                                 controller.editTask(context, id);
-
-                                controller.editTask(context, id);
                               },
                               child: Container(
                                 width: 100.w,

@@ -21,7 +21,7 @@ class SubTaskViewModel with ChangeNotifier {
 
   String daycontroller = "";
   String timecontroller = "";
-
+  int selectedUserIndexForEditing = -1;
   DateTime? selectedDay;
 
   List<userListData> _users = [];
@@ -70,6 +70,7 @@ class SubTaskViewModel with ChangeNotifier {
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
         );
+        Navigator.pop(context);
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
       } else {
@@ -116,6 +117,7 @@ class SubTaskViewModel with ChangeNotifier {
           context,
           MaterialPageRoute(builder: (context) => calender_screen()),
         );
+        //Navigator.pop(context);
         subtaskDescriptioncontroller.clear();
         subtaskTitlecontroller.clear();
         estimatedTimecontroller.clear();
@@ -175,6 +177,8 @@ class SubTaskViewModel with ChangeNotifier {
   void viewtasks(BuildContext context, SubTasks subtask) {
     subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
     subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
+    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+    pricecontroller.text = subtask.price.toString();
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);

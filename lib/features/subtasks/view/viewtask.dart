@@ -131,6 +131,129 @@ class ViewSubTasks extends StatelessWidget {
                       obscureText: false,
                     ),
                   ),
+                  SizedBox(
+                    //width: 50.w,
+                    height: 100.h,
+                    child: Row(children: [
+                      Icon(Icons.access_time_filled_sharp),
+                      2.horizontalSpace,
+                      const Text(
+                        'Estimated Time :',
+                        style: TextStyle(color: Color(0xff163300)),
+                      ),
+                      SizedBox(
+                        width: 50.w,
+                        height: 30.h,
+                        child: TextField(
+                          controller: subtaskcontroller.estimatedTimecontroller,
+                          style:
+                              TextStyle(color: Colors.black, fontSize: 15.sp),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0.0, horizontal: 10),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            disabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                  width: 1,
+                                )),
+                            errorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.grey)),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.grey)),
+                            hintText: "",
+                            hintStyle: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          obscureText: false,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 150.w,
+                      ),
+                      const Icon(Icons.money),
+                      2.horizontalSpace,
+                      const Text(
+                        'Price :  ',
+                        style: TextStyle(color: Color(0xff163300)),
+                      ),
+                      SizedBox(
+                        width: 50.w,
+                        height: 30.h,
+                        child: TextField(
+                          controller: subtaskcontroller.pricecontroller,
+                          style:
+                              TextStyle(color: Colors.black, fontSize: 15.sp),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 0.0, horizontal: 10),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            disabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(4.r)),
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.grey),
+                            ),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                  width: 1,
+                                )),
+                            errorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.grey)),
+                            focusedErrorBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(4.r)),
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.grey)),
+                            hintText: "",
+                            hintStyle: const TextStyle(
+                                fontSize: 16, color: Colors.black),
+                          ),
+                          obscureText: false,
+                        ),
+                      ),
+                    ]),
+                  ),
                   23.verticalSpace,
                   // Align(
                   //   alignment: Alignment.topLeft,

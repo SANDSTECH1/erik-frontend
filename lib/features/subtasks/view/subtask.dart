@@ -123,10 +123,11 @@ class SubAssignTask extends StatelessWidget {
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
+                                        // Toggle the user selection
+                                        bool isSelected = !taskcontroller
+                                            .usersdata[index].selected;
                                         taskcontroller.changeSelectedUser(
-                                            index,
-                                            !taskcontroller
-                                                .usersdata[index].selected);
+                                            index, isSelected);
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -151,13 +152,14 @@ class SubAssignTask extends StatelessWidget {
                                               ),
                                             ],
                                           ),
+                                          // Show the checkmark icon based on the selection
                                           taskcontroller
                                                   .usersdata[index].selected
-                                              ? const Icon(
+                                              ? Icon(
                                                   Icons.check_box,
                                                   color: Color(0xff163300),
                                                 )
-                                              : const SizedBox()
+                                              : SizedBox(),
                                         ],
                                       ),
                                     );

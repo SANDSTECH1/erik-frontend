@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:erick/features/subtasks/model/getSubtasks.dart';
-import 'package:erick/features/subtasks/model/subtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/view/task_screen.dart';
 import 'package:erick/helper/network/network.dart';
@@ -54,11 +52,6 @@ class CalendarViewModel with ChangeNotifier {
       List<taskByDate> _getTasks = jsonBody['data']
           .map<taskByDate>((m) => taskByDate.fromJson(m))
           .toList();
-      List<SubTasks> _getSubTasks =
-          jsonBody['data'].map<SubTasks>((m) => SubTasks.fromJson(m)).toList();
-      List<String> dates = [targetDate];
-      updateAssignedDates(dates);
-
       if (response.statusCode == 200) {
         // print(jsonBody['data']);
         Navigator.push(
@@ -90,15 +83,5 @@ class CalendarViewModel with ChangeNotifier {
       activeShowMonth++;
       notifyListeners();
     }
-  }
-
-  List<String> assignedDates = [];
-
-  // Other existing code...
-
-  // Method to update the assignedDates list when tasks are assigned.
-  void updateAssignedDates(List<String> dates) {
-    assignedDates = dates;
-    notifyListeners();
   }
 }

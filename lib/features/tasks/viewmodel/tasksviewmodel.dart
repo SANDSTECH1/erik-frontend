@@ -73,7 +73,7 @@ class TaskViewModel with ChangeNotifier {
         "estimatedTime": estimatedTimecontroller.text,
         "price": pricecontroller.text,
       });
-
+      //hideLoader(context);
       logger.d(response.body);
       final body = response.body;
       final jsonBody = json.decode(body);
@@ -89,20 +89,25 @@ class TaskViewModel with ChangeNotifier {
         clearAssignedUsers();
         changeselectedate(null);
         clearSelectedTime();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const calender_screen()),
-        );
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
+        return; // Return without navigating
       } else {
         showtoast('Failed to create the task');
+        return; // Return without navigating
       }
     } catch (e) {
       showtoast('Error creating task: $e');
+      return; // Return without navigating
     } finally {
       hideLoader(context); // Hide the loader regardless of success or error
     }
+    Navigator.pop(context);
+    // After the try-catch-finally block, navigate to the calendar screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const calender_screen()),
+    );
   }
 
   void editTask(BuildContext context, taskByDate task) async {
@@ -120,7 +125,7 @@ class TaskViewModel with ChangeNotifier {
 
       String? formattedDateTimeStr;
 
-      if (combinedDateTimeMillis != null && combinedDateTimeMillis != 0) {
+      if (combinedDateTimeMillis != 0) {
         // Use the provided date and time
         DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
           combinedDateTimeMillis,
@@ -153,11 +158,15 @@ class TaskViewModel with ChangeNotifier {
         hideLoader(context);
         showtoast('Task updated successfully');
 
-        // Use the Navigator.pushReplacement method to navigate to the calendar screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const calender_screen()),
-        );
+        // Check the current route before navigating
+        if (ModalRoute.of(context)?.settings.name != '/calender_screen') {
+          // Use the Navigator.pushReplacement method to navigate to the calendar screen
+          Navigator.pop(context);
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const calender_screen()),
+          // );
+        }
 
         // Clear fields and selections
         taskTitlecontroller.clear();
@@ -201,6 +210,24 @@ class TaskViewModel with ChangeNotifier {
   ) {
     clearAssignedUsers();
     showLoader(context);
+
+    // Convert UTC scheduledDateTime to local time
+    final int milliseconds = int.parse(task.scheduledDateTime ?? "0");
+    if (milliseconds != 0) {
+      final DateTime utcDateTime =
+          DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
+      final localDateTime = utcDateTime.toLocal();
+
+      // Store the local time without prompting if it's the same as selectedTime
+      final TimeOfDay localTimeOfDay = TimeOfDay.fromDateTime(localDateTime);
+      if (localTimeOfDay != selectedTime) {
+        selectedTime = localTimeOfDay;
+      }
+
+      daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
+      selectedDay = localDateTime;
+    }
+
     hideLoader(context);
     List<String> ids =
         task.assignedUsers!.map((user) => user.sId.toString()).toList();
@@ -221,17 +248,7 @@ class TaskViewModel with ChangeNotifier {
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
     estimatedTimecontroller.text = task.estimatedTime.toString();
-    // Convert UTC scheduledDateTime to local time
-    final int milliseconds = int.parse(task.scheduledDateTime ?? "0");
-    final DateTime utcDateTime =
-        DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
-    final localDateTime = utcDateTime.toLocal();
-    print("UTC Time: $utcDateTime");
-    print("Local Time: $localDateTime");
-    // Format and set local time values
-    selectedTime = TimeOfDay.fromDateTime(localDateTime);
-    daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
-    selectedDay = localDateTime;
+
     showtoast("Edit your Task Or Add Subtasks As Well");
     Navigator.push(
       context,
@@ -246,6 +263,8 @@ class TaskViewModel with ChangeNotifier {
   void viewtasks(BuildContext context, taskByDate taskss) {
     taskDescriptioncontroller.text = taskss.description.toString();
     taskTitlecontroller.text = taskss.title.toString();
+    estimatedTimecontroller.text = taskss.estimatedTime.toString();
+    pricecontroller.text = taskss.price.toString();
     List assignedmembers =
         _users.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
