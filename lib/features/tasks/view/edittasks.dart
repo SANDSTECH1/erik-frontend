@@ -295,15 +295,15 @@ class EditTask extends StatelessWidget {
                                             return Theme(
                                               data: ThemeData(
                                                 buttonTheme: ButtonThemeData(
-                                                  textTheme:
-                                                      ButtonTextTheme.primary,
-                                                ),
-                                                colorScheme:
-                                                    ColorScheme.fromSwatch(
-                                                  primarySwatch: Colors.green,
-                                                ).copyWith(
-                                                  secondary: Colors.green,
-                                                ),
+                                                    textTheme: ButtonTextTheme
+                                                        .primary),
+                                                colorScheme: ColorScheme
+                                                        .fromSwatch(
+                                                            primarySwatch:
+                                                                Colors.green)
+                                                    .copyWith(
+                                                        secondary:
+                                                            Colors.green),
                                               ),
                                               child: child!,
                                             );
@@ -315,10 +315,10 @@ class EditTask extends StatelessWidget {
                                               pickedTime, context);
                                         }
                                       },
-                                      child: Row(
+                                      child: const Row(
                                         children: [
                                           Icon(Icons.access_time_filled_sharp),
-                                          SizedBox(width: 8),
+                                          // SizedBox(width: 8),
                                           Text(
                                             'Time',
                                             style: TextStyle(
@@ -331,8 +331,7 @@ class EditTask extends StatelessWidget {
                                     Text(
                                       controller.selectedTime.format(context),
                                       style: const TextStyle(
-                                        color: Color(0xff163300),
-                                      ),
+                                          color: Color(0xff163300)),
                                     ),
                                   ],
                                 ),

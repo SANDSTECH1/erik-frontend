@@ -22,6 +22,7 @@ class TaskViewModel with ChangeNotifier {
   String timecontroller = "";
   String getFormattedMonthAndYearcontroller = "";
   DateTime? selectedDay;
+  bool isTimeModified = false;
 
   final TextEditingController taskDescriptioncontroller =
       TextEditingController();
@@ -41,6 +42,7 @@ class TaskViewModel with ChangeNotifier {
 
   TaskViewModel() {
     getmembers();
+    clearSelectedTime();
   }
   Future<void> hideLoader(BuildContext context) async {
     Navigator.of(context).pop();
@@ -209,6 +211,7 @@ class TaskViewModel with ChangeNotifier {
     taskByDate task,
   ) {
     clearAssignedUsers();
+    clearSelectedTime();
     showLoader(context);
 
     // Convert UTC scheduledDateTime to local time
@@ -218,14 +221,12 @@ class TaskViewModel with ChangeNotifier {
           DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
       final localDateTime = utcDateTime.toLocal();
 
-      // Store the local time without prompting if it's the same as selectedTime
-      final TimeOfDay localTimeOfDay = TimeOfDay.fromDateTime(localDateTime);
-      if (localTimeOfDay != selectedTime) {
-        selectedTime = localTimeOfDay;
-      }
-
       daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
       selectedDay = localDateTime;
+
+      // Automatically save the time without opening the time picker
+      selectedTime = TimeOfDay.fromDateTime(localDateTime);
+      isTimeModified = false; // Set time modification flag to false
     }
 
     hideLoader(context);
@@ -250,6 +251,7 @@ class TaskViewModel with ChangeNotifier {
     estimatedTimecontroller.text = task.estimatedTime.toString();
 
     showtoast("Edit your Task Or Add Subtasks As Well");
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -311,10 +313,18 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  resetUserSelections() {
+    for (var user in _users) {
+      user.selected = false;
+    }
+    notifyListeners();
+  }
+
   changeTime(pickedTime, context) {
     if (pickedTime == null) {
       // If pickedTime is null, it means the time selection was canceled, so clear the time.
       selectedTime = TimeOfDay.now();
+
       timecontroller = '';
     } else {
       // Otherwise, update the selected time.
@@ -324,6 +334,20 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  initializeTimeForNewSubtask(context) {
+    selectedTime = TimeOfDay.now();
+    timecontroller = selectedTime.format(context);
+  }
+
+  // Initialize time for editing an existing subtask
+  void initializeTimeForExistingSubtask(TimeOfDay scheduledTime, context) {
+    // Set the selected time to the subtask's scheduled time
+    selectedTime = scheduledTime;
+
+    // Update timecontroller
+    timecontroller = selectedTime.format(context);
+  }
+
   void clearAssignedUsers() {
     _users.forEach((user) {
       user.selected = false;
@@ -331,10 +355,23 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearSelectedTime() {
+  clearSelectedTime() {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
+  }
+
+  void showTimePickerAndUpdateFlag(BuildContext context) async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime ?? TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      selectedTime = pickedTime;
+      isTimeModified = true;
+      notifyListeners();
+    }
   }
 
   putimage(String url, data, file, type) async {

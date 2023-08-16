@@ -5,6 +5,7 @@ import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/helper/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class TaskScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class TaskScreen extends StatelessWidget {
     final calendarcontroller = Provider.of<CalendarViewModel>(context);
     final taskcontroller = Provider.of<TaskViewModel>(context);
     final subtaskcontroller = Provider.of<SubTaskViewModel>(context);
-
+    XFile? file;
     return Scaffold(
         body: Row(
       children: [
@@ -114,22 +115,36 @@ class TaskScreen extends StatelessWidget {
                           obscureText: false,
                         ),
                       ),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/icons/erickpic.png',
-                            width: 36.w,
-                          ),
-                          3.horizontalSpace,
-                          Text(
-                            'ERICK',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff163300),
-                                fontSize: 14.sp),
-                          ),
-                          10.horizontalSpace,
-                        ],
+                      GestureDetector(
+                        onTap: () async {
+                          final selectedImage = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
+                          if (selectedImage != null) {
+                            file = XFile(selectedImage.path);
+                            taskcontroller.putimage(
+                                "http://localhost:4000/api/v1/updateImage",
+                                [],
+                                file,
+                                "image");
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'assets/icons/erickpic.png',
+                              width: 36.w,
+                            ),
+                            3.horizontalSpace,
+                            Text(
+                              'ERICK',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xff163300),
+                                  fontSize: 14.sp),
+                            ),
+                            10.horizontalSpace,
+                          ],
+                        ),
                       )
                     ],
                   ),

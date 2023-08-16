@@ -1,9 +1,13 @@
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:printing/printing.dart';
 
 class ViewTask extends StatelessWidget {
   final taskByDate tasks;
@@ -64,12 +68,36 @@ class ViewTask extends StatelessWidget {
                           style: TextStyle(color: Colors.grey, fontSize: 20.sp),
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            const Icon(Icons.print),
-                            2.horizontalSpace,
-                            const Text(
-                              'Print ',
-                              style: TextStyle(color: Color(0xff163300)),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final pdfContent =
+                                    await generatePdfContent(taskcontroller);
+                                if (pdfContent != null) {
+                                  await Printing.layoutPdf(
+                                      onLayout: (format) => pdfContent);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary:
+                                    Colors.white, // Set the background color
+                              ),
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.print,
+                                    color: Color(0xff163300),
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    'Print',
+                                    style: TextStyle(
+                                      color: Color(0xff163300),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -305,4 +333,82 @@ Widget AssignTo(userListData user) {
       ],
     ),
   );
+}
+
+Future<Uint8List?> generatePdfContent(TaskViewModel taskcontroller) async {
+  final pdf = pdfWidgets.Document();
+
+  final headingStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.bold,
+  );
+
+  final dataStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.normal,
+  );
+
+  pdf.addPage(
+    pdfWidgets.Page(
+      build: (context) {
+        return pdfWidgets.Column(
+          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+          children: [
+            pdfWidgets.Text(
+              'Task Title:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.taskTitlecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Description:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.taskDescriptioncontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Estimated Time:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.estimatedTimecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Price:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.pricecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Assigned To:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
+            pdfWidgets.Column(
+              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+              children: taskcontroller.usersdata.map((user) {
+                return pdfWidgets.Text(
+                  user.name.toString(),
+                  style: dataStyle, // Use data style
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
+  return pdf.save();
 }

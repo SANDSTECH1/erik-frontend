@@ -18,6 +18,7 @@ class editSubAssignTask extends StatelessWidget {
     final controller = Provider.of<SubTaskViewModel>(context, listen: false);
 
     final taskcontroller = Provider.of<TaskViewModel>(context);
+    //taskcontroller.initializeTimeForExistingSubtask(subtaskScheduledTime, context);
 
     return Material(
       child: SizedBox(
@@ -187,7 +188,7 @@ class editSubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: controller.selectedTime,
+                                  initialTime: taskcontroller.selectedTime,
                                   builder:
                                       (BuildContext context, Widget? child) {
                                     return Theme(
@@ -204,15 +205,10 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  print("334 $taskcontroller.selectedTime");
                                   taskcontroller.changeTime(
                                       pickedTime, context);
-                                  // setState(() {
-                                  //   selectedTime = pickedTime;
-                                  //   controller.timecontroller = selectedTime.format(context);
-                                  // });
                                 }
-                              }, // Show time picker when tapped
+                              },
                               child: const Row(
                                 children: [
                                   Icon(Icons.access_time_filled_sharp),

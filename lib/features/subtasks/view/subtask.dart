@@ -13,6 +13,8 @@ class SubAssignTask extends StatelessWidget {
     print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
     final taskcontroller = Provider.of<TaskViewModel>(context);
+    // Initialize time and assigned users differently based on whether it's a new or existing subtask
+    taskcontroller.initializeTimeForNewSubtask(context);
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -118,52 +120,57 @@ class SubAssignTask extends StatelessWidget {
                               height: 700.h,
                               width: 198.w,
                               child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: taskcontroller.usersdata.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        // Toggle the user selection
-                                        bool isSelected = !taskcontroller
-                                            .usersdata[index].selected;
-                                        taskcontroller.changeSelectedUser(
-                                            index, isSelected);
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Image.asset(
-                                                'assets/icons/erickpic.png',
-                                                width: 36.w,
+                                shrinkWrap: true,
+                                itemCount: taskcontroller.usersdata.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Toggle the user selection
+                                      bool isSelected = !taskcontroller
+                                          .usersdata[index].selected;
+                                      taskcontroller.changeSelectedUser(
+                                          index, isSelected);
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/icons/erickpic.png',
+                                              width: 36.w,
+                                            ),
+                                            1.horizontalSpace,
+                                            Text(
+                                              taskcontroller
+                                                  .usersdata[index].name
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                color: taskcontroller
+                                                        .usersdata[index]
+                                                        .selected
+                                                    ? const Color(0xff163300)
+                                                    : Colors
+                                                        .black, // Change color for unselected users
+                                                fontSize: 16.sp,
                                               ),
-                                              1.horizontalSpace,
-                                              Text(
-                                                taskcontroller
-                                                    .usersdata[index].name
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        const Color(0xff163300),
-                                                    fontSize: 16.sp),
-                                              ),
-                                            ],
-                                          ),
-                                          // Show the checkmark icon based on the selection
-                                          taskcontroller
-                                                  .usersdata[index].selected
-                                              ? Icon(
-                                                  Icons.check_box,
-                                                  color: Color(0xff163300),
-                                                )
-                                              : SizedBox(),
-                                        ],
-                                      ),
-                                    );
-                                  }),
+                                            ),
+                                          ],
+                                        ),
+                                        // Show the checkmark icon based on the selection
+                                        taskcontroller.usersdata[index].selected
+                                            ? Icon(
+                                                Icons.check_box,
+                                                color: Color(0xff163300),
+                                              )
+                                            : SizedBox(),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
                             )
                           ],
                         ),
@@ -183,19 +190,27 @@ class SubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: controller.selectedTime,
+                                  initialTime: taskcontroller.selectedTime,
+                                  builder:
+                                      (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: ThemeData(
+                                        buttonTheme: ButtonThemeData(
+                                            textTheme: ButtonTextTheme.primary),
+                                        colorScheme: ColorScheme.fromSwatch(
+                                                primarySwatch: Colors.green)
+                                            .copyWith(secondary: Colors.green),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
                                 );
 
                                 if (pickedTime != null) {
-                                  print("334 $taskcontroller.selectedTime");
                                   taskcontroller.changeTime(
                                       pickedTime, context);
-                                  // setState(() {
-                                  //   selectedTime = pickedTime;
-                                  //   controller.timecontroller = selectedTime.format(context);
-                                  // });
                                 }
-                              }, // Show time picker when tapped
+                              },
                               child: const Row(
                                 children: [
                                   Icon(Icons.access_time_filled_sharp),
