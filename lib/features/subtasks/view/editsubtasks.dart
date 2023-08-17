@@ -7,7 +7,11 @@ import 'package:provider/provider.dart';
 
 class editSubAssignTask extends StatelessWidget {
   final id;
-  const editSubAssignTask({super.key, required this.id});
+  //final TimeOfDay? updatedTime;
+  const editSubAssignTask({
+    super.key,
+    required this.id, //this.updatedTime
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +22,6 @@ class editSubAssignTask extends StatelessWidget {
     final controller = Provider.of<SubTaskViewModel>(context, listen: false);
 
     final taskcontroller = Provider.of<TaskViewModel>(context);
-    //taskcontroller.initializeTimeForExistingSubtask(subtaskScheduledTime, context);
-
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -40,7 +42,7 @@ class editSubAssignTask extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                       child: CircleAvatar(
                         radius: 18.r,
@@ -188,7 +190,7 @@ class editSubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: taskcontroller.selectedTime,
+                                  initialTime: controller.selectedTime,
                                   builder:
                                       (BuildContext context, Widget? child) {
                                     return Theme(
@@ -205,8 +207,8 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  taskcontroller.changeTime(
-                                      pickedTime, context);
+                                  // ignore: use_build_context_synchronously
+                                  controller.changeTime(pickedTime, context);
                                 }
                               },
                               child: const Row(
@@ -222,7 +224,7 @@ class editSubAssignTask extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              taskcontroller.selectedTime.format(context),
+                              controller.selectedTime.format(context),
                               style: const TextStyle(color: Color(0xff163300)),
                             ),
                             const Icon(Icons.access_time_filled_sharp),

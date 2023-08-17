@@ -52,14 +52,15 @@ class CalendarViewModel with ChangeNotifier {
       List<taskByDate> _getTasks = jsonBody['data']
           .map<taskByDate>((m) => taskByDate.fromJson(m))
           .toList();
+      List<SubTasks> _subtasksget =
+          jsonBody['data'].map<SubTasks>((m) => SubTasks.fromJson(m)).toList();
       if (response.statusCode == 200) {
         // print(jsonBody['data']);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TaskScreen(
-              tasks: _getTasks,
-            ),
+            builder: (context) =>
+                TaskScreen(tasks: _getTasks, subtasks: _subtasksget),
           ),
         );
       } else if (response.statusCode == 400) {

@@ -13,8 +13,6 @@ class SubAssignTask extends StatelessWidget {
     print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
     final taskcontroller = Provider.of<TaskViewModel>(context);
-    // Initialize time and assigned users differently based on whether it's a new or existing subtask
-    taskcontroller.initializeTimeForNewSubtask(context);
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -35,7 +33,7 @@ class SubAssignTask extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                       child: CircleAvatar(
                         radius: 18.r,
@@ -190,7 +188,7 @@ class SubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: taskcontroller.selectedTime,
+                                  initialTime: controller.selectedTime,
                                   builder:
                                       (BuildContext context, Widget? child) {
                                     return Theme(
@@ -207,8 +205,7 @@ class SubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  taskcontroller.changeTime(
-                                      pickedTime, context);
+                                  controller.changeTime(pickedTime, context);
                                 }
                               },
                               child: const Row(
@@ -224,7 +221,7 @@ class SubAssignTask extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              taskcontroller.selectedTime.format(context),
+                              controller.selectedTime.format(context),
                               style: const TextStyle(color: Color(0xff163300)),
                             ),
                             const Icon(Icons.access_time_filled_sharp),

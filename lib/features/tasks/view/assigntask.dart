@@ -33,7 +33,7 @@ class AssignTask extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, true);
                         },
                         child: CircleAvatar(
                           radius: 18.r,

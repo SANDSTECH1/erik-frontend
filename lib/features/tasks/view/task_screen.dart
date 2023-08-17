@@ -10,9 +10,11 @@ import 'package:provider/provider.dart';
 
 class TaskScreen extends StatelessWidget {
   final List<taskByDate> tasks;
+  final List<SubTasks> subtasks;
   const TaskScreen({
     super.key,
     required this.tasks,
+    required this.subtasks,
   });
 
   @override
@@ -71,7 +73,7 @@ class TaskScreen extends StatelessWidget {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              Navigator.pop(context);
+                              Navigator.pop(context, true);
                             },
                             child: Container(
                               child: const Icon(Icons.arrow_back),
@@ -647,7 +649,8 @@ class TaskScreen extends StatelessWidget {
                                                                         hideLoader(
                                                                             context);
                                                                         Navigator.pop(
-                                                                            context);
+                                                                            context,
+                                                                            true);
                                                                         subtaskcontroller.editTaskclicks(
                                                                             context,
                                                                             tasks[index].subTasks![i]);
