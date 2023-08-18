@@ -196,7 +196,8 @@ class editSubAssignTask extends StatelessWidget {
                                     return Theme(
                                       data: ThemeData(
                                         buttonTheme: ButtonThemeData(
-                                            textTheme: ButtonTextTheme.primary),
+                                          textTheme: ButtonTextTheme.primary,
+                                        ),
                                         colorScheme: ColorScheme.fromSwatch(
                                                 primarySwatch: Colors.green)
                                             .copyWith(secondary: Colors.green),
@@ -207,7 +208,7 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  // ignore: use_build_context_synchronously
+                                  // Call the SubTaskViewModel method to set the selected time
                                   controller.changeTime(pickedTime, context);
                                 }
                               },
@@ -456,15 +457,15 @@ class editSubAssignTask extends StatelessWidget {
                             GestureDetector(
                               onTap: () async {
                                 // Show loading indicator
-                                showLoader(context);
+                                // showLoader(context);
 
-                                // Simulate an asynchronous task, like navigating to the next screen
-                                await Future.delayed(Duration(
-                                    seconds:
-                                        1)); // Replace this with your actual navigation logic
+                                // // Simulate an asynchronous task, like navigating to the next screen
+                                // await Future.delayed(Duration(
+                                //     seconds:
+                                //         1)); // Replace this with your actual navigation logic
 
-                                // Hide loading indicator after the asynchronous task is done
-                                hideLoader(context);
+                                // // Hide loading indicator after the asynchronous task is done
+                                // hideLoader(context);
                                 // Navigator.pop(context);
                                 controller.editTask(context, id);
                               },

@@ -83,6 +83,9 @@ class SubTasks {
   String? price;
   userModel? createdBy;
   int? iV;
+  List<userModel>? assignedUsers;
+  TimeOfDay? selectedTime;
+  DateTime? selectedDate;
 
   SubTasks(
       {this.sId,
@@ -92,6 +95,8 @@ class SubTasks {
       this.scheduledDateTime,
       this.estimatedTime,
       this.price,
+      this.assignedUsers,
+      this.selectedDate,
       this.iV});
 
   SubTasks.fromJson(Map<String, dynamic> json) {
@@ -100,6 +105,12 @@ class SubTasks {
     subTaskDescription = json['subTaskDescription'];
     task = json['task'];
     scheduledDateTime = json['scheduledDateTime'];
+    if (json['assignedUsers'] != null) {
+      assignedUsers = <userModel>[];
+      json['assignedUsers'].forEach((v) {
+        assignedUsers!.add(new userModel.fromJson(v));
+      });
+    }
     // createdBy = json['createdBy'] != null
     //     ? new userModel.fromJson(json['createdBy'])
     //     : null;
@@ -115,6 +126,10 @@ class SubTasks {
     data['subTaskDescription'] = this.subTaskDescription;
     data['task'] = this.task;
     data['scheduledDateTime'] = this.scheduledDateTime;
+    if (this.assignedUsers != null) {
+      data['assignedUsers'] =
+          this.assignedUsers!.map((v) => v.toJson()).toList();
+    }
     // if (this.createdBy != null) {
     //   data['createdBy'] = this.createdBy!.toJson();
     // }

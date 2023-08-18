@@ -194,7 +194,8 @@ class SubAssignTask extends StatelessWidget {
                                     return Theme(
                                       data: ThemeData(
                                         buttonTheme: ButtonThemeData(
-                                            textTheme: ButtonTextTheme.primary),
+                                          textTheme: ButtonTextTheme.primary,
+                                        ),
                                         colorScheme: ColorScheme.fromSwatch(
                                                 primarySwatch: Colors.green)
                                             .copyWith(secondary: Colors.green),
@@ -205,6 +206,7 @@ class SubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
+                                  // Call the SubTaskViewModel method to set the selected time
                                   controller.changeTime(pickedTime, context);
                                 }
                               },

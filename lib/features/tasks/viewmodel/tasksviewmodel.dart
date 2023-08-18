@@ -36,13 +36,13 @@ class TaskViewModel with ChangeNotifier {
   final kFirstDay = DateTime(
       DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
   final kLastDay = DateTime(
-      DateTime.now().year, DateTime.now().month + 12, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month + 20, DateTime.now().day);
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
   TaskViewModel() {
     getmembers();
-    clearSelectedTime();
+    //clearSelectedTime();
   }
   Future<void> hideLoader(BuildContext context) async {
     Navigator.of(context).pop();
@@ -59,6 +59,7 @@ class TaskViewModel with ChangeNotifier {
 
       String date = daycontroller;
       String time = timecontroller;
+
       int combinedDateTimeMillis = combineDateAndTime(date, time);
 
       DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
@@ -66,7 +67,6 @@ class TaskViewModel with ChangeNotifier {
           isUtc: true);
       final formattedDateTime =
           DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
-
       final response = await NetworkHelper().postApi(ApiUrls().createtask, {
         "title": taskTitlecontroller.text,
         "description": taskDescriptioncontroller.text,
@@ -123,6 +123,7 @@ class TaskViewModel with ChangeNotifier {
       // Check if the time is empty or not
       String date = daycontroller;
       String time = timecontroller;
+
       int combinedDateTimeMillis = combineDateAndTime(date, time);
 
       String? formattedDateTimeStr;
@@ -222,6 +223,17 @@ class TaskViewModel with ChangeNotifier {
       final localDateTime = utcDateTime.toLocal();
 
       daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
+      print(localDateTime);
+      DateTime dateTime = DateTime.parse(localDateTime.toString());
+      TimeOfDay timeOfDay =
+          TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+      String formattedTime = DateFormat.jm()
+          .format(dateTime); // Format as 12-hour clock with AM/PM
+
+      print(formattedTime);
+      timecontroller = formattedTime;
+
       selectedDay = localDateTime;
 
       // Automatically save the time without opening the time picker
@@ -334,20 +346,6 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  initializeTimeForNewSubtask(context) {
-    selectedTime = TimeOfDay.now();
-    timecontroller = selectedTime.format(context);
-  }
-
-  // Initialize time for editing an existing subtask
-  void initializeTimeForExistingSubtask(TimeOfDay scheduledTime, context) {
-    // Set the selected time to the subtask's scheduled time
-    selectedTime = scheduledTime;
-
-    // Update timecontroller
-    timecontroller = selectedTime.format(context);
-  }
-
   void clearAssignedUsers() {
     _users.forEach((user) {
       user.selected = false;
@@ -359,19 +357,6 @@ class TaskViewModel with ChangeNotifier {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
-  }
-
-  void showTimePickerAndUpdateFlag(BuildContext context) async {
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: selectedTime ?? TimeOfDay.now(),
-    );
-
-    if (pickedTime != null) {
-      selectedTime = pickedTime;
-      isTimeModified = true;
-      notifyListeners();
-    }
   }
 
   putimage(String url, data, file, type) async {
@@ -394,8 +379,11 @@ int combineDateAndTime(String? date, String? time) {
     throw ArgumentError("Date and time must not be null.");
   }
 
+  time = time.replaceAll('\u202F', ' ');
+
   DateTime parsedDate = DateTime.parse(date);
-  DateTime parsedTime = DateFormat("h:mm a").parse(time);
+  DateTime parsedTime = DateFormat("h:mm a").parse(time.toString());
+  print(parsedTime);
 
   // Convert to local time zone (if needed)
   DateTime combinedDateTime = DateTime(
