@@ -17,6 +17,7 @@ class TaskViewModel with ChangeNotifier {
   final TextEditingController taskTitlecontroller = TextEditingController();
   final TextEditingController estimatedTimecontroller = TextEditingController();
   final TextEditingController pricecontroller = TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
   String daycontroller = "";
   String timecontroller = "";
@@ -29,14 +30,21 @@ class TaskViewModel with ChangeNotifier {
 
   List<userListData> _users = [];
   List<userListData> get usersdata => _users;
+  List<userListData> _filteredUsers = [];
+  List<userListData> get filteredUsers => _filteredUsers;
+
+  set filteredUsers(List<userListData> value) {
+    _filteredUsers = value;
+    notifyListeners();
+  }
 
   CalendarFormat calendarFormat = CalendarFormat.month;
   DateTime focusedDay = DateTime.now();
 
   final kFirstDay = DateTime(
-      DateTime.now().year, DateTime.now().month - 3, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month - 7, DateTime.now().day);
   final kLastDay = DateTime(
-      DateTime.now().year, DateTime.now().month + 20, DateTime.now().day);
+      DateTime.now().year, DateTime.now().month + 40, DateTime.now().day);
 
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -294,6 +302,19 @@ class TaskViewModel with ChangeNotifier {
     );
   }
 
+  void filterMembers(String searchTerm) {
+    if (searchTerm.isEmpty) {
+      // If search input is empty, show all members
+      filteredUsers = usersdata;
+    } else {
+      // Filter members based on search input
+      filteredUsers = usersdata.where((user) {
+        return user.name!.toLowerCase().contains(searchTerm.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
+  }
+
   getmembers() async {
     print('memberscall');
     final response = await NetworkHelper().getApi(
@@ -306,6 +327,7 @@ class TaskViewModel with ChangeNotifier {
     _users = jsonBody['data']
         .map<userListData>((m) => userListData.fromJson(m))
         .toList();
+    _filteredUsers = _users.toList();
     notifyListeners();
   }
 
@@ -320,8 +342,22 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  changeSelectedUser(int, value) {
-    _users[int].selected = value;
+  void changeSelectedUser(int index, bool value) {
+    final userId = filteredUsers[index].sId;
+
+    // Update selection state in the main user list
+    final userIndex = usersdata.indexWhere((user) => user.sId == userId);
+    if (userIndex != -1) {
+      usersdata[userIndex].selected = value;
+    }
+
+    // Update selection state in the filtered user list
+    final filteredIndex =
+        filteredUsers.indexWhere((user) => user.sId == userId);
+    if (filteredIndex != -1) {
+      filteredUsers[filteredIndex].selected = value;
+    }
+
     notifyListeners();
   }
 
@@ -357,20 +393,6 @@ class TaskViewModel with ChangeNotifier {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
-  }
-
-  putimage(String url, data, file, type) async {
-    try {
-      final response = await NetworkHelper().mediaFormUpload(
-          "http://localhost:4000/api/v1/updateImage", [], file, "image");
-      if (response['success'] == true) {
-        print('Image update successful');
-      } else {
-        print('Failed to update image: ${response['message']}');
-      }
-    } catch (e) {
-      print('Error updating image: $e');
-    }
   }
 }
 

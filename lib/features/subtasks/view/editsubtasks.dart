@@ -1,6 +1,5 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/helper/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -190,14 +189,13 @@ class editSubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: controller.selectedTime,
+                                  initialTime: taskcontroller.selectedTime,
                                   builder:
                                       (BuildContext context, Widget? child) {
                                     return Theme(
                                       data: ThemeData(
                                         buttonTheme: ButtonThemeData(
-                                          textTheme: ButtonTextTheme.primary,
-                                        ),
+                                            textTheme: ButtonTextTheme.primary),
                                         colorScheme: ColorScheme.fromSwatch(
                                                 primarySwatch: Colors.green)
                                             .copyWith(secondary: Colors.green),
@@ -208,8 +206,8 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  // Call the SubTaskViewModel method to set the selected time
-                                  controller.changeTime(pickedTime, context);
+                                  taskcontroller.changeTime(
+                                      pickedTime, context);
                                 }
                               },
                               child: const Row(
@@ -225,7 +223,7 @@ class editSubAssignTask extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              controller.selectedTime.format(context),
+                              taskcontroller.selectedTime.format(context),
                               style: const TextStyle(color: Color(0xff163300)),
                             ),
                             const Icon(Icons.access_time_filled_sharp),

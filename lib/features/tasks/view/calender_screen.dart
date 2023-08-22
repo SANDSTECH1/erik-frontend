@@ -1,11 +1,9 @@
 import 'package:erick/features/tasks/view/assigntask.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
-import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:erick/helper/loader/loader.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -14,9 +12,7 @@ class calender_screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    XFile? file;
     final calendarcontroller = Provider.of<CalendarViewModel>(context);
-    final controller = Provider.of<TaskViewModel>(context);
     int totalDaysInMonth = calendarcontroller
         .datesByMonth[calendarcontroller.activeShowMonth].length;
 
@@ -83,7 +79,8 @@ class calender_screen extends StatelessWidget {
                           5.horizontalSpace,
                           Container(
                             child: Text(
-                              '${calendarcontroller.dateFormat.format(DateTime(calendarcontroller.year, calendarcontroller.activeShowMonth + 1))} ${calendarcontroller.year}',
+                              //'${calendarcontroller.activeShowYear}-${calendarcontroller.activeShowMonth + 1}',
+                              calendarcontroller.getFormattedMonthAndYear(),
                               style: TextStyle(
                                   fontSize: 16.sp,
                                   color: const Color(0xff000000),
@@ -120,36 +117,22 @@ class calender_screen extends StatelessWidget {
                           obscureText: false,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () async {
-                          final selectedImage = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
-                          if (selectedImage != null) {
-                            file = XFile(selectedImage.path);
-                            controller.putimage(
-                                "http://localhost:4000/api/v1/updateImage",
-                                [],
-                                file,
-                                "image");
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/icons/erickpic.png',
-                              width: 36.w,
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/icons/erickpic.png',
+                            width: 36.w,
+                          ),
+                          3.horizontalSpace,
+                          Text(
+                            'ERICK',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff163300),
+                              fontSize: 14.sp,
                             ),
-                            3.horizontalSpace,
-                            Text(
-                              'ERICK',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xff163300),
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       )
                     ],
                   ),

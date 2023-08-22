@@ -12,15 +12,15 @@ class CalendarViewModel with ChangeNotifier {
   final dateFormat = DateFormat('MMMM');
   final weekdayFormat = DateFormat('EEEE');
   final datesByMonth = [];
-  final year = 2023;
+  int activeShowYear = 2023;
   String date = '';
   int activeShowMonth = 7;
 
   CalendarViewModel() {
-    addDatesGrid();
+    addDatesGrid(activeShowYear);
   }
 
-  addDatesGrid() {
+  addDatesGrid(int year) {
     for (var i = 1; i < 13; i++) {
       final lastDayOfMonth = DateTime(now.year, i + 1, 0);
       final firstDayOfMonth = DateTime(now.year, i, 1);
@@ -37,10 +37,9 @@ class CalendarViewModel with ChangeNotifier {
   }
 
   showdetails(targetDate, context) async {
-    print('$year-${activeShowMonth + 1}-$targetDate');
-
     final response = await NetworkHelper().getApi(
-        "${ApiUrls().getTaskByDate}?targetDate=$year-${activeShowMonth + 1}-$targetDate");
+      "${ApiUrls().getTaskByDate}?targetDate=${activeShowYear}-${activeShowMonth + 1}-$targetDate",
+    );
 
     final body = response.body;
     final jsonBody = json.decode(body);
@@ -72,9 +71,20 @@ class CalendarViewModel with ChangeNotifier {
     }
   }
 
+  String getFormattedMonthAndYear() {
+    final formattedDate = DateFormat('MMMM, y')
+        .format(DateTime(activeShowYear, activeShowMonth + 1));
+    return formattedDate.toUpperCase();
+  }
+
   void previousMonth() {
     if (activeShowMonth > 0) {
       activeShowMonth--;
+      notifyListeners();
+    } else if (activeShowYear > 2023) {
+      activeShowYear--;
+      activeShowMonth = 11;
+      addDatesGrid(activeShowYear);
       notifyListeners();
     }
   }
@@ -82,6 +92,11 @@ class CalendarViewModel with ChangeNotifier {
   void nextMonth() {
     if (activeShowMonth < 11) {
       activeShowMonth++;
+      notifyListeners();
+    } else {
+      activeShowYear++;
+      activeShowMonth = 0;
+      addDatesGrid(activeShowYear);
       notifyListeners();
     }
   }

@@ -78,7 +78,13 @@ class AssignTask extends StatelessWidget {
                                 ),
                                 width: 198.w,
                                 child: TextField(
-                                  enabled: false,
+                                  style: TextStyle(color: Colors.black),
+                                  controller: controller.searchController,
+                                  onChanged: (value) {
+                                    // Call a function to filter the list based on the search input
+                                    controller.filterMembers(value);
+                                  },
+                                  //enabled: false,
                                   decoration: InputDecoration(
                                     prefixIcon: const Icon(Icons.search),
                                     fillColor: Colors.white,
@@ -115,18 +121,19 @@ class AssignTask extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(
-                                height: 700.h,
-                                width: 198.w,
-                                child: ListView.builder(
+                                  height: 700.h,
+                                  width: 198.w,
+                                  child: ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: controller.usersdata.length,
+                                    itemCount: controller.filteredUsers.length,
                                     itemBuilder: (context, index) {
                                       return GestureDetector(
                                         onTap: () {
                                           controller.changeSelectedUser(
-                                              index,
-                                              !controller
-                                                  .usersdata[index].selected);
+                                            index,
+                                            !controller
+                                                .filteredUsers[index].selected,
+                                          );
                                         },
                                         child: Row(
                                           mainAxisAlignment:
@@ -141,28 +148,29 @@ class AssignTask extends StatelessWidget {
                                                 1.horizontalSpace,
                                                 Text(
                                                   controller
-                                                      .usersdata[index].name
+                                                      .filteredUsers[index].name
                                                       .toString(),
                                                   style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: const Color(
-                                                          0xff163300),
-                                                      fontSize: 16.sp),
+                                                    fontWeight: FontWeight.w400,
+                                                    color:
+                                                        const Color(0xff163300),
+                                                    fontSize: 16.sp,
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                            controller.usersdata[index].selected
+                                            controller.filteredUsers[index]
+                                                    .selected
                                                 ? const Icon(
                                                     Icons.check_box,
                                                     color: Color(0xff163300),
                                                   )
-                                                : const SizedBox()
+                                                : const SizedBox(),
                                           ],
                                         ),
                                       );
-                                    }),
-                              ),
+                                    },
+                                  )),
                             ],
                           ),
                         ),
