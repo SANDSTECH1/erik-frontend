@@ -21,20 +21,6 @@ class editSubAssignTask extends StatelessWidget {
 
     final taskcontroller = Provider.of<TaskViewModel>(context);
 
-    // Preselect the selected members
-    for (final member in selectedMembers) {
-      // Find the corresponding member in taskcontroller.usersdata
-      final matchingMember = taskcontroller.usersdata.firstWhere(
-        (user) => user.sId == member.sId,
-        orElse: () => member,
-      );
-
-      // Update the isSelected property of the matching member
-      if (matchingMember != null) {
-        matchingMember.selected = true;
-      }
-    }
-
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -204,12 +190,12 @@ class editSubAssignTask extends StatelessWidget {
                               onTap: () async {
                                 final pickedTime = await showTimePicker(
                                   context: context,
-                                  initialTime: taskcontroller.selectedTime,
+                                  initialTime: controller.selectedTime,
                                   builder:
                                       (BuildContext context, Widget? child) {
                                     return Theme(
                                       data: ThemeData(
-                                        buttonTheme: ButtonThemeData(
+                                        buttonTheme: const ButtonThemeData(
                                             textTheme: ButtonTextTheme.primary),
                                         colorScheme: ColorScheme.fromSwatch(
                                                 primarySwatch: Colors.green)
@@ -221,8 +207,7 @@ class editSubAssignTask extends StatelessWidget {
                                 );
 
                                 if (pickedTime != null) {
-                                  taskcontroller.changeTime(
-                                      pickedTime, context);
+                                  controller.changeTime(pickedTime, context);
                                 }
                               },
                               child: const Row(
@@ -238,7 +223,7 @@ class editSubAssignTask extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              taskcontroller.selectedTime.format(context),
+                              controller.selectedTime.format(context),
                               style: const TextStyle(color: Color(0xff163300)),
                             ),
                             const Icon(Icons.access_time_filled_sharp),
@@ -362,7 +347,7 @@ class editSubAssignTask extends StatelessWidget {
                       SizedBox(
                         width: 400.w,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: controller.subtaskTitlecontroller,
                           //enabled: false, // to trigger disabledBorder
                           decoration: InputDecoration(
@@ -411,7 +396,7 @@ class editSubAssignTask extends StatelessWidget {
                       SizedBox(
                         width: 400.w,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: controller.subtaskDescriptioncontroller,
                           keyboardType: TextInputType.multiline,
                           minLines: 5, //Normal textInputField will be displayed

@@ -25,7 +25,7 @@ class SubTaskViewModel with ChangeNotifier {
   String timecontroller = '';
   String daycontroller = DateFormat('yyyy-MM-dd').format(DateTime.now());
   DateTime? selectedDay;
-  List<userListData> _users = [];
+  final List<userListData> _users = [];
   List<userListData> get usersdata => _users;
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -45,24 +45,33 @@ class SubTaskViewModel with ChangeNotifier {
       return; // Do not proceed
     }
     try {
-      // String date = daycontroller;
-      // String time = timecontroller;
+      String date = daycontroller;
+      String time = timecontroller;
+      print(daycontroller);
+      print(timecontroller);
 
-      // int combinedDateTimeMillis = combineDateAndTime(date, time);
+      int combinedDateTimeMillis = combineDateAndTime(date, time);
 
-      // DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
-      //     combinedDateTimeMillis,
-      //     isUtc: true);
-      // final formattedDateTime =
-      //     DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
-
+      DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
+          combinedDateTimeMillis,
+          isUtc: true);
+      final formattedDateTime =
+          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
+      print({
+        "subTaskTitle": subtaskTitlecontroller.text,
+        "subTaskDescription": subtaskDescriptioncontroller.text,
+        "task": taskid,
+        "estimatedTime": estimatedTimecontroller.text,
+        "price": pricecontroller.text,
+        "scheduledDateTime": formattedDateTime,
+      });
       final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
         "subTaskTitle": subtaskTitlecontroller.text,
         "subTaskDescription": subtaskDescriptioncontroller.text,
         "task": taskid,
         "estimatedTime": estimatedTimecontroller.text,
         "price": pricecontroller.text,
-        //"scheduledDateTime": formattedDateTime,
+        "scheduledDateTime": formattedDateTime,
       });
 
       subtaskDescriptioncontroller.clear();
@@ -149,7 +158,7 @@ class SubTaskViewModel with ChangeNotifier {
         hideLoader(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => calender_screen()),
+          MaterialPageRoute(builder: (context) => const calender_screen()),
         );
         subtaskDescriptioncontroller.clear();
         subtaskTitlecontroller.clear();
@@ -180,7 +189,7 @@ class SubTaskViewModel with ChangeNotifier {
       showtoast('Task deleted successfully');
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => calender_screen()),
+        MaterialPageRoute(builder: (context) => const calender_screen()),
       );
     } else {
       showtoast('Failed to delete the task');
@@ -189,16 +198,71 @@ class SubTaskViewModel with ChangeNotifier {
   }
 
   editTaskclicks(BuildContext context, SubTasks subtask) async {
-    subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
-    subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
-    pricecontroller.text = subtask.price.toString();
-    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+    print(subtask.subTaskTitle);
+    // subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
+    // subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
+    // pricecontroller.text = subtask.price.toString();
+    // estimatedTimecontroller.text = subtask.estimatedTime.toString();
     final selectedMembersProvider =
         Provider.of<SelectedMembersProvider>(context, listen: false);
     List<userListData> selectedMembers =
         selectedMembersProvider.getSelectedMembers();
-    showtoast("Edit your Task");
-    bool dataEdited = await Navigator.push(
+
+    clearAssignedUsers();
+    clearSelectedTime();
+    showLoader(context);
+    print(subtask.scheduledDateTime);
+    // Convert UTC scheduledDateTime to local time
+    final int milliseconds = int.parse(subtask.scheduledDateTime ?? "0");
+    if (milliseconds != 0) {
+      final DateTime utcDateTime =
+          DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
+      final localDateTime = utcDateTime.toLocal();
+
+      daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
+      print(localDateTime);
+      DateTime dateTime = DateTime.parse(localDateTime.toString());
+      TimeOfDay timeOfDay =
+          TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+
+      String formattedTime = DateFormat.jm()
+          .format(dateTime); // Format as 12-hour clock with AM/PM
+
+      print(formattedTime);
+      timecontroller = formattedTime;
+
+      selectedDay = localDateTime;
+
+      // Automatically save the time without opening the time picker
+      selectedTime = TimeOfDay.fromDateTime(localDateTime);
+      print(selectedTime);
+      // isTimeModified = false; // Set time modification flag to false
+    }
+
+    hideLoader(context);
+    // List<String> ids =
+    //     subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
+
+    // print('Assigned User IDs: $ids');
+
+    // Iterate through the assigned user IDs and update the selected property
+    // for (final assignedUserId in ids) {
+    //   final userIndex =
+    //       _users.indexWhere((user) => user.sId.toString() == assignedUserId);
+    //   if (userIndex != -1) {
+    //     _users[userIndex].selected = true;
+    //     print('User with ID $assignedUserId is marked as selected.');
+    //   }
+    // }
+
+    subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
+    subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
+    pricecontroller.text = subtask.price.toString();
+    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+
+    showtoast("Edit your Task Or Add Subtasks As Well");
+
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => editSubAssignTask(
@@ -207,14 +271,25 @@ class SubTaskViewModel with ChangeNotifier {
         ),
       ),
     );
-    if (dataEdited == true) {
-      // Clear the necessary data fields
-      subtaskDescriptioncontroller.clear();
-      subtaskTitlecontroller.clear();
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
-      // ...
-    }
+
+    // showtoast("Edit your Task");
+    // bool dataEdited = await Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => editSubAssignTask(
+    //       id: subtask,
+    //       selectedMembers: selectedMembers,
+    //     ),
+    //   ),
+    // );
+    // if (dataEdited == true) {
+    //   // Clear the necessary data fields
+    //   subtaskDescriptioncontroller.clear();
+    //   subtaskTitlecontroller.clear();
+    //   estimatedTimecontroller.clear();
+    //   pricecontroller.clear();
+    //   // ...
+    // }
   }
 
   void viewtasks(BuildContext context, SubTasks subtask) {
@@ -279,9 +354,23 @@ class SubTaskViewModel with ChangeNotifier {
   // }
 
   void clearAssignedUsers() {
-    _users.forEach((user) {
+    for (var user in _users) {
       user.selected = false;
-    });
+    }
+  }
+
+  changeTime(pickedTime, context) {
+    if (pickedTime == null) {
+      // If pickedTime is null, it means the time selection was canceled, so clear the time.
+      selectedTime = TimeOfDay.now();
+
+      timecontroller = '';
+    } else {
+      // Otherwise, update the selected time.
+      selectedTime = pickedTime;
+      timecontroller = selectedTime.format(context);
+    }
+    notifyListeners();
   }
 
   void clearSelectedTime() {
@@ -289,4 +378,30 @@ class SubTaskViewModel with ChangeNotifier {
     timecontroller = '';
     notifyListeners();
   }
+}
+
+int combineDateAndTime(String? date, String? time) {
+  if (date == null || time == null) {
+    throw ArgumentError("Date and time must not be null.");
+  }
+
+  time = time.replaceAll('\u202F', ' ');
+
+  DateTime parsedDate = DateTime.parse(date);
+  DateTime parsedTime = DateFormat("h:mm a").parse(time.toString());
+  print(parsedTime);
+
+  // Convert to local time zone (if needed)
+  DateTime combinedDateTime = DateTime(
+    parsedDate.year,
+    parsedDate.month,
+    parsedDate.day,
+    parsedTime.hour,
+    parsedTime.minute,
+  );
+
+  // Convert to UTC before getting milliseconds since epoch
+  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
+
+  return millisecondsSinceEpoch;
 }
