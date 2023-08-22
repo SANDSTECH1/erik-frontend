@@ -250,22 +250,7 @@ class TaskScreen extends StatelessWidget {
                                                               ),
                                                             ),
                                                             GestureDetector(
-                                                              onTap: () async {
-                                                                // Show loading indicator
-                                                                showLoader(
-                                                                    context);
-
-                                                                // Simulate an asynchronous task, like navigating to the next screen
-                                                                await Future.delayed(
-                                                                    Duration(
-                                                                        seconds:
-                                                                            1)); // Replace this with your actual navigation logic
-
-                                                                // Hide loading indicator after the asynchronous task is done
-                                                                hideLoader(
-                                                                    context);
-                                                                Navigator.pop(
-                                                                    context);
+                                                              onTap: () {
                                                                 taskcontroller
                                                                     .editTaskclick(
                                                                         context,
@@ -323,17 +308,7 @@ class TaskScreen extends StatelessWidget {
                                                   ),
                                                   5.horizontalSpace,
                                                   GestureDetector(
-                                                    onTap: () async {
-                                                      // Show loading indicator
-                                                      showLoader(context);
-
-                                                      // Simulate an asynchronous task, like navigating to the next screen
-                                                      await Future.delayed(Duration(
-                                                          seconds:
-                                                              1)); // Replace this with your actual navigation logic
-
-                                                      // Hide loading indicator after the asynchronous task is done
-                                                      hideLoader(context);
+                                                    onTap: () {
                                                       taskcontroller.viewtasks(
                                                           context,
                                                           tasks[index]);
@@ -424,22 +399,7 @@ class TaskScreen extends StatelessWidget {
                                                                     ),
                                                                   ),
                                                                   GestureDetector(
-                                                                    onTap:
-                                                                        () async {
-                                                                      // Show loading indicator
-                                                                      showLoader(
-                                                                          context);
-
-                                                                      // Simulate an asynchronous task, like navigating to the next screen
-                                                                      await Future.delayed(Duration(
-                                                                          seconds:
-                                                                              1)); // Replace this with your actual navigation logic
-
-                                                                      // Hide loading indicator after the asynchronous task is done
-                                                                      hideLoader(
-                                                                          context);
-                                                                      Navigator.pop(
-                                                                          context);
+                                                                    onTap: () {
                                                                       taskcontroller.deleteTask(
                                                                           context,
                                                                           tasks[
@@ -830,8 +790,4 @@ class TaskScreen extends StatelessWidget {
       ],
     ));
   }
-}
-
-Future<void> hideLoader(BuildContext context) async {
-  Navigator.of(context).pop();
 }
