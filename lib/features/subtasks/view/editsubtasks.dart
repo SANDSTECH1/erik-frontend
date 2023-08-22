@@ -1,4 +1,5 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
+import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,11 +7,9 @@ import 'package:provider/provider.dart';
 
 class editSubAssignTask extends StatelessWidget {
   final id;
-  //final TimeOfDay? updatedTime;
-  const editSubAssignTask({
-    super.key,
-    required this.id, //this.updatedTime
-  });
+  final List<userListData> selectedMembers;
+  const editSubAssignTask(
+      {super.key, required this.id, required this.selectedMembers});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +20,21 @@ class editSubAssignTask extends StatelessWidget {
     final controller = Provider.of<SubTaskViewModel>(context, listen: false);
 
     final taskcontroller = Provider.of<TaskViewModel>(context);
+
+    // Preselect the selected members
+    for (final member in selectedMembers) {
+      // Find the corresponding member in taskcontroller.usersdata
+      final matchingMember = taskcontroller.usersdata.firstWhere(
+        (user) => user.sId == member.sId,
+        orElse: () => member,
+      );
+
+      // Update the isSelected property of the matching member
+      if (matchingMember != null) {
+        matchingMember.selected = true;
+      }
+    }
+
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -127,14 +141,15 @@ class editSubAssignTask extends StatelessWidget {
                               width: 198.w,
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: taskcontroller.usersdata.length,
+                                  itemCount:
+                                      taskcontroller.filteredUsers.length,
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
                                         taskcontroller.changeSelectedUser(
                                             index,
                                             !taskcontroller
-                                                .usersdata[index].selected);
+                                                .filteredUsers[index].selected);
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -149,7 +164,7 @@ class editSubAssignTask extends StatelessWidget {
                                               1.horizontalSpace,
                                               Text(
                                                 taskcontroller
-                                                    .usersdata[index].name
+                                                    .filteredUsers[index].name
                                                     .toString(),
                                                 style: TextStyle(
                                                     fontWeight: FontWeight.w400,
@@ -160,7 +175,7 @@ class editSubAssignTask extends StatelessWidget {
                                             ],
                                           ),
                                           taskcontroller
-                                                  .usersdata[index].selected
+                                                  .filteredUsers[index].selected
                                               ? const Icon(
                                                   Icons.check_box,
                                                   color: Color(0xff163300),

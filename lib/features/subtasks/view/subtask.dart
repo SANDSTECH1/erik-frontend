@@ -1,3 +1,4 @@
+import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,8 @@ class SubAssignTask extends StatelessWidget {
     print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
     final taskcontroller = Provider.of<TaskViewModel>(context);
+    final selectedMembersProvider =
+        Provider.of<SelectedMembersProvider>(context);
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -130,11 +133,14 @@ class SubAssignTask extends StatelessWidget {
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
-                                        taskcontroller.changeSelectedUser(
-                                          index,
-                                          !taskcontroller
-                                              .filteredUsers[index].selected,
-                                        );
+                                        // taskcontroller.changeSelectedUser(
+                                        //   index,
+                                        //   !taskcontroller
+                                        //       .filteredUsers[index].selected,
+                                        // );
+                                        selectedMembersProvider.toggleSelected(
+                                            taskcontroller
+                                                .filteredUsers[index]);
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -160,12 +166,11 @@ class SubAssignTask extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          taskcontroller
-                                                  .filteredUsers[index].selected
-                                              ? const Icon(
-                                                  Icons.check_box,
-                                                  color: Color(0xff163300),
-                                                )
+                                          selectedMembersProvider.isSelected(
+                                                  taskcontroller
+                                                      .filteredUsers[index])
+                                              ? const Icon(Icons.check_box,
+                                                  color: Color(0xff163300))
                                               : const SizedBox(),
                                         ],
                                       ),

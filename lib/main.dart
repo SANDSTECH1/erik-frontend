@@ -1,5 +1,6 @@
 import 'package:erick/features/onboarding/view/login.dart';
 import 'package:erick/features/onboarding/viewmodel/loginviewmodel.dart';
+import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,5 +54,7 @@ List<SingleChildWidget> providers(BuildContext context) {
     ChangeNotifierProvider<CalendarViewModel>(
         create: (_) => CalendarViewModel()),
     ChangeNotifierProvider<SubTaskViewModel>(create: (_) => SubTaskViewModel()),
+    ChangeNotifierProvider<SelectedMembersProvider>(
+        create: (_) => SelectedMembersProvider()),
   ];
 }

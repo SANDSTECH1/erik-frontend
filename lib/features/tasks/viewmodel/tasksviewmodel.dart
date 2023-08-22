@@ -9,7 +9,7 @@ import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -50,6 +50,7 @@ class TaskViewModel with ChangeNotifier {
 
   TaskViewModel() {
     getmembers();
+    loadSelectedUsers();
     //clearSelectedTime();
   }
   Future<void> hideLoader(BuildContext context) async {
@@ -342,7 +343,8 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void changeSelectedUser(int index, bool value) {
+  // Update selected user and persist data
+  void changeSelectedUser(int index, bool value) async {
     final userId = filteredUsers[index].sId;
 
     // Update selection state in the main user list
@@ -358,7 +360,30 @@ class TaskViewModel with ChangeNotifier {
       filteredUsers[filteredIndex].selected = value;
     }
 
+    // Update selected user data in shared preferences
+    await saveSelectedUsers();
+
     notifyListeners();
+  }
+
+  // Save selected user data to shared preferences
+  Future<void> saveSelectedUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedUsersJson = json.encode(usersdata);
+    prefs.setString('selectedUsers', selectedUsersJson);
+  }
+
+  // Load selected user data from shared preferences
+  Future<void> loadSelectedUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedUsersJson = prefs.getString('selectedUsers');
+    if (selectedUsersJson != null) {
+      final List<dynamic> selectedUsersData = json.decode(selectedUsersJson);
+      _users = selectedUsersData
+          .map<userListData>((m) => userListData.fromJson(m))
+          .toList();
+      filteredUsers = usersdata.toList();
+    }
   }
 
   resetUserSelections() {

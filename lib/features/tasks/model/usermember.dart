@@ -1,3 +1,5 @@
+import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
+
 class userListData {
   String? sId;
   String? name;
@@ -40,6 +42,11 @@ class userListData {
     tasks = json['tasks'].cast<String>();
     subtasks = json['subtasks'].cast<String>();
     iV = json['__v'];
+    // Add a method to toggle selected state
+    void toggleSelected(SelectedMembersProvider provider) {
+      selected = !selected;
+      provider.toggleSelected(this);
+    }
   }
 
   Map<String, dynamic> toJson() {

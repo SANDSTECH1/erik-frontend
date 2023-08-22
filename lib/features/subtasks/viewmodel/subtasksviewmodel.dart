@@ -1,4 +1,5 @@
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
+import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 String userToken = "";
 
@@ -191,39 +193,17 @@ class SubTaskViewModel with ChangeNotifier {
     subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
     pricecontroller.text = subtask.price.toString();
     estimatedTimecontroller.text = subtask.estimatedTime.toString();
-
-    // // Convert UTC scheduledDateTime to local time
-    // final int milliseconds = int.parse(subtask.scheduledDateTime ?? "0");
-    // if (milliseconds != 0) {
-    //   final DateTime utcDateTime =
-    //       DateTime.fromMillisecondsSinceEpoch(milliseconds, isUtc: true);
-    //   final localDateTime = utcDateTime.toLocal();
-
-    //   daycontroller = DateFormat('yyyy-MM-dd').format(localDateTime);
-    //   print(localDateTime);
-    //   DateTime dateTime = DateTime.parse(localDateTime.toString());
-    //   TimeOfDay timeOfDay =
-    //       TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
-
-    //   String formattedTime = DateFormat.jm()
-    //       .format(dateTime); // Format as 12-hour clock with AM/PM
-
-    //   print(formattedTime);
-    //   timecontroller = formattedTime;
-
-    //   selectedDay = localDateTime;
-
-    //   // Automatically save the time without opening the time picker
-    //   selectedTime = TimeOfDay.fromDateTime(localDateTime);
-    //   //isTimeModified = false; // Set time modification flag to false
-    // }
+    final selectedMembersProvider =
+        Provider.of<SelectedMembersProvider>(context, listen: false);
+    List<userListData> selectedMembers =
+        selectedMembersProvider.getSelectedMembers();
     showtoast("Edit your Task");
     bool dataEdited = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => editSubAssignTask(
           id: subtask,
-          //updatedTime: selectedTime,
+          selectedMembers: selectedMembers,
         ),
       ),
     );
