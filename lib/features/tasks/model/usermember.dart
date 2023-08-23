@@ -43,10 +43,6 @@ class userListData {
     subtasks = json['subtasks'].cast<String>();
     iV = json['__v'];
     // Add a method to toggle selected state
-    void toggleSelected(SelectedMembersProvider provider) {
-      selected = !selected;
-      provider.toggleSelected(this);
-    }
   }
 
   Map<String, dynamic> toJson() {

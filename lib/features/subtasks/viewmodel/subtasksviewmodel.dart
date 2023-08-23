@@ -1,17 +1,16 @@
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
-import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
 import 'package:erick/features/tasks/view/calender_screen.dart';
 import 'package:erick/helper/loader/loader.dart';
+import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
-import 'package:erick/features/subtasks/view/viewtask.dart';
+import 'package:erick/features/subtasks/view/viewsubtask.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 String userToken = "";
 
@@ -21,13 +20,26 @@ class SubTaskViewModel with ChangeNotifier {
   final TextEditingController pricecontroller = TextEditingController();
   final TextEditingController subtaskDescriptioncontroller =
       TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
-  String timecontroller = '';
-  String daycontroller = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String daycontroller = "";
+  String timecontroller = "";
   DateTime? selectedDay;
-  final List<userListData> _users = [];
+  List<userListData> _users = [];
   List<userListData> get usersdata => _users;
   TimeOfDay selectedTime = TimeOfDay.now();
+  List<userListData> _filteredUsers = [];
+  List<userListData> get filteredUsers => _filteredUsers;
+  bool isTimeModified = false;
+
+  set filteredUsers(List<userListData> value) {
+    _filteredUsers = value;
+    notifyListeners();
+  }
+
+  SubTaskViewModel() {
+    getmembers();
+  }
 
   Future<void> hideLoader(BuildContext context) async {
     Navigator.of(context).pop();
@@ -45,26 +57,15 @@ class SubTaskViewModel with ChangeNotifier {
       return; // Do not proceed
     }
     try {
-      String date = daycontroller;
-      String time = timecontroller;
-      print(daycontroller);
-      print(timecontroller);
-
-      int combinedDateTimeMillis = combineDateAndTime(date, time);
-
-      DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
-          combinedDateTimeMillis,
-          isUtc: true);
-      final formattedDateTime =
-          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
-      print({
-        "subTaskTitle": subtaskTitlecontroller.text,
-        "subTaskDescription": subtaskDescriptioncontroller.text,
-        "task": taskid,
-        "estimatedTime": estimatedTimecontroller.text,
-        "price": pricecontroller.text,
-        "scheduledDateTime": formattedDateTime,
-      });
+      List assignedmembers =
+          _users.where((element) => element.selected == true).toList();
+      List<String> ids =
+          assignedmembers.map((user) => user.sId.toString()).toList();
+      // After populating assignedmembers
+      for (final user in _users) {
+        user.selected = assignedmembers.contains(user);
+      }
+      final formattedDateTime = combineTimeWithCurrentDay(timecontroller);
       final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
         "subTaskTitle": subtaskTitlecontroller.text,
         "subTaskDescription": subtaskDescriptioncontroller.text,
@@ -81,17 +82,21 @@ class SubTaskViewModel with ChangeNotifier {
       clearAssignedUsers();
       clearSelectedTime();
       //selectedTime = TimeOfDay.now();
-
+      logger.d(response.body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
       if (response.statusCode == 200) {
-        hideLoader(context);
         showtoast("SubTask Created Successfully");
+        hideLoader(context);
+        // Navigator.pop(context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
         );
-        Navigator.pop(context);
+        //Navigator.pop(context);
       } else if (response.statusCode == 400) {
-        //showtoast(jsonBody['message']);
+        showtoast(jsonBody['message']);
+        hideLoader(context);
       } else {
         showtoast("Failed To Create SubTask");
         hideLoader(context);
@@ -104,7 +109,7 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  void editTask(
+  void editSubTask(
     BuildContext context,
     SubTasks taskid,
   ) async {
@@ -118,26 +123,30 @@ class SubTaskViewModel with ChangeNotifier {
     }
     try {
       showLoader(context);
+      List assignedmembers =
+          _users.where((element) => element.selected == true).toList();
+      List<String> ids =
+          assignedmembers.map((user) => user.sId.toString()).toList();
       String date = daycontroller;
       String time = timecontroller;
 
-      // int combinedDateTimeMillis = combineDateAndTime(date, time);
+      int combinedDateTimeMillis = combineTimeWithCurrentDay(time);
 
-      // String? formattedDateTimeStr;
+      String formattedDateTimeStr = "";
 
-      // if (combinedDateTimeMillis != 0) {
-      //   // Use the provided date and time
-      //   DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
-      //     combinedDateTimeMillis,
-      //     isUtc: true,
-      //   ).toLocal();
+      if (combinedDateTimeMillis != 0) {
+        // Use the provided date and time
+        DateTime localDateTime = DateTime.fromMillisecondsSinceEpoch(
+          combinedDateTimeMillis,
+          isUtc: true,
+        ).toLocal();
 
-      //   formattedDateTimeStr =
-      //       DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
-      // } else {
-      //   // Use the existing scheduled time from the task
-      //   formattedDateTimeStr = taskid.scheduledDateTime;
-      // }
+        formattedDateTimeStr =
+            DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
+      } else {
+        // Use the existing scheduled time from the task
+        formattedDateTimeStr = taskid.scheduledDateTime.toString();
+      }
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatesubtasks}/${taskid.sId}",
         {
@@ -146,7 +155,7 @@ class SubTaskViewModel with ChangeNotifier {
           "task": taskid.task,
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
-          //"scheduledDateTime": formattedDateTimeStr,
+          "scheduledDateTime": formattedDateTimeStr.toString(),
         },
       );
 
@@ -158,12 +167,14 @@ class SubTaskViewModel with ChangeNotifier {
         hideLoader(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const calender_screen()),
+          MaterialPageRoute(builder: (context) => calender_screen()),
         );
         subtaskDescriptioncontroller.clear();
         subtaskTitlecontroller.clear();
         estimatedTimecontroller.clear();
         pricecontroller.clear();
+        clearSelectedTime();
+        clearAssignedUsers();
 
         //clearSelectedTime();
       } else if (response.statusCode == 400) {
@@ -181,38 +192,60 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  deleteTask(context, SubTasks taskid) async {
+  deleteSubTask(context, SubTasks taskid) async {
+    showLoader(context);
     final response = await NetworkHelper()
         .deleteApi("${ApiUrls().deletesubtasks}/${taskid.sId}");
     print(taskid.sId);
     if (response.statusCode == 200) {
+      hideLoader(context);
       showtoast('Task deleted successfully');
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const calender_screen()),
+        MaterialPageRoute(builder: (context) => calender_screen()),
       );
     } else {
+      hideLoader(context);
       showtoast('Failed to delete the task');
     }
     return response;
   }
 
-  editTaskclicks(BuildContext context, SubTasks subtask) async {
-    print(subtask.subTaskTitle);
-    // subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
-    // subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
-    // pricecontroller.text = subtask.price.toString();
-    // estimatedTimecontroller.text = subtask.estimatedTime.toString();
-    final selectedMembersProvider =
-        Provider.of<SelectedMembersProvider>(context, listen: false);
-    List<userListData> selectedMembers =
-        selectedMembersProvider.getSelectedMembers();
+  void editSubTaskclicks(BuildContext context, SubTasks subtask) async {
+    subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
+    subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
+    pricecontroller.text = subtask.price.toString();
+    estimatedTimecontroller.text = subtask.estimatedTime.toString();
+    //showLoader(context);
+    // if (subtask.assignedUsers != null) {
+    //   List<String> ids =
+    //       subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
 
-    clearAssignedUsers();
-    clearSelectedTime();
-    showLoader(context);
-    print(subtask.scheduledDateTime);
-    // Convert UTC scheduledDateTime to local time
+    //   // Iterate through the users and update the 'selected' property based on the assigned user IDs
+    //   for (final user in _users) {
+    //     user.selected = ids.contains(user.sId.toString());
+    //   }
+    //   for (final assignedUserId in ids) {
+    //     final userIndex =
+    //         _users.indexWhere((user) => user.sId.toString() == assignedUserId);
+    //     if (userIndex != -1) {
+    //       _users[userIndex].selected = true;
+    //       print('User with ID $assignedUserId is marked as selected.');
+    //     }
+    //   }
+
+    //   print('Assigned User IDs: $ids');
+    // } else {
+    //   print('subtask.assignedUsers is null');
+    // }
+    // Iterate through the users and update the 'selected' property based on the assigned user IDs
+    for (final user in _users) {
+      user.selected = subtask.assignedUsers != null &&
+          subtask.assignedUsers!
+              .any((assignedUser) => assignedUser.sId == user.sId);
+    }
+
+// Convert UTC scheduledDateTime to local time
     final int milliseconds = int.parse(subtask.scheduledDateTime ?? "0");
     if (milliseconds != 0) {
       final DateTime utcDateTime =
@@ -235,64 +268,21 @@ class SubTaskViewModel with ChangeNotifier {
 
       // Automatically save the time without opening the time picker
       selectedTime = TimeOfDay.fromDateTime(localDateTime);
-      print(selectedTime);
-      // isTimeModified = false; // Set time modification flag to false
+      isTimeModified = false; // Set time modification flag to false
     }
-
-    hideLoader(context);
-    // List<String> ids =
-    //     subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
-
-    // print('Assigned User IDs: $ids');
-
-    // Iterate through the assigned user IDs and update the selected property
-    // for (final assignedUserId in ids) {
-    //   final userIndex =
-    //       _users.indexWhere((user) => user.sId.toString() == assignedUserId);
-    //   if (userIndex != -1) {
-    //     _users[userIndex].selected = true;
-    //     print('User with ID $assignedUserId is marked as selected.');
-    //   }
-    // }
-
-    subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
-    subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
-    pricecontroller.text = subtask.price.toString();
-    estimatedTimecontroller.text = subtask.estimatedTime.toString();
-
-    showtoast("Edit your Task Or Add Subtasks As Well");
-
+    // Navigate to the editSubAssignTask screen
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => editSubAssignTask(
           id: subtask,
-          selectedMembers: selectedMembers,
         ),
       ),
     );
-
-    // showtoast("Edit your Task");
-    // bool dataEdited = await Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (context) => editSubAssignTask(
-    //       id: subtask,
-    //       selectedMembers: selectedMembers,
-    //     ),
-    //   ),
-    // );
-    // if (dataEdited == true) {
-    //   // Clear the necessary data fields
-    //   subtaskDescriptioncontroller.clear();
-    //   subtaskTitlecontroller.clear();
-    //   estimatedTimecontroller.clear();
-    //   pricecontroller.clear();
-    //   // ...
-    // }
   }
 
-  void viewtasks(BuildContext context, SubTasks subtask) {
+  void viewsubtasks(BuildContext context, SubTasks subtask) {
+    showLoader(context);
     subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
     subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
     estimatedTimecontroller.text = subtask.estimatedTime.toString();
@@ -303,6 +293,7 @@ class SubTaskViewModel with ChangeNotifier {
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
     showtoast("View Your Task");
+    hideLoader(context);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -312,51 +303,52 @@ class SubTaskViewModel with ChangeNotifier {
     );
   }
 
-  // changeTime(pickedTime, context) {
-  //   if (pickedTime == null) {
-  //     // If pickedTime is null, it means the time selection was canceled, so clear the time.
-  //     selectedTime = TimeOfDay.now();
+  getmembers() async {
+    print('memberscall');
+    final response = await NetworkHelper().getApi(
+      ApiUrls().getuser,
+    );
+    logger.d(response.body);
+    final jsonBody = json.decode(response.body);
+    logger.d(jsonBody['data']);
 
-  //     timecontroller = '';
-  //   } else {
-  //     // Otherwise, update the selected time.
-  //     selectedTime = pickedTime;
-  //     timecontroller = selectedTime.format(context);
-  //   }
-  //   notifyListeners();
-  // }
+    _users = jsonBody['data']
+        .map<userListData>((m) => userListData.fromJson(m))
+        .toList();
+    _filteredUsers = _users.toList();
+    notifyListeners();
+  }
 
-  // int combineDateAndTime(String? date, String? time) {
-  //   if (date == null || time == null) {
-  //     throw ArgumentError("Date and time must not be null.");
-  //   }
+  // Update selected user and persist data
+  void changeSelectedUser(int index, bool value) async {
+    final userId = filteredUsers[index].sId;
 
-  //   time = time.replaceAll('\u202F', ' ');
-
-  //   DateTime parsedDate = DateTime.parse(date);
-  //   DateTime parsedTime = DateFormat("h:mm a").parse(time.toString());
-  //   print(parsedTime);
-
-  //   // Convert to local time zone (if needed)
-  //   DateTime combinedDateTime = DateTime(
-  //     parsedDate.year,
-  //     parsedDate.month,
-  //     parsedDate.day,
-  //     parsedTime.hour,
-  //     parsedTime.minute,
-  //   );
-
-  //   // Convert to UTC before getting milliseconds since epoch
-  //   int millisecondsSinceEpoch =
-  //       combinedDateTime.toUtc().millisecondsSinceEpoch;
-
-  //   return millisecondsSinceEpoch;
-  // }
-
-  void clearAssignedUsers() {
-    for (var user in _users) {
-      user.selected = false;
+    // Update selection state in the main user list
+    final userIndex = usersdata.indexWhere((user) => user.sId == userId);
+    if (userIndex != -1) {
+      usersdata[userIndex].selected = value;
     }
+
+    // Update selection state in the filtered user list
+    final filteredIndex =
+        filteredUsers.indexWhere((user) => user.sId == userId);
+    if (filteredIndex != -1) {
+      filteredUsers[filteredIndex].selected = value;
+    }
+    notifyListeners();
+  }
+
+  void filterMembers(String searchTerm) {
+    if (searchTerm.isEmpty) {
+      // If search input is empty, show all members
+      filteredUsers = usersdata;
+    } else {
+      // Filter members based on search input
+      filteredUsers = usersdata.where((user) {
+        return user.name!.toLowerCase().contains(searchTerm.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
   }
 
   changeTime(pickedTime, context) {
@@ -373,35 +365,43 @@ class SubTaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  int combineTimeWithCurrentDay(String? time) {
+    if (time == null) {
+      throw ArgumentError("Time must not be null.");
+    }
+
+    // Get the current date
+    DateTime currentDate = DateTime.now();
+
+    // Parse the selected time
+    DateFormat timeFormat = DateFormat("h:mm a");
+    DateTime parsedTime = timeFormat.parse(time);
+
+    // Create a new DateTime by combining the current date and the selected time
+    DateTime combinedDateTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      parsedTime.hour,
+      parsedTime.minute,
+    );
+
+    // Convert to UTC before getting milliseconds since epoch
+    int millisecondsSinceEpoch =
+        combinedDateTime.toUtc().millisecondsSinceEpoch;
+
+    return millisecondsSinceEpoch;
+  }
+
+  void clearAssignedUsers() {
+    _users.forEach((user) {
+      user.selected = false;
+    });
+  }
+
   void clearSelectedTime() {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
   }
-}
-
-int combineDateAndTime(String? date, String? time) {
-  if (date == null || time == null) {
-    throw ArgumentError("Date and time must not be null.");
-  }
-
-  time = time.replaceAll('\u202F', ' ');
-
-  DateTime parsedDate = DateTime.parse(date);
-  DateTime parsedTime = DateFormat("h:mm a").parse(time.toString());
-  print(parsedTime);
-
-  // Convert to local time zone (if needed)
-  DateTime combinedDateTime = DateTime(
-    parsedDate.year,
-    parsedDate.month,
-    parsedDate.day,
-    parsedTime.hour,
-    parsedTime.minute,
-  );
-
-  // Convert to UTC before getting milliseconds since epoch
-  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
-
-  return millisecondsSinceEpoch;
 }

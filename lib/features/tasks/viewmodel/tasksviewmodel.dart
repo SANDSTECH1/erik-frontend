@@ -9,7 +9,6 @@ import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -50,7 +49,7 @@ class TaskViewModel with ChangeNotifier {
 
   TaskViewModel() {
     getmembers();
-    loadSelectedUsers();
+
     //clearSelectedTime();
   }
   Future<void> hideLoader(BuildContext context) async {
@@ -90,6 +89,7 @@ class TaskViewModel with ChangeNotifier {
       final jsonBody = json.decode(body);
 
       if (response.statusCode == 200) {
+        hideLoader(context);
         showtoast("Task Created Successfully");
         taskTitlecontroller.clear();
         taskDescriptioncontroller.clear();
@@ -101,9 +101,11 @@ class TaskViewModel with ChangeNotifier {
         changeselectedate(null);
         clearSelectedTime();
       } else if (response.statusCode == 400) {
+        hideLoader(context);
         showtoast(jsonBody['message']);
         return; // Return without navigating
       } else {
+        hideLoader(context);
         showtoast('Failed to create the task');
         return; // Return without navigating
       }
@@ -113,9 +115,9 @@ class TaskViewModel with ChangeNotifier {
     } finally {
       hideLoader(context); // Hide the loader regardless of success or error
     }
-    Navigator.pop(context);
+    // Navigator.pop(context);
     // After the try-catch-finally block, navigate to the calendar screen
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const calender_screen()),
     );
@@ -190,11 +192,14 @@ class TaskViewModel with ChangeNotifier {
         changeselectedate(null);
         clearSelectedTime();
       } else if (response.statusCode == 400) {
+        hideLoader(context);
         showtoast(jsonBody['message']);
       } else {
+        hideLoader(context);
         showtoast('Failed to update the task');
       }
     } catch (e) {
+      hideLoader(context);
       showtoast('Error updating task: $e');
     } finally {
       hideLoader(context); // Hide the loader regardless of success or error
@@ -202,15 +207,18 @@ class TaskViewModel with ChangeNotifier {
   }
 
   deleteTask(context, taskByDate task) async {
+    showLoader(context);
     final response =
         await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
     if (response.statusCode == 200) {
+      hideLoader(context);
       showtoast('Task deleted successfully');
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => calender_screen()),
       );
     } else {
+      hideLoader(context);
       showtoast('Failed to delete the task');
     }
     return response;
@@ -220,9 +228,9 @@ class TaskViewModel with ChangeNotifier {
     BuildContext context,
     taskByDate task,
   ) {
+    showLoader(context);
     clearAssignedUsers();
     clearSelectedTime();
-    showLoader(context);
 
     // Convert UTC scheduledDateTime to local time
     final int milliseconds = int.parse(task.scheduledDateTime ?? "0");
@@ -264,6 +272,7 @@ class TaskViewModel with ChangeNotifier {
         _users[userIndex].selected = true;
         print('User with ID $assignedUserId is marked as selected.');
       }
+      hideLoader(context);
     }
 
     taskDescriptioncontroller.text = task.description.toString();
@@ -271,7 +280,7 @@ class TaskViewModel with ChangeNotifier {
     pricecontroller.text = task.price.toString();
     estimatedTimecontroller.text = task.estimatedTime.toString();
 
-    showtoast("Edit your Task Or Add Subtasks As Well");
+    //showtoast("Edit your Task Or Add Subtasks As Well");
 
     Navigator.push(
       context,
@@ -284,6 +293,7 @@ class TaskViewModel with ChangeNotifier {
   }
 
   void viewtasks(BuildContext context, taskByDate taskss) {
+    showLoader(context);
     taskDescriptioncontroller.text = taskss.description.toString();
     taskTitlecontroller.text = taskss.title.toString();
     estimatedTimecontroller.text = taskss.estimatedTime.toString();
@@ -293,6 +303,7 @@ class TaskViewModel with ChangeNotifier {
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
+    hideLoader(context);
     showtoast("View Your Task");
     Navigator.push(
       context,
@@ -361,30 +372,29 @@ class TaskViewModel with ChangeNotifier {
     }
 
     // Update selected user data in shared preferences
-    await saveSelectedUsers();
 
     notifyListeners();
   }
 
-  // Save selected user data to shared preferences
-  Future<void> saveSelectedUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final selectedUsersJson = json.encode(usersdata);
-    prefs.setString('selectedUsers', selectedUsersJson);
-  }
+  // // Save selected user data to shared preferences
+  // Future<void> saveSelectedUsers() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final selectedUsersJson = json.encode(usersdata);
+  //   prefs.setString('selectedUsers', selectedUsersJson);
+  // }
 
-  // Load selected user data from shared preferences
-  Future<void> loadSelectedUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final selectedUsersJson = prefs.getString('selectedUsers');
-    if (selectedUsersJson != null) {
-      final List<dynamic> selectedUsersData = json.decode(selectedUsersJson);
-      _users = selectedUsersData
-          .map<userListData>((m) => userListData.fromJson(m))
-          .toList();
-      filteredUsers = usersdata.toList();
-    }
-  }
+  // // Load selected user data from shared preferences
+  // Future<void> loadSelectedUsers() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final selectedUsersJson = prefs.getString('selectedUsers');
+  //   if (selectedUsersJson != null) {
+  //     final List<dynamic> selectedUsersData = json.decode(selectedUsersJson);
+  //     _users = selectedUsersData
+  //         .map<userListData>((m) => userListData.fromJson(m))
+  //         .toList();
+  //     filteredUsers = usersdata.toList();
+  //   }
+  // }
 
   resetUserSelections() {
     for (var user in _users) {

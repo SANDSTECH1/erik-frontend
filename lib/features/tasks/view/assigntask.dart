@@ -31,18 +31,13 @@ class AssignTask extends StatelessWidget {
                         "Assign Task",
                         style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context, true);
-                        },
-                        child: CircleAvatar(
-                          radius: 18.r,
-                          backgroundColor: Colors.white,
-                          child: Icon(
-                            Icons.close,
-                            size: 20.w,
-                            color: Colors.green,
-                          ),
+                      CircleAvatar(
+                        radius: 18.r,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.close,
+                          size: 20.w,
+                          color: Colors.green,
                         ),
                       )
                     ],
@@ -568,45 +563,6 @@ class AssignTask extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     Navigator.pop(context);
-                              //     subcontroller.createSubTask(context);
-
-                              //     showDialog(
-                              //         context: context,
-                              //         builder: (_) => AlertDialog(
-                              //               contentPadding: EdgeInsets.zero,
-                              //               shape: const RoundedRectangleBorder(
-                              //                   borderRadius: BorderRadius.all(
-                              //                       Radius.circular(10.0))),
-                              //               content: Builder(
-                              //                 builder: (context) {
-                              //                   return const SubAssignTask();
-                              //                 },
-                              //               ),
-                              //             ));
-                              //   },
-                              //   child: Container(
-                              //     width: 100.w,
-                              //     decoration: BoxDecoration(
-                              //         color: const Color(0xff9FE870),
-                              //         borderRadius: BorderRadius.all(
-                              //             Radius.circular(4.r))),
-                              //     child: Padding(
-                              //       padding: EdgeInsets.all(9.w),
-                              //       child: Center(
-                              //         child: Text(
-                              //           'ADD SUBTASK',
-                              //           style: TextStyle(
-                              //               color: Colors.white,
-                              //               fontSize: 14.sp),
-                              //         ),
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              // 20.horizontalSpace,
                               GestureDetector(
                                 onTap: () {
                                   controller.createTask(context);

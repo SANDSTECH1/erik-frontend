@@ -1,12 +1,10 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
-import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:printing/printing.dart';
 
@@ -20,8 +18,6 @@ class ViewSubTasks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subtaskcontroller = Provider.of<SubTaskViewModel>(context);
-    final taskcontroller = Provider.of<TaskViewModel>(context);
-
     return Material(
       child: SizedBox(
         width: 500.w,
@@ -76,8 +72,8 @@ class ViewSubTasks extends StatelessWidget {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                final pdfContent = await generatePdfContent(
-                                    subtaskcontroller, taskcontroller);
+                                final pdfContent =
+                                    await generatePdfContent(subtaskcontroller);
                                 if (pdfContent != null) {
                                   await Printing.layoutPdf(
                                       onLayout: (format) => pdfContent);
@@ -308,8 +304,8 @@ class ViewSubTasks extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        taskcontroller.usersdata.length,
-                        (index) => AssignTo(taskcontroller.usersdata[index]),
+                        subtaskcontroller.usersdata.length,
+                        (index) => AssignTo(subtaskcontroller.usersdata[index]),
                       ))
                 ],
               ),
@@ -352,7 +348,7 @@ Widget AssignTo(userListData user) {
 }
 
 Future<Uint8List?> generatePdfContent(
-    SubTaskViewModel subtaskcontroller, TaskViewModel taskcontroller) async {
+    SubTaskViewModel subtaskcontroller) async {
   final pdf = pdfWidgets.Document();
 
   final headingStyle = pdfWidgets.TextStyle(
@@ -414,7 +410,9 @@ Future<Uint8List?> generatePdfContent(
             pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
             pdfWidgets.Column(
               crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: taskcontroller.usersdata.map((user) {
+              children: subtaskcontroller.usersdata
+                  .where((user) => user.selected) // Filter assigned users
+                  .map((user) {
                 return pdfWidgets.Text(
                   user.name.toString(),
                   style: dataStyle, // Use data style

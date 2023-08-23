@@ -1,6 +1,4 @@
-import 'package:erick/features/subtasks/viewmodel/selectedmebersviewmodel.dart';
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
-import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -13,9 +11,6 @@ class SubAssignTask extends StatelessWidget {
   Widget build(BuildContext context) {
     print(id);
     final controller = Provider.of<SubTaskViewModel>(context);
-    final taskcontroller = Provider.of<TaskViewModel>(context);
-    final selectedMembersProvider =
-        Provider.of<SelectedMembersProvider>(context);
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -34,18 +29,13 @@ class SubAssignTask extends StatelessWidget {
                       "Sub Assign Task",
                       style: TextStyle(color: Colors.white, fontSize: 17.sp),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context, true);
-                      },
-                      child: CircleAvatar(
-                        radius: 18.r,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.close,
-                          size: 20.w,
-                          color: Colors.green,
-                        ),
+                    CircleAvatar(
+                      radius: 18.r,
+                      backgroundColor: Colors.white,
+                      child: Icon(
+                        Icons.close,
+                        size: 20.w,
+                        color: Colors.green,
                       ),
                     )
                   ],
@@ -82,10 +72,10 @@ class SubAssignTask extends StatelessWidget {
                               width: 198.w,
                               child: TextField(
                                 style: const TextStyle(color: Colors.black),
-                                controller: taskcontroller.searchController,
+                                controller: controller.searchController,
                                 onChanged: (value) {
                                   // Call a function to filter the list based on the search input
-                                  taskcontroller.filterMembers(value);
+                                  controller.filterMembers(value);
                                 },
                                 //enabled: false,
                                 decoration: InputDecoration(
@@ -124,59 +114,55 @@ class SubAssignTask extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                                height: 700.h,
-                                width: 198.w,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount:
-                                      taskcontroller.filteredUsers.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        // taskcontroller.changeSelectedUser(
-                                        //   index,
-                                        //   !taskcontroller
-                                        //       .filteredUsers[index].selected,
-                                        // );
-                                        selectedMembersProvider.toggleSelected(
-                                            taskcontroller
-                                                .filteredUsers[index]);
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Image.asset(
-                                                'assets/icons/erickpic.png',
-                                                width: 36.w,
+                              height: 700.h,
+                              width: 198.w,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: controller.filteredUsers.length,
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      controller.changeSelectedUser(
+                                        index,
+                                        !controller
+                                            .filteredUsers[index].selected,
+                                      );
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/icons/erickpic.png',
+                                              width: 36.w,
+                                            ),
+                                            1.horizontalSpace,
+                                            Text(
+                                              controller
+                                                  .filteredUsers[index].name
+                                                  .toString(),
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                color: const Color(0xff163300),
+                                                fontSize: 16.sp,
                                               ),
-                                              1.horizontalSpace,
-                                              Text(
-                                                taskcontroller
-                                                    .filteredUsers[index].name
-                                                    .toString(),
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  color:
-                                                      const Color(0xff163300),
-                                                  fontSize: 16.sp,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          selectedMembersProvider.isSelected(
-                                                  taskcontroller
-                                                      .filteredUsers[index])
-                                              ? const Icon(Icons.check_box,
-                                                  color: Color(0xff163300))
-                                              : const SizedBox(),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                )),
+                                            ),
+                                          ],
+                                        ),
+                                        controller.filteredUsers[index].selected
+                                            ? const Icon(
+                                                Icons.check_box,
+                                                color: Color(0xff163300),
+                                              )
+                                            : const SizedBox(),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -456,39 +442,8 @@ class SubAssignTask extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            // Container(
-                            //   width: 100.w,
-                            //   decoration: BoxDecoration(
-                            //       color: const Color(0xff9FE870),
-                            //       borderRadius:
-                            //           BorderRadius.all(Radius.circular(4.r))),
-                            //   child: Padding(
-                            //     padding: EdgeInsets.all(9.w),
-                            //     child: Center(
-                            //       child: Text(
-                            //         'ADD SUBTASK',
-                            //         style: TextStyle(
-                            //             color: Colors.white, fontSize: 14.sp),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                            // 20.horizontalSpace,
                             GestureDetector(
                               onTap: () {
-                                // Show loading indicator
-                                // showLoader(context);
-
-                                // // Simulate an asynchronous task, like navigating to the next screen
-                                // await Future.delayed(Duration(
-                                //     seconds:
-                                //         1)); // Replace this with your actual navigation logic
-
-                                // // Hide loading indicator after the asynchronous task is done
-                                // hideLoader(context);
-                                // // Navigator.pop(context);
-                                // //controller.editTask(context, id);
-
                                 controller.createSubTask(context, id);
                               },
                               child: Container(

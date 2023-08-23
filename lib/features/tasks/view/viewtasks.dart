@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:printing/printing.dart';
 
@@ -397,7 +396,9 @@ Future<Uint8List?> generatePdfContent(TaskViewModel taskcontroller) async {
             pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
             pdfWidgets.Column(
               crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: taskcontroller.usersdata.map((user) {
+              children: taskcontroller.usersdata
+                  .where((user) => user.selected) // Filter assigned users
+                  .map((user) {
                 return pdfWidgets.Text(
                   user.name.toString(),
                   style: dataStyle, // Use data style

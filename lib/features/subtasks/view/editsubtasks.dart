@@ -1,26 +1,19 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
-import 'package:erick/features/tasks/model/usermember.dart';
-import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class editSubAssignTask extends StatelessWidget {
   final id;
-  final List<userListData> selectedMembers;
-  const editSubAssignTask(
-      {super.key, required this.id, required this.selectedMembers});
+
+  const editSubAssignTask({
+    super.key,
+    required this.id,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Future<void> hideLoader(BuildContext context) async {
-      Navigator.of(context).pop();
-    }
-
     final controller = Provider.of<SubTaskViewModel>(context, listen: false);
-
-    final taskcontroller = Provider.of<TaskViewModel>(context);
-
     return Material(
       child: SizedBox(
         width: 725.w,
@@ -127,15 +120,14 @@ class editSubAssignTask extends StatelessWidget {
                               width: 198.w,
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount:
-                                      taskcontroller.filteredUsers.length,
+                                  itemCount: controller.usersdata.length,
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
-                                        taskcontroller.changeSelectedUser(
-                                            index,
-                                            !taskcontroller
-                                                .filteredUsers[index].selected);
+                                        controller.changeSelectedUser(
+                                          index,
+                                          !controller.usersdata[index].selected,
+                                        );
                                       },
                                       child: Row(
                                         mainAxisAlignment:
@@ -147,21 +139,22 @@ class editSubAssignTask extends StatelessWidget {
                                                 'assets/icons/erickpic.png',
                                                 width: 36.w,
                                               ),
-                                              1.horizontalSpace,
+                                              const SizedBox(
+                                                  width:
+                                                      1), // Add your horizontal space here
                                               Text(
-                                                taskcontroller
-                                                    .filteredUsers[index].name
+                                                controller.usersdata[index].name
                                                     .toString(),
                                                 style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        const Color(0xff163300),
-                                                    fontSize: 16.sp),
+                                                  fontWeight: FontWeight.w400,
+                                                  color:
+                                                      const Color(0xff163300),
+                                                  fontSize: 16.sp,
+                                                ),
                                               ),
                                             ],
                                           ),
-                                          taskcontroller
-                                                  .filteredUsers[index].selected
+                                          controller.usersdata[index].selected
                                               ? const Icon(
                                                   Icons.check_box,
                                                   color: Color(0xff163300),
@@ -453,7 +446,7 @@ class editSubAssignTask extends StatelessWidget {
                           children: [
                             20.horizontalSpace,
                             GestureDetector(
-                              onTap: () async {
+                              onTap: () {
                                 // Show loading indicator
                                 // showLoader(context);
 
@@ -465,7 +458,7 @@ class editSubAssignTask extends StatelessWidget {
                                 // // Hide loading indicator after the asynchronous task is done
                                 // hideLoader(context);
                                 // Navigator.pop(context);
-                                controller.editTask(context, id);
+                                controller.editSubTask(context, id);
                               },
                               child: Container(
                                 width: 100.w,

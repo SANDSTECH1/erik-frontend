@@ -2,7 +2,6 @@ import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/viewmodel/calendarviewmodel.dart';
 import 'package:erick/features/tasks/viewmodel/tasksviewmodel.dart';
-import 'package:erick/helper/loader/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -582,7 +581,7 @@ class TaskScreen extends StatelessWidget {
                                                                     GestureDetector(
                                                                       onTap:
                                                                           () {
-                                                                        subtaskcontroller.editTaskclicks(
+                                                                        subtaskcontroller.editSubTaskclicks(
                                                                             context,
                                                                             tasks[index].subTasks![i]);
                                                                       },
@@ -640,7 +639,7 @@ class TaskScreen extends StatelessWidget {
                                                               // Show loading indicator
 
                                                               subtaskcontroller
-                                                                  .viewtasks(
+                                                                  .viewsubtasks(
                                                                       context,
                                                                       tasks[index]
                                                                           .subTasks![i]);
@@ -726,7 +725,7 @@ class TaskScreen extends StatelessWidget {
                                                                           GestureDetector(
                                                                             onTap:
                                                                                 () {
-                                                                              subtaskcontroller.deleteTask(context, tasks[index].subTasks![i]);
+                                                                              subtaskcontroller.deleteSubTask(context, tasks[index].subTasks![i]);
                                                                             },
                                                                             child:
                                                                                 Container(
