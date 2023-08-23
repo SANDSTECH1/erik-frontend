@@ -89,10 +89,12 @@ class SubTaskViewModel with ChangeNotifier {
         showtoast("SubTask Created Successfully");
         hideLoader(context);
         // Navigator.pop(context);
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
-        );
+        ).then((_) {
+          // Code to handle navigation after returning from the calendar screen
+        });
         //Navigator.pop(context);
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);

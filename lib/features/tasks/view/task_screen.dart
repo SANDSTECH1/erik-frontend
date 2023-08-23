@@ -581,6 +581,8 @@ class TaskScreen extends StatelessWidget {
                                                                     GestureDetector(
                                                                       onTap:
                                                                           () {
+                                                                        Navigator.pop(
+                                                                            context);
                                                                         subtaskcontroller.editSubTaskclicks(
                                                                             context,
                                                                             tasks[index].subTasks![i]);
