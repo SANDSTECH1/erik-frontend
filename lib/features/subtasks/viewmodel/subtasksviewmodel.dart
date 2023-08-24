@@ -8,8 +8,9 @@ import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
 import 'package:erick/features/subtasks/view/viewsubtask.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
-
+import 'package:async/async.dart';
 import 'package:intl/intl.dart';
 
 String userToken = "";
@@ -56,6 +57,7 @@ class SubTaskViewModel with ChangeNotifier {
       hideLoader(context);
       return; // Do not proceed
     }
+
     try {
       List assignedmembers =
           _users.where((element) => element.selected == true).toList();
@@ -65,7 +67,21 @@ class SubTaskViewModel with ChangeNotifier {
       for (final user in _users) {
         user.selected = assignedmembers.contains(user);
       }
-      final formattedDateTime = combineTimeWithCurrentDay(timecontroller);
+      String date = daycontroller;
+      String time = timecontroller;
+      int combinedDateTimeMillis = combineDateAndTime(date, time);
+
+      DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
+          combinedDateTimeMillis,
+          isUtc: true);
+      if (combinedDateTimeMillis == 0) {
+        showtoast('Please select a date and time');
+        hideLoader(context);
+        return; // Do not proceed
+      }
+      //final formattedDateTime = combineTimeWithCurrentDay(timecontroller);
+      final formattedDateTime =
+          DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(combinedDateTimeUtc);
       final response = await NetworkHelper().postApi(ApiUrls().createsubtask, {
         "subTaskTitle": subtaskTitlecontroller.text,
         "subTaskDescription": subtaskDescriptioncontroller.text,
@@ -73,6 +89,7 @@ class SubTaskViewModel with ChangeNotifier {
         "estimatedTime": estimatedTimecontroller.text,
         "price": pricecontroller.text,
         "scheduledDateTime": formattedDateTime,
+        "assignedUsers": ids,
       });
 
       subtaskDescriptioncontroller.clear();
@@ -88,24 +105,27 @@ class SubTaskViewModel with ChangeNotifier {
       if (response.statusCode == 200) {
         showtoast("SubTask Created Successfully");
         hideLoader(context);
-        // Navigator.pop(context);
+        // Navigate back to the calendar screen and handle the return using .then
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const calender_screen()),
         ).then((_) {
-          // Code to handle navigation after returning from the calendar screen
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const calender_screen()));
         });
-        //Navigator.pop(context);
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
         hideLoader(context);
+        return;
       } else {
         showtoast("Failed To Create SubTask");
         hideLoader(context);
+        return;
       }
     } catch (e) {
       showtoast("Error creating SubTask: $e");
       hideLoader(context);
+      return;
     } finally {
       hideLoader(context);
     }
@@ -132,9 +152,9 @@ class SubTaskViewModel with ChangeNotifier {
       String date = daycontroller;
       String time = timecontroller;
 
-      int combinedDateTimeMillis = combineTimeWithCurrentDay(time);
+      int combinedDateTimeMillis = combineDateAndTime(date, time);
 
-      String formattedDateTimeStr = "";
+      String? formattedDateTimeStr;
 
       if (combinedDateTimeMillis != 0) {
         // Use the provided date and time
@@ -147,7 +167,7 @@ class SubTaskViewModel with ChangeNotifier {
             DateFormat("yyyy-MM-ddTHH:mm:ss'Z'").format(localDateTime.toUtc());
       } else {
         // Use the existing scheduled time from the task
-        formattedDateTimeStr = taskid.scheduledDateTime.toString();
+        formattedDateTimeStr = taskid.scheduledDateTime;
       }
       final response = await NetworkHelper().putApi(
         "${ApiUrls().updatesubtasks}/${taskid.sId}",
@@ -158,6 +178,7 @@ class SubTaskViewModel with ChangeNotifier {
           "estimatedTime": estimatedTimecontroller.text,
           "price": pricecontroller.text,
           "scheduledDateTime": formattedDateTimeStr.toString(),
+          "assignedUsers": ids,
         },
       );
 
@@ -195,17 +216,13 @@ class SubTaskViewModel with ChangeNotifier {
   }
 
   deleteSubTask(context, SubTasks taskid) async {
-    showLoader(context);
+    //showLoader(context);
     final response = await NetworkHelper()
         .deleteApi("${ApiUrls().deletesubtasks}/${taskid.sId}");
     print(taskid.sId);
     if (response.statusCode == 200) {
       hideLoader(context);
       showtoast('Task deleted successfully');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => calender_screen()),
-      );
     } else {
       hideLoader(context);
       showtoast('Failed to delete the task');
@@ -219,33 +236,19 @@ class SubTaskViewModel with ChangeNotifier {
     pricecontroller.text = subtask.price.toString();
     estimatedTimecontroller.text = subtask.estimatedTime.toString();
     //showLoader(context);
-    // if (subtask.assignedUsers != null) {
-    //   List<String> ids =
-    //       subtask.assignedUsers!.map((user) => user.sId.toString()).toList();
+    List<String> assignedUserIds = subtask.assignedUsers!; // List of user IDs
 
-    //   // Iterate through the users and update the 'selected' property based on the assigned user IDs
-    //   for (final user in _users) {
-    //     user.selected = ids.contains(user.sId.toString());
-    //   }
-    //   for (final assignedUserId in ids) {
-    //     final userIndex =
-    //         _users.indexWhere((user) => user.sId.toString() == assignedUserId);
-    //     if (userIndex != -1) {
-    //       _users[userIndex].selected = true;
-    //       print('User with ID $assignedUserId is marked as selected.');
-    //     }
-    //   }
+    print('Assigned User IDs: $assignedUserIds');
 
-    //   print('Assigned User IDs: $ids');
-    // } else {
-    //   print('subtask.assignedUsers is null');
-    // }
-    // Iterate through the users and update the 'selected' property based on the assigned user IDs
-    for (final user in _users) {
-      user.selected = subtask.assignedUsers != null &&
-          subtask.assignedUsers!
-              .any((assignedUser) => assignedUser.sId == user.sId);
+// Iterate through the assigned user IDs and update the selected property
+    for (final assignedUserId in assignedUserIds) {
+      final userIndex = _users.indexWhere((user) => user.sId == assignedUserId);
+      if (userIndex != -1) {
+        _users[userIndex].selected = true;
+        print('User with ID $assignedUserId is marked as selected. 111');
+      }
     }
+    hideLoader(context);
 
 // Convert UTC scheduledDateTime to local time
     final int milliseconds = int.parse(subtask.scheduledDateTime ?? "0");
@@ -272,15 +275,6 @@ class SubTaskViewModel with ChangeNotifier {
       selectedTime = TimeOfDay.fromDateTime(localDateTime);
       isTimeModified = false; // Set time modification flag to false
     }
-    // Navigate to the editSubAssignTask screen
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => editSubAssignTask(
-          id: subtask,
-        ),
-      ),
-    );
   }
 
   void viewsubtasks(BuildContext context, SubTasks subtask) {
@@ -305,20 +299,32 @@ class SubTaskViewModel with ChangeNotifier {
     );
   }
 
-  getmembers() async {
+  Future<void> getmembers() async {
     print('memberscall');
-    final response = await NetworkHelper().getApi(
-      ApiUrls().getuser,
-    );
-    logger.d(response.body);
-    final jsonBody = json.decode(response.body);
-    logger.d(jsonBody['data']);
+    try {
+      final response = await NetworkHelper().getApi(ApiUrls().getuser);
+      logger.d(response.body);
 
-    _users = jsonBody['data']
-        .map<userListData>((m) => userListData.fromJson(m))
-        .toList();
-    _filteredUsers = _users.toList();
-    notifyListeners();
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        logger.d(jsonBody['data']);
+
+        _users = jsonBody['data']
+            .map<userListData>((m) => userListData.fromJson(m))
+            .toList();
+        _filteredUsers = _users.toList();
+        notifyListeners();
+      } else {
+        // Handle the case when the API response indicates an error
+        final errorBody = json.decode(response.body);
+        final errorMessage = errorBody['message'];
+        print('API Error: $errorMessage');
+        // You can display the error message or handle it in any other way you prefer.
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+      // Handle other types of exceptions that might occur during the API call.
+    }
   }
 
   // Update selected user and persist data
@@ -367,34 +373,6 @@ class SubTaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  int combineTimeWithCurrentDay(String? time) {
-    if (time == null) {
-      throw ArgumentError("Time must not be null.");
-    }
-
-    // Get the current date
-    DateTime currentDate = DateTime.now();
-
-    // Parse the selected time
-    DateFormat timeFormat = DateFormat("h:mm a");
-    DateTime parsedTime = timeFormat.parse(time);
-
-    // Create a new DateTime by combining the current date and the selected time
-    DateTime combinedDateTime = DateTime(
-      currentDate.year,
-      currentDate.month,
-      currentDate.day,
-      parsedTime.hour,
-      parsedTime.minute,
-    );
-
-    // Convert to UTC before getting milliseconds since epoch
-    int millisecondsSinceEpoch =
-        combinedDateTime.toUtc().millisecondsSinceEpoch;
-
-    return millisecondsSinceEpoch;
-  }
-
   void clearAssignedUsers() {
     _users.forEach((user) {
       user.selected = false;
@@ -406,4 +384,195 @@ class SubTaskViewModel with ChangeNotifier {
     timecontroller = '';
     notifyListeners();
   }
+
+  void editSubTaskConfirmation(BuildContext context, SubTasks subtask) {
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0xffFFF1E8),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Your confirmation message
+            Text(
+              'Are You Sure?',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Close the AlertDialog
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.black),
+                    )),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    editSubTaskclicks(context, subtask);
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => editSubAssignTask(
+                          id: subtask,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'EDIT',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.white),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void deleteSubTaskConfirmation(BuildContext context, SubTasks taskid) {
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0xffFFF1E8),
+        // contentPadding:
+        //     EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Your confirmation message
+            Text(
+              'Are You Sure?',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Close the AlertDialog
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.black),
+                    )),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(context); // Close the AlertDialog
+                    await deleteSubTask(
+                        context, taskid); // Wait for task deletion to complete
+                    Navigator.pushReplacement(
+                      // Navigate back to the calendar screen
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => calender_screen()),
+                    );
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'DELETE',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.white),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+int combineDateAndTime(String? date, String? time) {
+  if (date == null || time == null) {
+    //return 0;
+    throw ArgumentError("Date and time must not be null.");
+  }
+
+  time = time.replaceAll('\u202F', ' ');
+// Get the current date
+  DateTime currentDate = DateTime.now();
+  DateFormat timeFormat = DateFormat("h:mm a");
+  DateTime parsedTime = timeFormat.parse(time);
+  print(parsedTime);
+
+  // Convert to local time zone (if needed)
+  DateTime combinedDateTime = DateTime(
+    currentDate.year,
+    currentDate.month,
+    currentDate.day,
+    parsedTime.hour,
+    parsedTime.minute,
+  );
+
+  // Convert to UTC before getting milliseconds since epoch
+  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
+
+  return millisecondsSinceEpoch;
 }

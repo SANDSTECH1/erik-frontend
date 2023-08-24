@@ -74,68 +74,107 @@ class taskByDate {
 }
 
 class SubTasks {
-  String? sId;
   String? subTaskTitle;
   String? subTaskDescription;
   String? task;
+  String? createdBy;
   String? scheduledDateTime;
+  List<String>? assignedUsers;
   String? estimatedTime;
   String? price;
-  userModel? createdBy;
+  String? sId;
   int? iV;
-  List<userModel>? assignedUsers;
-  TimeOfDay? selectedTime;
-  DateTime? selectedDate;
 
   SubTasks(
-      {this.sId,
-      this.subTaskTitle,
+      {this.subTaskTitle,
       this.subTaskDescription,
       this.task,
+      this.createdBy,
       this.scheduledDateTime,
+      this.assignedUsers,
       this.estimatedTime,
       this.price,
-      this.assignedUsers,
-      this.selectedDate,
+      this.sId,
       this.iV});
 
   SubTasks.fromJson(Map<String, dynamic> json) {
-    sId = json['_id'];
     subTaskTitle = json['subTaskTitle'];
     subTaskDescription = json['subTaskDescription'];
     task = json['task'];
+    //createdBy = json['createdBy'];
     scheduledDateTime = json['scheduledDateTime'];
-    if (json['assignedUsers'] != null) {
-      assignedUsers = <userModel>[];
-      json['assignedUsers'].forEach((v) {
-        assignedUsers!.add(new userModel.fromJson(v));
-      });
-    }
-    // createdBy = json['createdBy'] != null
-    //     ? new userModel.fromJson(json['createdBy'])
-    //     : null;
+    assignedUsers = json['assignedUsers'].cast<String>();
     estimatedTime = json['estimatedTime'];
     price = json['price'];
+    sId = json['_id'];
     iV = json['__v'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
     data['subTaskTitle'] = this.subTaskTitle;
     data['subTaskDescription'] = this.subTaskDescription;
     data['task'] = this.task;
+    //data['createdBy'] = this.createdBy;
     data['scheduledDateTime'] = this.scheduledDateTime;
-    if (this.assignedUsers != null) {
-      data['assignedUsers'] =
-          this.assignedUsers!.map((v) => v.toJson()).toList();
-    }
-    // if (this.createdBy != null) {
-    //   data['createdBy'] = this.createdBy!.toJson();
-    // }
+    data['assignedUsers'] = this.assignedUsers;
     data['estimatedTime'] = this.estimatedTime;
     data['price'] = this.price;
+    data['_id'] = this.sId;
     data['__v'] = this.iV;
     return data;
   }
 }
+
+// class SubTasks {
+//   String? subTaskTitle;
+//   String? subTaskDescription;
+//   String? task;
+//   String? createdBy;
+//   String? scheduledDateTime;
+//   List<userModel>? assignedUsers;
+//   String? estimatedTime;
+//   String? price;
+//   String? sId;
+//   int? iV;
+
+//   SubTasks(
+//       {this.subTaskTitle,
+//       this.subTaskDescription,
+//       this.task,
+//       this.createdBy,
+//       this.scheduledDateTime,
+//       this.assignedUsers,
+//       this.estimatedTime,
+//       this.price,
+//       this.sId,
+//       this.iV});
+
+//   SubTasks.fromJson(Map<String, dynamic> json) {
+//     subTaskTitle = json['subTaskTitle'];
+//     subTaskDescription = json['subTaskDescription'];
+//     task = json['task'];
+//     createdBy = json['createdBy'];
+//     scheduledDateTime = json['scheduledDateTime'];
+//     assignedUsers = json['assignedUsers'].cast<String>();
+//     estimatedTime = json['estimatedTime'];
+//     price = json['price'];
+//     sId = json['_id'];
+//     iV = json['__v'];
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = new Map<String, dynamic>();
+//     data['subTaskTitle'] = this.subTaskTitle;
+//     data['subTaskDescription'] = this.subTaskDescription;
+//     data['task'] = this.task;
+//     data['createdBy'] = this.createdBy;
+//     data['scheduledDateTime'] = this.scheduledDateTime;
+//     data['assignedUsers'] = this.assignedUsers;
+//     data['estimatedTime'] = this.estimatedTime;
+//     data['price'] = this.price;
+//     data['_id'] = this.sId;
+//     data['__v'] = this.iV;
+//     return data;
+//   }
+// }

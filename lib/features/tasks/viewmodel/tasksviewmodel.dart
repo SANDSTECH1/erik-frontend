@@ -8,6 +8,7 @@ import 'package:erick/helper/logger/logger.dart';
 import 'package:erick/helper/network/network.dart';
 import 'package:erick/helper/toast/toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -69,7 +70,9 @@ class TaskViewModel with ChangeNotifier {
       String time = timecontroller;
 
       int combinedDateTimeMillis = combineDateAndTime(date, time);
-
+      if (date.isEmpty || time.isEmpty) {
+        throw Exception("Date and time must be selected.");
+      }
       DateTime combinedDateTimeUtc = DateTime.fromMillisecondsSinceEpoch(
           combinedDateTimeMillis,
           isUtc: true);
@@ -87,7 +90,15 @@ class TaskViewModel with ChangeNotifier {
       logger.d(response.body);
       final body = response.body;
       final jsonBody = json.decode(body);
-
+      taskTitlecontroller.clear();
+      taskDescriptioncontroller.clear();
+      daycontroller = '';
+      timecontroller = '';
+      estimatedTimecontroller.clear();
+      pricecontroller.clear();
+      clearAssignedUsers();
+      changeselectedate(null);
+      clearSelectedTime();
       if (response.statusCode == 200) {
         hideLoader(context);
         showtoast("Task Created Successfully");
@@ -101,17 +112,17 @@ class TaskViewModel with ChangeNotifier {
         changeselectedate(null);
         clearSelectedTime();
       } else if (response.statusCode == 400) {
-        hideLoader(context);
+        //hideLoader(context);
         showtoast(jsonBody['message']);
-        return; // Return without navigating
+        return;
       } else {
-        hideLoader(context);
+        //hideLoader(context);
         showtoast('Failed to create the task');
-        return; // Return without navigating
+        return;
       }
     } catch (e) {
       showtoast('Error creating task: $e');
-      return; // Return without navigating
+      return;
     } finally {
       hideLoader(context); // Hide the loader regardless of success or error
     }
@@ -207,16 +218,11 @@ class TaskViewModel with ChangeNotifier {
   }
 
   deleteTask(context, taskByDate task) async {
-    showLoader(context);
     final response =
         await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
     if (response.statusCode == 200) {
       hideLoader(context);
       showtoast('Task deleted successfully');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => calender_screen()),
-      );
     } else {
       hideLoader(context);
       showtoast('Failed to delete the task');
@@ -279,17 +285,6 @@ class TaskViewModel with ChangeNotifier {
     taskTitlecontroller.text = task.title.toString();
     pricecontroller.text = task.price.toString();
     estimatedTimecontroller.text = task.estimatedTime.toString();
-
-    //showtoast("Edit your Task Or Add Subtasks As Well");
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditTask(
-          tasks: task,
-        ),
-      ),
-    );
   }
 
   void viewtasks(BuildContext context, taskByDate taskss) {
@@ -327,20 +322,32 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  getmembers() async {
+  Future<void> getmembers() async {
     print('memberscall');
-    final response = await NetworkHelper().getApi(
-      ApiUrls().getuser,
-    );
-    logger.d(response.body);
-    final jsonBody = json.decode(response.body);
-    logger.d(jsonBody['data']);
+    try {
+      final response = await NetworkHelper().getApi(ApiUrls().getuser);
+      logger.d(response.body);
 
-    _users = jsonBody['data']
-        .map<userListData>((m) => userListData.fromJson(m))
-        .toList();
-    _filteredUsers = _users.toList();
-    notifyListeners();
+      if (response.statusCode == 200) {
+        final jsonBody = json.decode(response.body);
+        logger.d(jsonBody['data']);
+
+        _users = jsonBody['data']
+            .map<userListData>((m) => userListData.fromJson(m))
+            .toList();
+        _filteredUsers = _users.toList();
+        notifyListeners();
+      } else {
+        // Handle the case when the API response indicates an error
+        final errorBody = json.decode(response.body);
+        final errorMessage = errorBody['message'];
+        print('API Error: $errorMessage');
+        // You can display the error message or handle it in any other way you prefer.
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+      // Handle other types of exceptions that might occur during the API call.
+    }
   }
 
   changeselectedate(s) {
@@ -376,26 +383,6 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // // Save selected user data to shared preferences
-  // Future<void> saveSelectedUsers() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final selectedUsersJson = json.encode(usersdata);
-  //   prefs.setString('selectedUsers', selectedUsersJson);
-  // }
-
-  // // Load selected user data from shared preferences
-  // Future<void> loadSelectedUsers() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final selectedUsersJson = prefs.getString('selectedUsers');
-  //   if (selectedUsersJson != null) {
-  //     final List<dynamic> selectedUsersData = json.decode(selectedUsersJson);
-  //     _users = selectedUsersData
-  //         .map<userListData>((m) => userListData.fromJson(m))
-  //         .toList();
-  //     filteredUsers = usersdata.toList();
-  //   }
-  // }
-
   resetUserSelections() {
     for (var user in _users) {
       user.selected = false;
@@ -428,6 +415,170 @@ class TaskViewModel with ChangeNotifier {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
+  }
+
+  void editTaskConfirmation(BuildContext context, taskByDate task) {
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0xffFFF1E8),
+        // contentPadding:
+        //     EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Your confirmation message
+            Text(
+              'Are You Sure?',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Close the AlertDialog
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.black),
+                    )),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    editTaskclick(context, task);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditTask(
+                          tasks: task,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'EDIT',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.white),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void deleteTaskConfirmation(BuildContext context, taskByDate task) {
+    showDialog(
+      barrierColor: Colors.transparent,
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0xffFFF1E8),
+        // contentPadding:
+        //     EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Your confirmation message
+            Text(
+              'Are You Sure?',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+            ),
+            SizedBox(height: 20.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Close the AlertDialog
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.black),
+                    )),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    Navigator.pop(context); // Close the AlertDialog
+                    await deleteTask(
+                        context, task); // Wait for task deletion to complete
+                    Navigator.pushReplacement(
+                      // Navigate back to the calendar screen
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => calender_screen()),
+                    );
+                  },
+                  child: Container(
+                    width: 71.w,
+                    height: 26.h,
+                    decoration: BoxDecoration(
+                        color: Colors.black,
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Center(
+                        child: Text(
+                      'DELETE',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10.sp,
+                          color: Colors.white),
+                    )),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

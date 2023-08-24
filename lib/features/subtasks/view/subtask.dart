@@ -29,13 +29,18 @@ class SubAssignTask extends StatelessWidget {
                       "Sub Assign Task",
                       style: TextStyle(color: Colors.white, fontSize: 17.sp),
                     ),
-                    CircleAvatar(
-                      radius: 18.r,
-                      backgroundColor: Colors.white,
-                      child: Icon(
-                        Icons.close,
-                        size: 20.w,
-                        color: Colors.green,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: CircleAvatar(
+                        radius: 18.r,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.close,
+                          size: 20.w,
+                          color: Colors.green,
+                        ),
                       ),
                     )
                   ],
@@ -48,123 +53,119 @@ class SubAssignTask extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 242.w,
-                    child: Expanded(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            20.verticalSpace,
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 3,
-                                    blurRadius: 5,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              width: 198.w,
-                              child: TextField(
-                                style: const TextStyle(color: Colors.black),
-                                controller: controller.searchController,
-                                onChanged: (value) {
-                                  // Call a function to filter the list based on the search input
-                                  controller.filterMembers(value);
-                                },
-                                //enabled: false,
-                                decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.search),
-                                  fillColor: Colors.white,
-                                  filled: true,
-                                  border: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      width: 0,
-                                      style: BorderStyle.none,
-                                    ),
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  hintText: "Search",
-                                  hintStyle: const TextStyle(
-                                      fontSize: 16, color: Color(0xFFB3B1B1)),
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          20.verticalSpace,
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 3,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
                                 ),
-                                obscureText: false,
-                              ),
+                              ],
                             ),
-                            20.verticalSpace,
-                            SizedBox(
-                              width: 198.w,
-                              child: Align(
-                                alignment: Alignment.topLeft,
-                                child: Padding(
-                                  padding: EdgeInsets.only(left: 10.w),
-                                  child: Text(
-                                    "Members",
-                                    style: TextStyle(
-                                        fontSize: 16.sp,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
+                            width: 198.w,
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: controller.searchController,
+                              onChanged: (value) {
+                                // Call a function to filter the list based on the search input
+                                controller.filterMembers(value);
+                              },
+                              //enabled: false,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.search),
+                                fillColor: Colors.white,
+                                filled: true,
+                                border: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    width: 0,
+                                    style: BorderStyle.none,
                                   ),
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                hintText: "Search",
+                                hintStyle: const TextStyle(
+                                    fontSize: 16, color: Color(0xFFB3B1B1)),
+                              ),
+                              obscureText: false,
+                            ),
+                          ),
+                          20.verticalSpace,
+                          SizedBox(
+                            width: 198.w,
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 10.w),
+                                child: Text(
+                                  "Members",
+                                  style: TextStyle(
+                                      fontSize: 16.sp,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              height: 700.h,
-                              width: 198.w,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: controller.filteredUsers.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      controller.changeSelectedUser(
-                                        index,
-                                        !controller
-                                            .filteredUsers[index].selected,
-                                      );
-                                    },
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Image.asset(
-                                              'assets/icons/erickpic.png',
-                                              width: 36.w,
+                          ),
+                          SizedBox(
+                            height: 700.h,
+                            width: 198.w,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: controller.filteredUsers.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    controller.changeSelectedUser(
+                                      index,
+                                      !controller.filteredUsers[index].selected,
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Image.asset(
+                                            'assets/icons/erickpic.png',
+                                            width: 36.w,
+                                          ),
+                                          1.horizontalSpace,
+                                          Text(
+                                            controller.filteredUsers[index].name
+                                                .toString(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: const Color(0xff163300),
+                                              fontSize: 16.sp,
                                             ),
-                                            1.horizontalSpace,
-                                            Text(
-                                              controller
-                                                  .filteredUsers[index].name
-                                                  .toString(),
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                color: const Color(0xff163300),
-                                                fontSize: 16.sp,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        controller.filteredUsers[index].selected
-                                            ? const Icon(
-                                                Icons.check_box,
-                                                color: Color(0xff163300),
-                                              )
-                                            : const SizedBox(),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
+                                          ),
+                                        ],
+                                      ),
+                                      controller.filteredUsers[index].selected
+                                          ? const Icon(
+                                              Icons.check_box,
+                                              color: Color(0xff163300),
+                                            )
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

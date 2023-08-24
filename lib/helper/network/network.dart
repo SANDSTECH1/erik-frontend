@@ -152,4 +152,6 @@ class ApiUrls {
   String deletesubtasks = "$baseUrl/deleteSubTask";
   String updatesubtasks = "$baseUrl/updateSubTask";
   String getTaskByDate = "$baseUrl/getTaskByDate";
+  String generateTaskPdf = "$baseUrl/generatepdftask";
+  String generateSubTaskPdf = "$baseUrl/generatepdfsubtask";
 }

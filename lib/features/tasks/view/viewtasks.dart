@@ -353,6 +353,18 @@ Future<Uint8List?> generatePdfContent(TaskViewModel taskcontroller) async {
         return pdfWidgets.Column(
           crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
           children: [
+            pdfWidgets.Row(
+              mainAxisAlignment: pdfWidgets.MainAxisAlignment.center,
+              children: [
+                pdfWidgets.Text(
+                  'Task Report',
+                  style: pdfWidgets.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pdfWidgets.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             pdfWidgets.Text(
               'Task Title:',
               style: headingStyle, // Use heading style
@@ -396,7 +408,7 @@ Future<Uint8List?> generatePdfContent(TaskViewModel taskcontroller) async {
             pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
             pdfWidgets.Column(
               crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: taskcontroller.usersdata
+              children: taskcontroller.filteredUsers
                   .where((user) => user.selected) // Filter assigned users
                   .map((user) {
                 return pdfWidgets.Text(

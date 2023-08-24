@@ -37,37 +37,43 @@ class CalendarViewModel with ChangeNotifier {
   }
 
   showdetails(targetDate, context) async {
-    final response = await NetworkHelper().getApi(
-      "${ApiUrls().getTaskByDate}?targetDate=${activeShowYear}-${activeShowMonth + 1}-$targetDate",
-    );
+    try {
+      final response = await NetworkHelper().getApi(
+        "${ApiUrls().getTaskByDate}?targetDate=${activeShowYear}-${activeShowMonth + 1}-$targetDate",
+      );
 
-    final body = response.body;
-    final jsonBody = json.decode(body);
+      final body = response.body;
+      final jsonBody = json.decode(body);
 
-    if (jsonBody['data'] == null) {
-      // No tasks found, show a message to the user
-      showtoast('No tasks found for the selected date.');
-    } else {
-      List<taskByDate> _getTasks = jsonBody['data']
-          .map<taskByDate>((m) => taskByDate.fromJson(m))
-          .toList();
-      List<SubTasks> _subtasksget =
-          jsonBody['data'].map<SubTasks>((m) => SubTasks.fromJson(m)).toList();
-      if (response.statusCode == 200) {
-        // print(jsonBody['data']);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                TaskScreen(tasks: _getTasks, subtasks: _subtasksget),
-          ),
-        );
-      } else if (response.statusCode == 400) {
-        showtoast(jsonBody['message']);
+      if (jsonBody['data'] == null) {
+        // No tasks found, show a message to the user
+        showtoast('No tasks found for the selected date.');
       } else {
-        // throw Exception(
-        //     'Failed to make the API request. Status code: ${response.statusCode}');
+        List<taskByDate> _getTasks = jsonBody['data']
+            .map<taskByDate>((m) => taskByDate.fromJson(m))
+            .toList();
+        List<SubTasks> _subtasksget = jsonBody['data']
+            .map<SubTasks>((m) => SubTasks.fromJson(m))
+            .toList();
+        if (response.statusCode == 200) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  TaskScreen(tasks: _getTasks, subtasks: _subtasksget),
+            ),
+          );
+        } else if (response.statusCode == 400) {
+          showtoast(jsonBody['message']);
+        } else {
+          throw Exception(
+              'Failed to make the API request. Status code: ${response.statusCode}');
+        }
       }
+    } catch (e) {
+      // Handle exceptions that might occur during the API call
+      print('An error occurred: $e');
+      showtoast('An error occurred while fetching tasks.');
     }
   }
 

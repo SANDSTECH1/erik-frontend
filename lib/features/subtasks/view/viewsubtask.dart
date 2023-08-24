@@ -72,8 +72,13 @@ class ViewSubTasks extends StatelessWidget {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                final pdfContent =
-                                    await generatePdfContent(subtaskcontroller);
+                                final List<userListData> selectedUsers =
+                                    subtaskcontroller.usersdata
+                                        .where((user) => user.selected)
+                                        .toList();
+
+                                final pdfContent = await generatePdfContent(
+                                    subtaskcontroller, selectedUsers);
                                 if (pdfContent != null) {
                                   await Printing.layoutPdf(
                                       onLayout: (format) => pdfContent);
@@ -347,8 +352,8 @@ Widget AssignTo(userListData user) {
   );
 }
 
-Future<Uint8List?> generatePdfContent(
-    SubTaskViewModel subtaskcontroller) async {
+Future<Uint8List?> generatePdfContent(SubTaskViewModel subtaskcontroller,
+    List<userListData> selectedUsers) async {
   final pdf = pdfWidgets.Document();
 
   final headingStyle = pdfWidgets.TextStyle(
@@ -367,6 +372,18 @@ Future<Uint8List?> generatePdfContent(
         return pdfWidgets.Column(
           crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
           children: [
+            pdfWidgets.Row(
+              mainAxisAlignment: pdfWidgets.MainAxisAlignment.center,
+              children: [
+                pdfWidgets.Text(
+                  'Sub Task Report',
+                  style: pdfWidgets.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pdfWidgets.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             pdfWidgets.Text(
               'Task Title:',
               style: headingStyle, // Use heading style
@@ -410,9 +427,7 @@ Future<Uint8List?> generatePdfContent(
             pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
             pdfWidgets.Column(
               crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: subtaskcontroller.usersdata
-                  .where((user) => user.selected) // Filter assigned users
-                  .map((user) {
+              children: selectedUsers.map((user) {
                 return pdfWidgets.Text(
                   user.name.toString(),
                   style: dataStyle, // Use data style

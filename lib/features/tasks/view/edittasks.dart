@@ -59,119 +59,115 @@ class EditTask extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: 242.w,
-                      child: Expanded(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              20.verticalSpace,
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      spreadRadius: 3,
-                                      blurRadius: 5,
-                                      offset: const Offset(0, 3),
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            20.verticalSpace,
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 3,
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              width: 198.w,
+                              child: TextField(
+                                enabled: false,
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.search),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  border: OutlineInputBorder(
+                                    borderSide: const BorderSide(
+                                      width: 0,
+                                      style: BorderStyle.none,
                                     ),
-                                  ],
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  hintText: "Search",
+                                  hintStyle: const TextStyle(
+                                      fontSize: 16, color: Color(0xFFB3B1B1)),
                                 ),
-                                width: 198.w,
-                                child: TextField(
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    prefixIcon: const Icon(Icons.search),
-                                    fillColor: Colors.white,
-                                    filled: true,
-                                    border: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        width: 0,
-                                        style: BorderStyle.none,
+                                obscureText: false,
+                              ),
+                            ),
+                            20.verticalSpace,
+                            SizedBox(
+                              width: 198.w,
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 10.w),
+                                  child: Text(
+                                    "Members",
+                                    style: TextStyle(
+                                        fontSize: 16.sp,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 700.h,
+                              width: 198.w,
+                              child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: controller.usersdata.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        controller.changeSelectedUser(
+                                          index,
+                                          !controller.usersdata[index].selected,
+                                        );
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Image.asset(
+                                                'assets/icons/erickpic.png',
+                                                width: 36.w,
+                                              ),
+                                              const SizedBox(
+                                                  width:
+                                                      1), // Add your horizontal space here
+                                              Text(
+                                                controller.usersdata[index].name
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color:
+                                                      const Color(0xff163300),
+                                                  fontSize: 16.sp,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          controller.usersdata[index].selected
+                                              ? const Icon(
+                                                  Icons.check_box,
+                                                  color: Color(0xff163300),
+                                                )
+                                              : const SizedBox()
+                                        ],
                                       ),
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    hintText: "Search",
-                                    hintStyle: const TextStyle(
-                                        fontSize: 16, color: Color(0xFFB3B1B1)),
-                                  ),
-                                  obscureText: false,
-                                ),
-                              ),
-                              20.verticalSpace,
-                              SizedBox(
-                                width: 198.w,
-                                child: Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 10.w),
-                                    child: Text(
-                                      "Members",
-                                      style: TextStyle(
-                                          fontSize: 16.sp,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                height: 700.h,
-                                width: 198.w,
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: controller.usersdata.length,
-                                    itemBuilder: (context, index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          controller.changeSelectedUser(
-                                            index,
-                                            !controller
-                                                .usersdata[index].selected,
-                                          );
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Image.asset(
-                                                  'assets/icons/erickpic.png',
-                                                  width: 36.w,
-                                                ),
-                                                const SizedBox(
-                                                    width:
-                                                        1), // Add your horizontal space here
-                                                Text(
-                                                  controller
-                                                      .usersdata[index].name
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.w400,
-                                                    color:
-                                                        const Color(0xff163300),
-                                                    fontSize: 16.sp,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            controller.usersdata[index].selected
-                                                ? const Icon(
-                                                    Icons.check_box,
-                                                    color: Color(0xff163300),
-                                                  )
-                                                : const SizedBox()
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              )
-                            ],
-                          ),
+                                    );
+                                  }),
+                            )
+                          ],
                         ),
                       ),
                     ),
