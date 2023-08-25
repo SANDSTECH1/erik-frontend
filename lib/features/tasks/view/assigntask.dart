@@ -31,13 +31,19 @@ class AssignTask extends StatelessWidget {
                         "Assign Task",
                         style: TextStyle(color: Colors.white, fontSize: 17.sp),
                       ),
-                      CircleAvatar(
-                        radius: 18.r,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.close,
-                          size: 20.w,
-                          color: Colors.green,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          controller.clearTaskData();
+                        },
+                        child: CircleAvatar(
+                          radius: 18.r,
+                          backgroundColor: Colors.white,
+                          child: Icon(
+                            Icons.close,
+                            size: 20.w,
+                            color: Colors.green,
+                          ),
                         ),
                       )
                     ],

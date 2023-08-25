@@ -1,3 +1,4 @@
+import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
@@ -10,8 +11,9 @@ import 'package:erick/features/subtasks/view/viewsubtask.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
-import 'package:async/async.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
 
 String userToken = "";
 
@@ -22,7 +24,6 @@ class SubTaskViewModel with ChangeNotifier {
   final TextEditingController subtaskDescriptioncontroller =
       TextEditingController();
   final TextEditingController searchController = TextEditingController();
-
   String daycontroller = "";
   String timecontroller = "";
   DateTime? selectedDay;
@@ -60,7 +61,7 @@ class SubTaskViewModel with ChangeNotifier {
 
     try {
       List assignedmembers =
-          _users.where((element) => element.selected == true).toList();
+          _filteredUsers.where((element) => element.selected == true).toList();
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
       // After populating assignedmembers
@@ -92,13 +93,7 @@ class SubTaskViewModel with ChangeNotifier {
         "assignedUsers": ids,
       });
 
-      subtaskDescriptioncontroller.clear();
-      subtaskTitlecontroller.clear();
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
-      clearAssignedUsers();
-      clearSelectedTime();
-      //selectedTime = TimeOfDay.now();
+      clearSubTaskData();
       logger.d(response.body);
       final body = response.body;
       final jsonBody = json.decode(body);
@@ -116,16 +111,13 @@ class SubTaskViewModel with ChangeNotifier {
       } else if (response.statusCode == 400) {
         showtoast(jsonBody['message']);
         hideLoader(context);
-        return;
       } else {
         showtoast("Failed To Create SubTask");
         hideLoader(context);
-        return;
       }
     } catch (e) {
       showtoast("Error creating SubTask: $e");
       hideLoader(context);
-      return;
     } finally {
       hideLoader(context);
     }
@@ -146,7 +138,7 @@ class SubTaskViewModel with ChangeNotifier {
     try {
       showLoader(context);
       List assignedmembers =
-          _users.where((element) => element.selected == true).toList();
+          _filteredUsers.where((element) => element.selected == true).toList();
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
       String date = daycontroller;
@@ -192,14 +184,7 @@ class SubTaskViewModel with ChangeNotifier {
           context,
           MaterialPageRoute(builder: (context) => calender_screen()),
         );
-        subtaskDescriptioncontroller.clear();
-        subtaskTitlecontroller.clear();
-        estimatedTimecontroller.clear();
-        pricecontroller.clear();
-        clearSelectedTime();
-        clearAssignedUsers();
-
-        //clearSelectedTime();
+        clearSubTaskData();
       } else if (response.statusCode == 400) {
         hideLoader(context);
 
@@ -242,9 +227,10 @@ class SubTaskViewModel with ChangeNotifier {
 
 // Iterate through the assigned user IDs and update the selected property
     for (final assignedUserId in assignedUserIds) {
-      final userIndex = _users.indexWhere((user) => user.sId == assignedUserId);
+      final userIndex =
+          _filteredUsers.indexWhere((user) => user.sId == assignedUserId);
       if (userIndex != -1) {
-        _users[userIndex].selected = true;
+        _filteredUsers[userIndex].selected = true;
         print('User with ID $assignedUserId is marked as selected. 111');
       }
     }
@@ -277,26 +263,51 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  void viewsubtasks(BuildContext context, SubTasks subtask) {
+  void viewsubtasks(BuildContext context, SubTasks subtask) async {
     showLoader(context);
-    subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
-    subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
-    estimatedTimecontroller.text = subtask.estimatedTime.toString();
-    pricecontroller.text = subtask.price.toString();
-    List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
-    print(assignedmembers.length);
-    List<String> ids =
-        assignedmembers.map((user) => user.sId.toString()).toList();
-    showtoast("View Your Task");
-    hideLoader(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ViewSubTasks(
-                subtasks: subtask,
-              )),
-    );
+
+    try {
+      subtaskDescriptioncontroller.text = subtask.subTaskDescription.toString();
+      subtaskTitlecontroller.text = subtask.subTaskTitle.toString();
+      estimatedTimecontroller.text = subtask.estimatedTime.toString();
+      pricecontroller.text = subtask.price.toString();
+
+      List assignedmembers =
+          _filteredUsers.where((element) => element.selected == true).toList();
+      List<String> ids =
+          assignedmembers.map((user) => user.sId.toString()).toList();
+
+      // Generate the PDF content
+      Uint8List? pdfContent = await generatePdfContent(this);
+
+      // Check if PDF generation was successful
+      if (pdfContent != null) {
+        // Show a success toast
+        showtoast("View Your Task");
+
+        // Hide the loader
+        hideLoader(context);
+
+        // Navigate to the ViewSubTasks screen, passing the PDF content
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ViewSubTasks(
+              subtasks: subtask,
+              //pdfContent: pdfContent, // Pass the PDF content here
+            ),
+          ),
+        );
+      } else {
+        // Handle PDF generation failure
+        hideLoader(context);
+        showtoast("Failed to generate PDF");
+      }
+    } catch (e) {
+      // Handle any errors that might occur during PDF generation
+      hideLoader(context);
+      showtoast("Error: $e");
+    }
   }
 
   Future<void> getmembers() async {
@@ -304,15 +315,20 @@ class SubTaskViewModel with ChangeNotifier {
     try {
       final response = await NetworkHelper().getApi(ApiUrls().getuser);
       logger.d(response.body);
+// Generate PDF after loading user data
+      final pdfContent = await generatePdfContent(this);
+      if (pdfContent != null) {
+        // Store the PDF content in a variable for later use
+      }
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
         logger.d(jsonBody['data']);
 
-        _users = jsonBody['data']
+        _filteredUsers = jsonBody['data']
             .map<userListData>((m) => userListData.fromJson(m))
             .toList();
-        _filteredUsers = _users.toList();
+        _filteredUsers = _filteredUsers.toList();
         notifyListeners();
       } else {
         // Handle the case when the API response indicates an error
@@ -327,7 +343,6 @@ class SubTaskViewModel with ChangeNotifier {
     }
   }
 
-  // Update selected user and persist data
   void changeSelectedUser(int index, bool value) async {
     final userId = filteredUsers[index].sId;
 
@@ -343,6 +358,13 @@ class SubTaskViewModel with ChangeNotifier {
     if (filteredIndex != -1) {
       filteredUsers[filteredIndex].selected = value;
     }
+
+    // Also update the _filteredUsers list
+    final _userIndex = _filteredUsers.indexWhere((user) => user.sId == userId);
+    if (_userIndex != -1) {
+      _filteredUsers[_userIndex].selected = value;
+    }
+
     notifyListeners();
   }
 
@@ -374,15 +396,32 @@ class SubTaskViewModel with ChangeNotifier {
   }
 
   void clearAssignedUsers() {
-    _users.forEach((user) {
+    _filteredUsers.forEach((user) {
       user.selected = false;
     });
+  }
+
+  void clearSubTaskUserData() {
+    clearAssignedUsers();
+  }
+
+  void clearSubTaskData() {
+    clearSubTaskUserData();
+    clearSubTaskNonUserData();
   }
 
   void clearSelectedTime() {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
+  }
+
+  void clearSubTaskNonUserData() {
+    subtaskTitlecontroller.clear();
+    subtaskDescriptioncontroller.clear();
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
+    clearSelectedTime();
   }
 
   void editSubTaskConfirmation(BuildContext context, SubTasks subtask) {
@@ -550,29 +589,126 @@ class SubTaskViewModel with ChangeNotifier {
 }
 
 int combineDateAndTime(String? date, String? time) {
-  if (date == null || time == null) {
-    //return 0;
-    throw ArgumentError("Date and time must not be null.");
+  if (date == null || time == null || time.isEmpty) {
+    return 0; // Return a value that indicates no time is selected
   }
 
   time = time.replaceAll('\u202F', ' ');
-// Get the current date
+
   DateTime currentDate = DateTime.now();
   DateFormat timeFormat = DateFormat("h:mm a");
-  DateTime parsedTime = timeFormat.parse(time);
-  print(parsedTime);
 
-  // Convert to local time zone (if needed)
-  DateTime combinedDateTime = DateTime(
-    currentDate.year,
-    currentDate.month,
-    currentDate.day,
-    parsedTime.hour,
-    parsedTime.minute,
+  try {
+    DateTime parsedTime = timeFormat.parse(time);
+    DateTime combinedDateTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      parsedTime.hour,
+      parsedTime.minute,
+    );
+    int millisecondsSinceEpoch =
+        combinedDateTime.toUtc().millisecondsSinceEpoch;
+    return millisecondsSinceEpoch;
+  } catch (e) {
+    // Handle the exception, e.g., show an error message
+    print("Error parsing time: $e");
+    return 0; // Return a value that indicates an error
+  }
+}
+
+Future<Uint8List?> generatePdfContent(
+  SubTaskViewModel subtaskcontroller,
+) async {
+  final pdf = pdfWidgets.Document();
+
+  final headingStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.bold,
   );
 
-  // Convert to UTC before getting milliseconds since epoch
-  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
+  final dataStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.normal,
+  );
 
-  return millisecondsSinceEpoch;
+  pdf.addPage(
+    pdfWidgets.Page(
+      build: (context) {
+        return pdfWidgets.Column(
+          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+          children: [
+            pdfWidgets.Row(
+              mainAxisAlignment: pdfWidgets.MainAxisAlignment.center,
+              children: [
+                pdfWidgets.Text(
+                  'Sub Task Report',
+                  style: pdfWidgets.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pdfWidgets.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            pdfWidgets.Text(
+              'Task Title:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              subtaskcontroller.subtaskTitlecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Description:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              subtaskcontroller.subtaskDescriptioncontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Estimated Time:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              subtaskcontroller.estimatedTimecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Price:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              subtaskcontroller.pricecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Assigned To:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
+            pdfWidgets.Column(
+              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+              // children: subtaskcontroller
+              //     .filteredUsers // Use the filteredUsers list
+              //     .where((user) => user.selected) // Check for selected users
+              //     .map((user) {
+              children: subtaskcontroller.filteredUsers.map((user) {
+                return pdfWidgets.Text(
+                  user.name.toString(),
+                  style: dataStyle,
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
+  return pdf.save();
 }

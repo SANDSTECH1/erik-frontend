@@ -38,6 +38,7 @@ class EditTask extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           Navigator.pop(context, true);
+                          controller.clearTaskData();
                         },
                         child: CircleAvatar(
                           radius: 18.r,
@@ -122,13 +123,14 @@ class EditTask extends StatelessWidget {
                               width: 198.w,
                               child: ListView.builder(
                                   shrinkWrap: true,
-                                  itemCount: controller.usersdata.length,
+                                  itemCount: controller.filteredUsers.length,
                                   itemBuilder: (context, index) {
                                     return GestureDetector(
                                       onTap: () {
                                         controller.changeSelectedUser(
                                           index,
-                                          !controller.usersdata[index].selected,
+                                          !controller
+                                              .filteredUsers[index].selected,
                                         );
                                       },
                                       child: Row(
@@ -145,7 +147,8 @@ class EditTask extends StatelessWidget {
                                                   width:
                                                       1), // Add your horizontal space here
                                               Text(
-                                                controller.usersdata[index].name
+                                                controller
+                                                    .filteredUsers[index].name
                                                     .toString(),
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w400,
@@ -156,7 +159,8 @@ class EditTask extends StatelessWidget {
                                               ),
                                             ],
                                           ),
-                                          controller.usersdata[index].selected
+                                          controller
+                                                  .filteredUsers[index].selected
                                               ? const Icon(
                                                   Icons.check_box,
                                                   color: Color(0xff163300),

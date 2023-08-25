@@ -1,11 +1,9 @@
 import 'package:erick/features/subtasks/viewmodel/subtasksviewmodel.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:printing/printing.dart';
 
 class ViewSubTasks extends StatelessWidget {
@@ -39,6 +37,7 @@ class ViewSubTasks extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
+                        subtaskcontroller.clearSubTaskData();
                       },
                       child: CircleAvatar(
                         radius: 20.r,
@@ -72,21 +71,16 @@ class ViewSubTasks extends StatelessWidget {
                           children: [
                             ElevatedButton(
                               onPressed: () async {
-                                final List<userListData> selectedUsers =
-                                    subtaskcontroller.usersdata
-                                        .where((user) => user.selected)
-                                        .toList();
-
                                 final pdfContent = await generatePdfContent(
-                                    subtaskcontroller, selectedUsers);
+                                  subtaskcontroller,
+                                );
                                 if (pdfContent != null) {
                                   await Printing.layoutPdf(
                                       onLayout: (format) => pdfContent);
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                primary:
-                                    Colors.white, // Set the background color
+                                primary: Colors.white,
                               ),
                               child: Row(
                                 children: const [
@@ -283,17 +277,6 @@ class ViewSubTasks extends StatelessWidget {
                     ]),
                   ),
                   23.verticalSpace,
-                  // Align(
-                  //   alignment: Alignment.topLeft,
-                  //   child: Text(
-                  //     'Assigned To',
-                  //     style: TextStyle(
-                  //         color: Colors.black,
-                  //         fontSize: 20.sp,
-                  //         fontWeight: FontWeight.bold),
-                  //   ),
-                  // ),
-                  23.verticalSpace,
                   Align(
                     alignment: Alignment.topLeft,
                     child: Text(
@@ -309,8 +292,9 @@ class ViewSubTasks extends StatelessWidget {
                       spacing: 10,
                       runSpacing: 10,
                       children: List.generate(
-                        subtaskcontroller.usersdata.length,
-                        (index) => AssignTo(subtaskcontroller.usersdata[index]),
+                        subtaskcontroller.filteredUsers.length,
+                        (index) =>
+                            AssignTo(subtaskcontroller.filteredUsers[index]),
                       ))
                 ],
               ),
@@ -350,95 +334,4 @@ Widget AssignTo(userListData user) {
       ],
     ),
   );
-}
-
-Future<Uint8List?> generatePdfContent(SubTaskViewModel subtaskcontroller,
-    List<userListData> selectedUsers) async {
-  final pdf = pdfWidgets.Document();
-
-  final headingStyle = pdfWidgets.TextStyle(
-    fontSize: 20,
-    fontWeight: pdfWidgets.FontWeight.bold,
-  );
-
-  final dataStyle = pdfWidgets.TextStyle(
-    fontSize: 20,
-    fontWeight: pdfWidgets.FontWeight.normal,
-  );
-
-  pdf.addPage(
-    pdfWidgets.Page(
-      build: (context) {
-        return pdfWidgets.Column(
-          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-          children: [
-            pdfWidgets.Row(
-              mainAxisAlignment: pdfWidgets.MainAxisAlignment.center,
-              children: [
-                pdfWidgets.Text(
-                  'Sub Task Report',
-                  style: pdfWidgets.TextStyle(
-                    fontSize: 24,
-                    fontWeight: pdfWidgets.FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            pdfWidgets.Text(
-              'Task Title:',
-              style: headingStyle, // Use heading style
-            ),
-            pdfWidgets.Text(
-              subtaskcontroller.subtaskTitlecontroller.text,
-              style: dataStyle, // Use data style
-            ),
-            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
-            pdfWidgets.Text(
-              'Description:',
-              style: headingStyle, // Use heading style
-            ),
-            pdfWidgets.Text(
-              subtaskcontroller.subtaskDescriptioncontroller.text,
-              style: dataStyle, // Use data style
-            ),
-            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
-            pdfWidgets.Text(
-              'Estimated Time:',
-              style: headingStyle, // Use heading style
-            ),
-            pdfWidgets.Text(
-              subtaskcontroller.estimatedTimecontroller.text,
-              style: dataStyle, // Use data style
-            ),
-            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
-            pdfWidgets.Text(
-              'Price:',
-              style: headingStyle, // Use heading style
-            ),
-            pdfWidgets.Text(
-              subtaskcontroller.pricecontroller.text,
-              style: dataStyle, // Use data style
-            ),
-            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
-            pdfWidgets.Text(
-              'Assigned To:',
-              style: headingStyle, // Use heading style
-            ),
-            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
-            pdfWidgets.Column(
-              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: selectedUsers.map((user) {
-                return pdfWidgets.Text(
-                  user.name.toString(),
-                  style: dataStyle, // Use data style
-                );
-              }).toList(),
-            ),
-          ],
-        );
-      },
-    ),
-  );
-
-  return pdf.save();
 }

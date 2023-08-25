@@ -12,6 +12,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:flutter/foundation.dart';
 
 class TaskViewModel with ChangeNotifier {
   final TextEditingController taskTitlecontroller = TextEditingController();
@@ -32,7 +34,6 @@ class TaskViewModel with ChangeNotifier {
   List<userListData> get usersdata => _users;
   List<userListData> _filteredUsers = [];
   List<userListData> get filteredUsers => _filteredUsers;
-
   set filteredUsers(List<userListData> value) {
     _filteredUsers = value;
     notifyListeners();
@@ -62,7 +63,7 @@ class TaskViewModel with ChangeNotifier {
       showLoader(context);
 
       List assignedmembers =
-          _users.where((element) => element.selected == true).toList();
+          _filteredUsers.where((element) => element.selected == true).toList();
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
 
@@ -90,27 +91,11 @@ class TaskViewModel with ChangeNotifier {
       logger.d(response.body);
       final body = response.body;
       final jsonBody = json.decode(body);
-      taskTitlecontroller.clear();
-      taskDescriptioncontroller.clear();
-      daycontroller = '';
-      timecontroller = '';
-      estimatedTimecontroller.clear();
-      pricecontroller.clear();
-      clearAssignedUsers();
-      changeselectedate(null);
-      clearSelectedTime();
+      clearTaskData();
       if (response.statusCode == 200) {
         hideLoader(context);
         showtoast("Task Created Successfully");
-        taskTitlecontroller.clear();
-        taskDescriptioncontroller.clear();
-        daycontroller = '';
-        timecontroller = '';
-        estimatedTimecontroller.clear();
-        pricecontroller.clear();
-        clearAssignedUsers();
-        changeselectedate(null);
-        clearSelectedTime();
+        clearTaskData();
       } else if (response.statusCode == 400) {
         //hideLoader(context);
         showtoast(jsonBody['message']);
@@ -138,7 +123,7 @@ class TaskViewModel with ChangeNotifier {
     try {
       showLoader(context);
       List assignedmembers =
-          _users.where((element) => element.selected == true).toList();
+          _filteredUsers.where((element) => element.selected == true).toList();
       List<String> ids =
           assignedmembers.map((user) => user.sId.toString()).toList();
 
@@ -185,23 +170,13 @@ class TaskViewModel with ChangeNotifier {
 
         // Check the current route before navigating
         if (ModalRoute.of(context)?.settings.name != '/calender_screen') {
-          // Use the Navigator.pushReplacement method to navigate to the calendar screen
           Navigator.pop(context);
           // Navigator.pushReplacement(
           //   context,
           //   MaterialPageRoute(builder: (context) => const calender_screen()),
           // );
         }
-
-        // Clear fields and selections
-        taskTitlecontroller.clear();
-        taskDescriptioncontroller.clear();
-        timecontroller = '';
-        estimatedTimecontroller.clear();
-        pricecontroller.clear();
-        clearAssignedUsers();
-        changeselectedate(null);
-        clearSelectedTime();
+        clearTaskData();
       } else if (response.statusCode == 400) {
         hideLoader(context);
         showtoast(jsonBody['message']);
@@ -272,10 +247,10 @@ class TaskViewModel with ChangeNotifier {
 
     // Iterate through the assigned user IDs and update the selected property
     for (final assignedUserId in ids) {
-      final userIndex =
-          _users.indexWhere((user) => user.sId.toString() == assignedUserId);
+      final userIndex = _filteredUsers
+          .indexWhere((user) => user.sId.toString() == assignedUserId);
       if (userIndex != -1) {
-        _users[userIndex].selected = true;
+        _filteredUsers[userIndex].selected = true;
         print('User with ID $assignedUserId is marked as selected.');
       }
       hideLoader(context);
@@ -294,7 +269,7 @@ class TaskViewModel with ChangeNotifier {
     estimatedTimecontroller.text = taskss.estimatedTime.toString();
     pricecontroller.text = taskss.price.toString();
     List assignedmembers =
-        _users.where((element) => element.selected == true).toList();
+        _filteredUsers.where((element) => element.selected == true).toList();
     print(assignedmembers.length);
     List<String> ids =
         assignedmembers.map((user) => user.sId.toString()).toList();
@@ -327,6 +302,10 @@ class TaskViewModel with ChangeNotifier {
     try {
       final response = await NetworkHelper().getApi(ApiUrls().getuser);
       logger.d(response.body);
+      final pdfContent = await generatePdfContent(this);
+      if (pdfContent != null) {
+        // Store the PDF content in a variable for later use
+      }
 
       if (response.statusCode == 200) {
         final jsonBody = json.decode(response.body);
@@ -335,7 +314,19 @@ class TaskViewModel with ChangeNotifier {
         _users = jsonBody['data']
             .map<userListData>((m) => userListData.fromJson(m))
             .toList();
-        _filteredUsers = _users.toList();
+
+        // Sync the selected status between _users and _filteredUsers
+        for (var user in _users) {
+          final filteredUserIndex = _filteredUsers
+              .indexWhere((filteredUser) => filteredUser.sId == user.sId);
+          if (filteredUserIndex != -1) {
+            user.selected = _filteredUsers[filteredUserIndex].selected;
+          }
+        }
+
+        // Assign _users to _filteredUsers
+        _filteredUsers = _filteredUsers.toList();
+
         notifyListeners();
       } else {
         // Handle the case when the API response indicates an error
@@ -361,14 +352,13 @@ class TaskViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  // Update selected user and persist data
   void changeSelectedUser(int index, bool value) async {
     final userId = filteredUsers[index].sId;
 
     // Update selection state in the main user list
-    final userIndex = usersdata.indexWhere((user) => user.sId == userId);
+    final userIndex = _filteredUsers.indexWhere((user) => user.sId == userId);
     if (userIndex != -1) {
-      usersdata[userIndex].selected = value;
+      _filteredUsers[userIndex].selected = value;
     }
 
     // Update selection state in the filtered user list
@@ -378,13 +368,17 @@ class TaskViewModel with ChangeNotifier {
       filteredUsers[filteredIndex].selected = value;
     }
 
-    // Update selected user data in shared preferences
+    // Also update the _filteredUsers list
+    final _userIndex = _filteredUsers.indexWhere((user) => user.sId == userId);
+    if (_userIndex != -1) {
+      _filteredUsers[_userIndex].selected = value;
+    }
 
     notifyListeners();
   }
 
   resetUserSelections() {
-    for (var user in _users) {
+    for (var user in _filteredUsers) {
       user.selected = false;
     }
     notifyListeners();
@@ -405,16 +399,35 @@ class TaskViewModel with ChangeNotifier {
   }
 
   void clearAssignedUsers() {
-    _users.forEach((user) {
+    _filteredUsers.forEach((user) {
       user.selected = false;
     });
-    notifyListeners();
   }
 
-  clearSelectedTime() {
+  void clearTaskUserData() {
+    clearAssignedUsers();
+  }
+
+  void clearTaskData() {
+    clearTaskUserData();
+    clearTaskNonUserData();
+  }
+
+  void clearSelectedTime() {
     selectedTime = TimeOfDay.now();
     timecontroller = '';
     notifyListeners();
+  }
+
+  void clearTaskNonUserData() {
+    taskTitlecontroller.clear();
+    taskDescriptioncontroller.clear();
+    estimatedTimecontroller.clear();
+    pricecontroller.clear();
+    clearSelectedTime();
+    changeselectedate(null);
+    daycontroller = '';
+    timecontroller = '';
   }
 
   void editTaskConfirmation(BuildContext context, taskByDate task) {
@@ -584,7 +597,7 @@ class TaskViewModel with ChangeNotifier {
 
 int combineDateAndTime(String? date, String? time) {
   if (date == null || time == null) {
-    throw ArgumentError("Date and time must not be null.");
+    return 0;
   }
 
   time = time.replaceAll('\u202F', ' ');
@@ -593,17 +606,113 @@ int combineDateAndTime(String? date, String? time) {
   DateTime parsedTime = DateFormat("h:mm a").parse(time.toString());
   print(parsedTime);
 
-  // Convert to local time zone (if needed)
-  DateTime combinedDateTime = DateTime(
-    parsedDate.year,
-    parsedDate.month,
-    parsedDate.day,
-    parsedTime.hour,
-    parsedTime.minute,
+  try {
+    DateTime combinedDateTime = DateTime(
+      parsedDate.year,
+      parsedDate.month,
+      parsedDate.day,
+      parsedTime.hour,
+      parsedTime.minute,
+    );
+
+    // Convert to UTC before getting milliseconds since epoch
+    int millisecondsSinceEpoch =
+        combinedDateTime.toUtc().millisecondsSinceEpoch;
+
+    return millisecondsSinceEpoch;
+  } catch (e) {
+    // Handle the exception, e.g., show an error message
+    print("Error parsing time: $e");
+    return 0; // Return a value that indicates an error
+  }
+}
+
+Future<Uint8List?> generatePdfContent(TaskViewModel taskcontroller) async {
+  final pdf = pdfWidgets.Document();
+
+  final headingStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.bold,
   );
 
-  // Convert to UTC before getting milliseconds since epoch
-  int millisecondsSinceEpoch = combinedDateTime.toUtc().millisecondsSinceEpoch;
+  final dataStyle = pdfWidgets.TextStyle(
+    fontSize: 20,
+    fontWeight: pdfWidgets.FontWeight.normal,
+  );
 
-  return millisecondsSinceEpoch;
+  pdf.addPage(
+    pdfWidgets.Page(
+      build: (context) {
+        return pdfWidgets.Column(
+          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+          children: [
+            pdfWidgets.Row(
+              mainAxisAlignment: pdfWidgets.MainAxisAlignment.center,
+              children: [
+                pdfWidgets.Text(
+                  'Task Report',
+                  style: pdfWidgets.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pdfWidgets.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            pdfWidgets.Text(
+              'Task Title:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.taskTitlecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Description:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.taskDescriptioncontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Estimated Time:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.estimatedTimecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Price:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Text(
+              taskcontroller.pricecontroller.text,
+              style: dataStyle, // Use data style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 20)),
+            pdfWidgets.Text(
+              'Assigned To:',
+              style: headingStyle, // Use heading style
+            ),
+            pdfWidgets.Padding(padding: pdfWidgets.EdgeInsets.only(top: 10)),
+            pdfWidgets.Column(
+              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+              children: taskcontroller._filteredUsers.map((user) {
+                return pdfWidgets.Text(
+                  user.name.toString(),
+                  style: dataStyle,
+                );
+              }).toList(),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
+  return pdf.save();
 }

@@ -32,6 +32,7 @@ class SubAssignTask extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
+                        controller.clearSubTaskData();
                       },
                       child: CircleAvatar(
                         radius: 18.r,
