@@ -134,7 +134,8 @@ class NetworkHelper {
 }
 
 class ApiUrls {
-  static const String baseUrl = "http://localhost:4000/api/v1";
+  static const String baseUrl =
+      "https://scfpk19fy8.execute-api.us-east-2.amazonaws.com/production/api/v1/";
 
   //For Users
   String login = "$baseUrl/userLogin";

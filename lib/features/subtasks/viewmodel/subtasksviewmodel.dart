@@ -1,4 +1,3 @@
-import 'package:erick/features/onboarding/model/user.dart';
 import 'package:erick/features/subtasks/view/editsubtasks.dart';
 import 'package:erick/features/tasks/model/tasks.dart';
 import 'package:erick/features/tasks/model/usermember.dart';
@@ -41,6 +40,7 @@ class SubTaskViewModel with ChangeNotifier {
 
   SubTaskViewModel() {
     getmembers();
+    filteredUsers = _users;
   }
 
   Future<void> hideLoader(BuildContext context) async {
@@ -201,13 +201,13 @@ class SubTaskViewModel with ChangeNotifier {
   }
 
   deleteSubTask(context, SubTasks taskid) async {
-    //showLoader(context);
+    showLoader(context);
     final response = await NetworkHelper()
         .deleteApi("${ApiUrls().deletesubtasks}/${taskid.sId}");
     print(taskid.sId);
     if (response.statusCode == 200) {
       hideLoader(context);
-      showtoast('Task deleted successfully');
+      showtoast(' SubTask deleted successfully');
     } else {
       hideLoader(context);
       showtoast('Failed to delete the task');
@@ -315,7 +315,6 @@ class SubTaskViewModel with ChangeNotifier {
     try {
       final response = await NetworkHelper().getApi(ApiUrls().getuser);
       logger.d(response.body);
-// Generate PDF after loading user data
       final pdfContent = await generatePdfContent(this);
       if (pdfContent != null) {
         // Store the PDF content in a variable for later use
@@ -325,10 +324,22 @@ class SubTaskViewModel with ChangeNotifier {
         final jsonBody = json.decode(response.body);
         logger.d(jsonBody['data']);
 
-        _filteredUsers = jsonBody['data']
+        _users = jsonBody['data']
             .map<userListData>((m) => userListData.fromJson(m))
             .toList();
-        _filteredUsers = _filteredUsers.toList();
+
+        // Sync the selected status between _users and _filteredUsers
+        for (var user in _users) {
+          final filteredUserIndex = _filteredUsers
+              .indexWhere((filteredUser) => filteredUser.sId == user.sId);
+          if (filteredUserIndex != -1) {
+            user.selected = _filteredUsers[filteredUserIndex].selected;
+          }
+        }
+
+        // Assign _users to _filteredUsers
+        _filteredUsers = _users.toList();
+
         notifyListeners();
       } else {
         // Handle the case when the API response indicates an error

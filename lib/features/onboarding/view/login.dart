@@ -216,141 +216,141 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  30.verticalSpace,
-                  Text(
-                    'OR',
-                    style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  30.verticalSpace,
-                  Container(
-                    width: 447.w,
-                    decoration: BoxDecoration(
-                        color: const Color(0xff9FE870),
-                        borderRadius: BorderRadius.all(Radius.circular(4.r))),
-                    child: Padding(
-                      padding: EdgeInsets.all(9.w),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/apple.png',
-                              color: Colors.white,
-                              width: 15.w,
-                            ),
-                            5.horizontalSpace,
-                            SizedBox(
-                              width: 60.w,
-                              child: Text(
-                                'APPLE',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14.sp),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  15.verticalSpace,
-                  Container(
-                    width: 447.w,
-                    decoration: BoxDecoration(
-                        color: const Color(0xff9FE870),
-                        borderRadius: BorderRadius.all(Radius.circular(4.r))),
-                    child: Padding(
-                      padding: EdgeInsets.all(9.w),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/facebook.png',
-                              color: Colors.white,
-                              width: 15.w,
-                            ),
-                            5.horizontalSpace,
-                            SizedBox(
-                              width: 60.w,
-                              child: Text(
-                                'FACEBOOK',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14.sp),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  15.verticalSpace,
-                  Container(
-                    width: 447.w,
-                    decoration: BoxDecoration(
-                        color: const Color(0xff9FE870),
-                        borderRadius: BorderRadius.all(Radius.circular(4.r))),
-                    child: Padding(
-                      padding: EdgeInsets.all(9.w),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/icons/google.png',
-                              color: Colors.white,
-                              width: 15.w,
-                            ),
-                            5.horizontalSpace,
-                            SizedBox(
-                              width: 60.w,
-                              child: Text(
-                                'GOOGLE',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 14.sp),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  30.verticalSpace,
-                  SizedBox(
-                    width: 447.w,
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Don't you have an account ? ",
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 16.sp),
-                          ),
-                          5.horizontalSpace,
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const RegisterScreen()),
-                              );
-                            },
-                            child: Text(
-                              'Create One',
-                              style: TextStyle(
-                                  color: const Color(0xff9FE870),
-                                  fontSize: 16.sp),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // 30.verticalSpace,
+                  // Text(
+                  //   'OR',
+                  //   style: TextStyle(
+                  //       fontSize: 16.sp,
+                  //       color: Colors.black,
+                  //       fontWeight: FontWeight.bold),
+                  // ),
+                  // 30.verticalSpace,
+                  // Container(
+                  //   width: 447.w,
+                  //   decoration: BoxDecoration(
+                  //       color: const Color(0xff9FE870),
+                  //       borderRadius: BorderRadius.all(Radius.circular(4.r))),
+                  //   child: Padding(
+                  //     padding: EdgeInsets.all(9.w),
+                  //     child: Center(
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Image.asset(
+                  //             'assets/icons/apple.png',
+                  //             color: Colors.white,
+                  //             width: 15.w,
+                  //           ),
+                  //           5.horizontalSpace,
+                  //           SizedBox(
+                  //             width: 60.w,
+                  //             child: Text(
+                  //               'APPLE',
+                  //               style: TextStyle(
+                  //                   color: Colors.white, fontSize: 14.sp),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // 15.verticalSpace,
+                  // Container(
+                  //   width: 447.w,
+                  //   decoration: BoxDecoration(
+                  //       color: const Color(0xff9FE870),
+                  //       borderRadius: BorderRadius.all(Radius.circular(4.r))),
+                  //   child: Padding(
+                  //     padding: EdgeInsets.all(9.w),
+                  //     child: Center(
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Image.asset(
+                  //             'assets/icons/facebook.png',
+                  //             color: Colors.white,
+                  //             width: 15.w,
+                  //           ),
+                  //           5.horizontalSpace,
+                  //           SizedBox(
+                  //             width: 60.w,
+                  //             child: Text(
+                  //               'FACEBOOK',
+                  //               style: TextStyle(
+                  //                   color: Colors.white, fontSize: 14.sp),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // 15.verticalSpace,
+                  // Container(
+                  //   width: 447.w,
+                  //   decoration: BoxDecoration(
+                  //       color: const Color(0xff9FE870),
+                  //       borderRadius: BorderRadius.all(Radius.circular(4.r))),
+                  //   child: Padding(
+                  //     padding: EdgeInsets.all(9.w),
+                  //     child: Center(
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Image.asset(
+                  //             'assets/icons/google.png',
+                  //             color: Colors.white,
+                  //             width: 15.w,
+                  //           ),
+                  //           5.horizontalSpace,
+                  //           SizedBox(
+                  //             width: 60.w,
+                  //             child: Text(
+                  //               'GOOGLE',
+                  //               style: TextStyle(
+                  //                   color: Colors.white, fontSize: 14.sp),
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // 30.verticalSpace,
+                  // SizedBox(
+                  //   width: 447.w,
+                  //   child: Align(
+                  //     alignment: Alignment.topRight,
+                  //     child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.end,
+                  //       children: [
+                  //         Text(
+                  //           "Don't you have an account ? ",
+                  //           style:
+                  //               TextStyle(color: Colors.black, fontSize: 16.sp),
+                  //         ),
+                  //         5.horizontalSpace,
+                  //         GestureDetector(
+                  //           onTap: () {
+                  //             Navigator.push(
+                  //               context,
+                  //               MaterialPageRoute(
+                  //                   builder: (context) =>
+                  //                       const RegisterScreen()),
+                  //             );
+                  //           },
+                  //           child: Text(
+                  //             'Create One',
+                  //             style: TextStyle(
+                  //                 color: const Color(0xff9FE870),
+                  //                 fontSize: 16.sp),
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

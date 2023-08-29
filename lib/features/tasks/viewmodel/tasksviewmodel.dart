@@ -51,6 +51,7 @@ class TaskViewModel with ChangeNotifier {
 
   TaskViewModel() {
     getmembers();
+    filteredUsers = _users;
 
     //clearSelectedTime();
   }
@@ -193,6 +194,7 @@ class TaskViewModel with ChangeNotifier {
   }
 
   deleteTask(context, taskByDate task) async {
+    showLoader(context);
     final response =
         await NetworkHelper().deleteApi("${ApiUrls().deletetask}/${task.sId}");
     if (response.statusCode == 200) {
@@ -325,7 +327,7 @@ class TaskViewModel with ChangeNotifier {
         }
 
         // Assign _users to _filteredUsers
-        _filteredUsers = _filteredUsers.toList();
+        _filteredUsers = _users.toList();
 
         notifyListeners();
       } else {

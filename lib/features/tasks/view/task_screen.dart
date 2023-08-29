@@ -72,6 +72,8 @@ class TaskScreen extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context, true);
+                              taskcontroller.clearTaskData();
+                              subtaskcontroller.clearSubTaskData();
                             },
                             child: Container(
                               child: const Icon(Icons.arrow_back),
